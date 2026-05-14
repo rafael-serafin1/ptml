@@ -1,3 +1,4 @@
+module Stacks
 #load "token.fsx"
 open Token
 

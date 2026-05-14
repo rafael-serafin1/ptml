@@ -22,7 +22,6 @@ type Token = {
     children: Token[] option
 }
 
-
 type LexToken =
     | ProcInst of string
     | Comment of string

@@ -1,11 +1,9 @@
-#load "token.fsx"
 #load "stacks.fsx"
+
 open Token
-open Stacks
-open System.IO
 
 // existing tags
-let validTags = ["text"; "row"; "column"; "box"]
+let tags = ["text"; "row"; "column"; "box"]
 
 let rec lex (input: string) (pos: int) (acc: list<LexToken>) : list<LexToken> =
     if pos >= input.Length then acc |> List.rev
@@ -18,9 +16,10 @@ let rec lex (input: string) (pos: int) (acc: list<LexToken>) : list<LexToken> =
                     // processing instruction
                     let start = pos
                     let mutable endPos = pos + 2
-                    while endPos < input.Length && not (input.[endPos] = '!' && endPos + 1 < input.Length && input.[endPos + 1] = '>') do
+                    while endPos + 1 < input.Length && not (input.[endPos] = '?' && input.[endPos + 1] = '>') do
                         endPos <- endPos + 1
-                    endPos <- endPos + 2
+                    if endPos + 1 < input.Length then
+                        endPos <- endPos + 2
                     let pi = input.[start..endPos - 1]
                     lex input endPos (ProcInst pi :: acc)
                 | '/' ->
@@ -30,7 +29,6 @@ let rec lex (input: string) (pos: int) (acc: list<LexToken>) : list<LexToken> =
                     while endPos < input.Length && input.[endPos] <> '>' do
                         endPos <- endPos + 1
                     let tag = input.[start..endPos - 1].Trim()
-                    if not (List.contains tag validTags) then failwith $"Invalid end tag: {tag}"
                     lex input (endPos + 1) (EndTag tag :: acc)
                 | '!' when pos + 3 < input.Length && input.[pos + 2] = '-' && input.[pos + 3] = '-' ->
                     // comment
@@ -78,7 +76,6 @@ let rec lex (input: string) (pos: int) (acc: list<LexToken>) : list<LexToken> =
                     // skip '>'
                     if tagPos < input.Length && input.[tagPos] = '>' then tagPos <- tagPos + 1
                     // validate tag name
-                    if not (List.contains tagName validTags) then failwith $"Invalid start tag: {tagName}"
                     lex input tagPos (StartTag (tagName, selfClosing, attrs |> List.rev) :: acc)
             else
                 // invalid, treat as text
@@ -91,9 +88,3 @@ let rec lex (input: string) (pos: int) (acc: list<LexToken>) : list<LexToken> =
                 endPos <- endPos + 1
             let text = input.[start..endPos - 1]
             lex input endPos (Text text :: acc)
-
-let path: string = "index.ptml"
-let content = File.ReadAllText(path)
-let tokens = lex content 0 []
-for token in tokens do
-    printfn "%A" token

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 run:
-	dotnet fsi lexer.fsx
+	dotnet fsi runtime.fsx
 
 test:
 	dotnet fsi ./tests/first-impression/tests.fsx

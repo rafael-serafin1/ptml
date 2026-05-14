@@ -1,3 +1,5 @@
-<?ptml encoding="UTF-8" terminal-resize="reflow"!>
-<text foreground="red" background="cyan">Hello World!</text>
-<!-- Processamento de Ideias -->
+<?ptml encoding="UTF-8" terminal-resize="reflow"?>
+<box border="single">
+    <text foreground="red">Hello World!</text>
+</box>
+<!-- Sintaxe corrigida -->

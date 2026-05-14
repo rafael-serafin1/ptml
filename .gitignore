@@ -4,3 +4,10 @@
 *.tmp
 *.temp
 .fake
+
+# dirs
+/logs
+/hazard
+/prompt
+/node_modules
+/.vscode
