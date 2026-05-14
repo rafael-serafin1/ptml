@@ -1,0 +1,11 @@
+# txt files
+*.txt text
+*.md text
+*.brainstorm text
+*.log text
+
+# Binary files
+*.bin binary
+*.exe binary
+*.dll binary
+*.jpg binary

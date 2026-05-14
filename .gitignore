@@ -1,0 +1,6 @@
+# files
+*.brainstorm
+*.log
+*.tmp
+*.temp
+.fake
