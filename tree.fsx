@@ -1,4 +1,5 @@
 module Tree
+#load "parser.fsx"
 open Token
 
 type AstNode =
