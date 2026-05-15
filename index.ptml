@@ -1,5 +1,7 @@
 <?ptml encoding="UTF-8" terminal-resize="reflow"?>
-<box border="single">
-    <text foreground="red">Hello World!</text>
+<box border="single" width="15" height="5">
+    <box border="single">
+        <text foreground="red">Hello World!</text>
+    </box>
 </box>
 <!-- Sintaxe corrigida -->
