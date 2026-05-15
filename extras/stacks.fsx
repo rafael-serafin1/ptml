@@ -1,5 +1,5 @@
 module Stacks
-#load "token.fsx"
+#load "../token.fsx"
 open Token
 
 [<Struct>]

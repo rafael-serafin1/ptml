@@ -1,5 +1,4 @@
-#load "stacks.fsx"
-
+#load "./extras/stacks.fsx"
 open Token
 
 // existing tags
