@@ -169,6 +169,49 @@ Exemplo:
 |  Red John  |
 ```
 
+***connected***:
+Atributo booleano que define se os filhos do elemento-pai `<row>` teram continuidade ou não.
+
+Exemplo:
+**SEM**
+- Input
+```ptml
+<row>
+    <box border="single">
+        <text>Hello World!</text>
+    </box>
+    <box border="single">
+        <text>GoodBye World!</text>
+    </box>
+</row>
+```
+
+- Output
+```cmd
+┌────────────┐┌──────────────┐
+│Hello World!││GoodBye World!│
+└────────────┘└──────────────┘
+```
+
+**COM**
+- Input
+```ptml
+<row connected>
+    <box border="single">
+        <text>Hello World!</text>
+    </box>
+    <box border="single">
+        <text>GoodBye World!</text>
+    </box>
+</row>
+```
+
+- Output
+```cmd
+┌────────────┬──────────────┐
+│Hello World!│GoodBye World!│
+└────────────┴──────────────┘
+```
 
 ---
 ## Elemento `<column>`
@@ -243,6 +286,121 @@ Exemplo:
 |  Red|
 |     |
 | John|
+```
+
+***connected***:
+Atributo booleano que define se os filhos do elemento-pai `<row>` teram continuidade ou não.
+
+Exemplo: <br />
+**SEM**
+- Input
+```ptml
+<column>
+    <row connected>
+        <box border="single">
+            <text>Hello World!</text>
+        </box>
+        <box border="single">
+            <text>GoodBye World!</text>
+        </box>
+    </row>
+    <row connected>
+        <box border="single">
+            <text>Hello World!</text>
+        </box>
+        <box border="single">
+            <text>GoodBye World!</text>
+        </box>
+    </row>
+</column>
+```
+
+- Output
+```cmd
+┌────────────┐┌──────────────┐
+│Hello World!││GoodBye World!│
+└────────────┘└──────────────┘
+┌────────────┐┌──────────────┐
+│Hello World!││GoodBye World!│
+└────────────┘└──────────────┘
+```
+
+**COM (APENAS NO COLUMN)**
+- Input
+```ptml
+<column connected>
+    <row>
+        <box border="single">
+            <text>Hello World!</text>
+        </box>
+        <box border="single">
+            <text>GoodBye World!</text>
+        </box>
+    </row>
+    <row>
+        <box border="single">
+            <text>Hello World!</text>
+        </box>
+        <box border="single">
+            <text>GoodBye World!</text>
+        </box>
+    </row>
+</column>
+```
+
+- Output
+```cmd
+┌────────────┐┌──────────────┐
+│Hello World!││GoodBye World!│
+├────────────┤├──────────────┤
+│Hello World!││GoodBye World!│
+└────────────┘└──────────────┘
+```
+
+**COM (ROW E COLUMN)**
+- Input
+```ptml
+<column connected>
+    <row connected>
+        <box border="single">
+            <text>Hello World!</text>
+        </box>
+        <box border="single">
+            <text>GoodBye World!</text>
+        </box>
+    </row>
+    <row connected>
+        <box border="single">
+            <text>Hello World!</text>
+        </box>
+        <box border="single">
+            <text>GoodBye World!</text>
+        </box>
+    </row>
+</column>
+```
+
+- Output
+```cmd
+┌────────────┬──────────────┐
+│Hello World!│GoodBye World!│
+├────────────┼──────────────┤
+│Hello World!│GoodBye World!│
+└────────────┴──────────────┘
+```
+
+---
+<!-- IGNORE ESSE ELEMENTO -->
+## Elemento `<depth>`
+
+`<depth></depth>`
+
+
+```cmd
+┌────────────┐
+│┌───────────┴┐
+└┤Hello World!│
+ └────────────┘
 ```
 
 ---

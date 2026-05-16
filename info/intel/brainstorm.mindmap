@@ -218,6 +218,34 @@
               "fontSize": "16px"
             },
             "isFolded": false
+          },
+          {
+            "id": "be242f1b-9ff8-4e60-815b-782eb2a0f870",
+            "topic": "connected",
+            "children": [
+              {
+                "id": "a71d0ddc-c8a0-4f50-bddc-a58a78f74527",
+                "topic": "true",
+                "style": {
+                  "fontSize": "16px",
+                  "color": "#E67E22"
+                },
+                "isFolded": false
+              },
+              {
+                "id": "c3a5a3ee-41a1-4f53-bbb6-e1eb667a7977",
+                "topic": "false",
+                "style": {
+                  "fontSize": "16px",
+                  "color": "#2ECC71"
+                },
+                "isFolded": false
+              }
+            ],
+            "style": {
+              "fontSize": "16px"
+            },
+            "isFolded": false
           }
         ],
         "style": {
@@ -323,6 +351,34 @@
                 "style": {
                   "fontSize": "16px",
                   "color": "#E67E22"
+                },
+                "isFolded": false
+              }
+            ],
+            "style": {
+              "fontSize": "16px"
+            },
+            "isFolded": false
+          },
+          {
+            "id": "84c352e8-b75d-491b-9e0c-09711b49b473",
+            "topic": "connected",
+            "children": [
+              {
+                "id": "0e41a3e9-59b2-4942-9c51-13a3f5d833d2",
+                "topic": "true",
+                "style": {
+                  "fontSize": "16px",
+                  "color": "#E67E22"
+                },
+                "isFolded": false
+              },
+              {
+                "id": "f38a0aa0-88d9-4323-bea5-d9bb0cb047d0",
+                "topic": "false",
+                "style": {
+                  "fontSize": "16px",
+                  "color": "#2ECC71"
                 },
                 "isFolded": false
               }
@@ -648,5 +704,8 @@
     "isFolded": false
   },
   "theme": "colorful",
-  "selectedIds": []
+  "selectedId": "be242f1b-9ff8-4e60-815b-782eb2a0f870",
+  "selectedIds": [
+    "be242f1b-9ff8-4e60-815b-782eb2a0f870"
+  ]
 }
