@@ -1,5 +1,8 @@
 #load "parser.fsx"
+#load "buffer.fsx"
 #load "diff.fsx"
+#load "output.fsx"
+open System
 open System.IO
 open Lexer          (*LEXER*)
 open Parser         (*PARSER*)
@@ -7,7 +10,8 @@ open Tree           (*AST & SEMANTIC TREE*)
 open Layout         (*LAYOUT PASS*)
 open Render         (*TREE RENDER*)
 open Buffer         (*TERMINAL BUFFER*)
-open Diff           (*DIFF ENGINNE*)
+open Diff           (*DIFF ENGINE*)
+open Output        
 
 type Status = 
     | SUCCESS = 0
@@ -24,6 +28,7 @@ let run(): Status =
     let layout = layoutTree semantic
     let renderOps = renderTree layout
     let buffer = processRenderTree renderOps 80 24
+    let emptyBuffer = createBuffer 80 24
 
     printfn "Tokens:\n%A" tokens
     printfn "\nAST:\n%A" ast
@@ -35,5 +40,17 @@ let run(): Status =
         for x in 0 .. Array2D.length2 buffer - 1 do
             printf "%s" buffer.[y, x].char
         printfn ""
+
+    printfn "\nDiff from empty screen to current screen:"
+    Diff.diffBuffers emptyBuffer buffer
+    |> Diff.diffToLines
+    |> List.iter (printfn "%s")
+
+    printfn "\nRendering ANSI output to terminal..."
+    Console.Write("\x1b[2J\x1b[H")
+    Output.printAnsiBuffer buffer
+    printfn ""
+
     Status.SUCCESS
+
 run()

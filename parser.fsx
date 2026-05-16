@@ -4,7 +4,8 @@ module Parser
 open Token
 
 let validTags = Set.ofList ["text"; "row"; "column"; "box"]
-let colorValues = Set.ofList ["none"; "black"; "red"; "green"; "gold"; "blue"; "purple"; "cyan"; "fire"; "limegreen"; "yellow"; "lightblue"; "lilac"; "crystal"; "gray"; "lightgray"]
+let colorValues = Set.ofList ["none"; "black"; "red"; "green"; "gold"; "blue"; "purple"; "cyan"; "fire"; "limegreen"; "yellow"; "lightblue"; "lilac"; "crystal"; "gray"; "lightgray"; "white"]
+let fontValues = Set.ofList ["none"; "bold"; "dim"; "italic"; "underline"; "slowblink"; "rapidblink"; "reverse"; "conceal"; "strikethrough"]
 let overflowValues = Set.ofList ["break"; "wrap"; "cut"; "clip"]
 let alignValues = Set.ofList ["start"; "center"; "end"]
 let borderValues = Set.ofList ["single"; "double"; "bold"; "rounded"; "ascii"; "none"]
@@ -14,6 +15,7 @@ let validAttributes = Map.ofList [
     "text", Map.ofList [
         "foreground", colorValues
         "background", colorValues
+        "font", fontValues
     ]
     "row", Map.ofList [
         "overflow", overflowValues

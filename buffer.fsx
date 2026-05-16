@@ -1,3 +1,5 @@
+module Buffer
+
 (* TERMINAL BUFFER LOGIC *)
 #load "render.fsx"
 open Render
@@ -29,17 +31,17 @@ type ConsoleFont =
 (* BUFFER *)
 type Cell = {
     char: string
-    foreground: ConsoleColor 
-    background: ConsoleColor
-    font: ConsoleFont
+    foreground: string option
+    background: string option
+    font: string option
 }
 
 (* EMPTY CELL *)
 let emptyCell: Cell = {
     char = " "
-    foreground = ConsoleColor.None
-    background = ConsoleColor.None
-    font = ConsoleFont.None
+    foreground = None
+    background = None
+    font = None
 }
 
 (* BUFFER INITIALIZATION *)
@@ -72,10 +74,10 @@ let clearBuffer buffer =
 let renderToBuffer buffer renderOps =
     renderOps |> List.iter (fun op ->
         match op with
-        | Render.DrawChar(text, x, y) ->
+        | Render.DrawChar(text, x, y, fg, bg, font) ->
             text
                 |> Seq.iteri (fun offset ch ->
-                    setCell buffer (x + offset) y (string ch) ConsoleColor.None ConsoleColor.None ConsoleFont.None)
+                    setCell buffer (x + offset) y (string ch) fg bg font)
     )
     buffer
 

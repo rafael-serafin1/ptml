@@ -32,11 +32,12 @@ let rec private shiftWidget dx dy widget =
     match widget with
     | PositionedTextWidget(text, fg, bg, font, metrics) -> PositionedTextWidget(text, fg, bg, font, shiftMetrics metrics)
     | PositionedRowWidget(width, border, gap, align, metrics, children) ->
-        PositionedRowWidget(width, border, gap, align, shiftMetrics metrics, children |> List.map (shiftWidget dx dy))
+        PositionedRowWidget(width, border, gap, align, shiftMetrics metrics, children)
     | PositionedColumnWidget(width, border, gap, yAlign, metrics, children) ->
-        PositionedColumnWidget(width, border, gap, yAlign, shiftMetrics metrics, children |> List.map (shiftWidget dx dy))
+        PositionedColumnWidget(width, border, gap, yAlign, shiftMetrics metrics, children)
     | PositionedBoxWidget(width, height, border, borderColor, align, metrics, children) ->
-        PositionedBoxWidget(width, height, border, borderColor, align, shiftMetrics metrics, children |> List.map (shiftWidget dx dy))
+        PositionedBoxWidget(width, height, border, borderColor, align, shiftMetrics metrics, children)
+
 
 let private alignOffset containerSize childSize alignOption =
     match alignOption with
@@ -52,6 +53,20 @@ let rec layoutWidget widget parentWidth parentHeight =
         | PositionedColumnWidget(_, _, _, _, m, _)
         | PositionedBoxWidget(_, _, _, _, _, m, _) -> m
 
+    let totalWidth widget =
+        let metrics = metricsOf widget
+        match widget with
+        | PositionedBoxWidget(_, _, border, _, _, _, _) when border <> NoBorder ->
+            metrics.w + 2
+        | _ -> metrics.w
+
+    let totalHeight widget =
+        let metrics = metricsOf widget
+        match widget with
+        | PositionedBoxWidget(_, _, border, _, _, _, _) when border <> NoBorder ->
+            metrics.h + 2
+        | _ -> metrics.h
+
     match widget with
     (* Layout logic for each widget type *)
     (* Entra em loop até chegar aqui     *)
@@ -62,8 +77,8 @@ let rec layoutWidget widget parentWidth parentHeight =
 
     | RowWidget(width, border, gap, align, children) ->
         let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
-        let childWidths = positionedChildren |> List.map (fun child -> (metricsOf child).w)
-        let childHeights = positionedChildren |> List.map (fun child -> (metricsOf child).h)
+        let childWidths = positionedChildren |> List.map totalWidth
+        let childHeights = positionedChildren |> List.map totalHeight
         let totalChildWidth = if List.isEmpty childWidths then 0 else List.sum childWidths + gap * (List.length childWidths - 1)
         let maxChildHeight = if List.isEmpty childHeights then 0 else List.max childHeights
         let resolvedWidth = resolveDimension width parentWidth totalChildWidth
@@ -73,18 +88,19 @@ let rec layoutWidget widget parentWidth parentHeight =
                 match children with
                 | [] -> List.rev acc
                 | child :: rest ->
-                    let childMetrics = metricsOf child
-                    let yOffset = alignOffset resolvedHeight childMetrics.h align
+                    let childTotalWidth = totalWidth child
+                    let childTotalHeight = totalHeight child
+                    let yOffset = alignOffset resolvedHeight childTotalHeight align
                     let positioned = shiftWidget xOffset yOffset child
-                    let nextX = xOffset + childMetrics.w + gap
+                    let nextX = xOffset + childTotalWidth + gap
                     place rest nextX (positioned :: acc)
             place positionedChildren 0 []
         PositionedRowWidget(width, border, gap, align, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
 
     | ColumnWidget(width, border, gap, yAlign, children) ->
         let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
-        let childWidths = positionedChildren |> List.map (fun child -> (metricsOf child).w)
-        let childHeights = positionedChildren |> List.map (fun child -> (metricsOf child).h)
+        let childWidths = positionedChildren |> List.map totalWidth
+        let childHeights = positionedChildren |> List.map totalHeight
         let maxChildWidth = if List.isEmpty childWidths then 0 else List.max childWidths
         let totalChildHeight = if List.isEmpty childHeights then 0 else List.sum childHeights + gap * (List.length childHeights - 1)
         let resolvedWidth = resolveDimension width parentWidth maxChildWidth
@@ -94,27 +110,28 @@ let rec layoutWidget widget parentWidth parentHeight =
                 match children with
                 | [] -> List.rev acc
                 | child :: rest ->
-                    let childMetrics = metricsOf child
-                    let xOffset = alignOffset resolvedWidth childMetrics.w yAlign
+                    let childTotalWidth = totalWidth child
+                    let childTotalHeight = totalHeight child
+                    let xOffset = alignOffset resolvedWidth childTotalWidth yAlign
                     let positioned = shiftWidget xOffset yOffset child
-                    let nextY = yOffset + childMetrics.h + gap
+                    let nextY = yOffset + childTotalHeight + gap
                     place rest nextY (positioned :: acc)
             place positionedChildren 0 []
         PositionedColumnWidget(width, border, gap, yAlign, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
 
     | BoxWidget(width, height, border, borderColor, align, children) ->
         let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
-        let childWidths = positionedChildren |> List.map (fun child -> (metricsOf child).w)
-        let childHeights = positionedChildren |> List.map (fun child -> (metricsOf child).h)
+        let childWidths = positionedChildren |> List.map totalWidth
+        let childHeights = positionedChildren |> List.map totalHeight
         let maxChildWidth = if List.isEmpty childWidths then 0 else List.max childWidths
-        let totalChildHeight = if List.isEmpty childHeights then 0 else List.sum childHeights
+        let totalChildHeight = if List.isEmpty childHeights then 0 else List.max childHeights
         let resolvedWidth = resolveDimension width parentWidth maxChildWidth
         let resolvedHeight = resolveDimension height parentHeight totalChildHeight
         let positionedChildren =
             positionedChildren
             |> List.map (fun child ->
-                let childMetrics = metricsOf child
-                let xOffset = alignOffset resolvedWidth childMetrics.w align
+                let childTotalWidth = totalWidth child
+                let xOffset = alignOffset resolvedWidth childTotalWidth align
                 shiftWidget xOffset 0 child)
         PositionedBoxWidget(width, height, border, borderColor, align, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
 

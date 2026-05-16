@@ -24,6 +24,29 @@ type Border =
     | Ascii
     | NoBorder
 
+type Colors =
+    | None = 0
+    | Black = 30
+    | Red = 31
+    | Green = 32
+    | Gold = 33
+    | Blue = 34
+    | Purple = 35
+    | Cyan = 36
+    | White = 37
+
+type Fonts =
+    | None = 0
+    | Bold = 1
+    | Dim = 2
+    | Italic = 3
+    | UnderLine = 4
+    | SlowBlink = 5
+    | RapidBlink = 6
+    | Marked = 7
+    | Conceal = 8
+    | StrikeThrough = 9
+
 // discriminated union for semantic tree
 type Widget =
     | TextWidget of text:string * foreground:string option * background:string option * font:string option
@@ -137,14 +160,14 @@ and buildWidget node =
             | [TextWidget(text, _, _, _)] -> TextWidget(text, fg, bg, font)
             | _ -> TextWidget(buildTextContent childrenWidgets, fg, bg, font)
         | "row" ->
-            let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue (Fixed 10)
-            let border = tryGetAttr "border" attrs |> Option.map parseBorder |> Option.defaultValue Single
+            let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
+            let border = tryGetAttr "border" attrs |> Option.map parseBorder |> Option.defaultValue NoBorder
             let gap = parseIntAttr "gap" 0 attrs
             let align = tryGetAttr "align" attrs |> Option.map parseAlign
             RowWidget(width, border, gap, align, childrenWidgets)
         | "column" ->
-            let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue (Fixed 10)
-            let border = tryGetAttr "border" attrs |> Option.map parseBorder |> Option.defaultValue Single
+            let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
+            let border = tryGetAttr "border" attrs |> Option.map parseBorder |> Option.defaultValue NoBorder
             let gap = parseIntAttr "gap" 0 attrs
             let yAlign = tryGetAttr "y-align" attrs |> Option.map parseAlign
             ColumnWidget(width, border, gap, yAlign, childrenWidgets)

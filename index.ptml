@@ -1,7 +1,13 @@
 <?ptml encoding="UTF-8" terminal-resize="reflow"?>
-<box border="single" width="15" height="5">
+<row>
     <box border="single">
-        <text foreground="red">Hello World!</text>
+        <text foreground="red" font="italic">Hello World!</text>
     </box>
-</box>
+    <box border="single">
+        <text font="italic">I'm made in PTML!</text>
+    </box>
+    <box border="single">
+        <text font="italic">GoodBye World!</text>
+    </box>
+</row>
 <!-- Sintaxe corrigida -->

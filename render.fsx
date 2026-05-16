@@ -3,7 +3,7 @@ open Tree
 open Layout
 
 type RenderOperation =
-    | DrawChar of string * int * int
+    | DrawChar of string * int * int * string option * string option * string option
 
 let private borderChars border =
     match border with
@@ -14,13 +14,13 @@ let private borderChars border =
     | Ascii -> ("+", "+", "+", "+", "-", "|")
     | NoBorder -> ("", "", "", "", "", "")
 
-let private drawHorizontal xStart xEnd y char =
-    [ for x in xStart .. xEnd -> DrawChar(char, x, y) ]
+let private drawHorizontal xStart xEnd y char fore =
+    [ for x in xStart .. xEnd -> DrawChar(char, x, y, fore, None, None) ]
 
-let private drawVertical x yStart yEnd char =
-    [ for y in yStart .. yEnd -> DrawChar(char, x, y) ]
+let private drawVertical x yStart yEnd char fore =
+    [ for y in yStart .. yEnd -> DrawChar(char, x, y, fore, None, None) ]
 
-let private drawBorder x y width height border =
+let private drawBorder x y width height border borderColor =
     match border with
     | NoBorder -> []
     | _ ->
@@ -29,36 +29,36 @@ let private drawBorder x y width height border =
         let right = x + width + 1
         let top = y
         let bottom = y + height + 1
+        let fore = borderColor
 
-        [ DrawChar(topLeft, left, top)
-          DrawChar(topRight, right, top)
-          DrawChar(bottomLeft, left, bottom)
-          DrawChar(bottomRight, right, bottom) ]
-        @ drawHorizontal (left + 1) (right - 1) top horizontal
-        @ drawHorizontal (left + 1) (right - 1) bottom horizontal
-        @ drawVertical left (top + 1) (bottom - 1) vertical
-        @ drawVertical right (top + 1) (bottom - 1) vertical
+        [ DrawChar(topLeft, left, top, fore, None, None)
+          DrawChar(topRight, right, top, fore, None, None)
+          DrawChar(bottomLeft, left, bottom, fore, None, None)
+          DrawChar(bottomRight, right, bottom, fore, None, None) ]
+        @ drawHorizontal (left + 1) (right - 1) top horizontal fore
+        @ drawHorizontal (left + 1) (right - 1) bottom horizontal fore
+        @ drawVertical left (top + 1) (bottom - 1) vertical fore
+        @ drawVertical right (top + 1) (bottom - 1) vertical fore
 
 let rec private renderWidget offsetX offsetY widget =
-    let renderChildren border metrics children =
+    match widget with
+    | PositionedTextWidget(text, fg, bg, font, metrics) ->
+        [ DrawChar(text, offsetX + metrics.x, offsetY + metrics.y, fg, bg, font) ]
+
+    | PositionedRowWidget(_, _, _, _, metrics, children)
+    | PositionedColumnWidget(_, _, _, _, metrics, children) ->
         let baseX = offsetX + metrics.x
         let baseY = offsetY + metrics.y
-        let contentX = if border = NoBorder then baseX else baseX + 1
-        let contentY = if border = NoBorder then baseY else baseY + 1
-        let borderOps = drawBorder baseX baseY metrics.w metrics.h border
-        let childOps = children |> List.collect (renderWidget contentX contentY)
-        if border = NoBorder then childOps else borderOps @ childOps
+        children |> List.collect (renderWidget baseX baseY)
 
-    match widget with
-    | PositionedTextWidget(text, _, _, _, metrics) ->
-        [ DrawChar(text, offsetX + metrics.x, offsetY + metrics.y) ]
-
-    | PositionedRowWidget(_, border, _, _, metrics, children)
-    | PositionedColumnWidget(_, border, _, _, metrics, children) ->
-        renderChildren border metrics children
-
-    | PositionedBoxWidget(_, _, border, _, _, metrics, children) ->
-        renderChildren border metrics children
+    | PositionedBoxWidget(_, _, border, borderColor, _, metrics, children) ->
+        let baseX = offsetX + metrics.x
+        let baseY = offsetY + metrics.y
+        let borderOps = drawBorder baseX baseY metrics.w metrics.h border borderColor
+        let childBaseX = if border <> NoBorder then baseX + 1 else baseX
+        let childBaseY = if border <> NoBorder then baseY + 1 else baseY
+        let childOps = children |> List.collect (renderWidget childBaseX childBaseY)
+        borderOps @ childOps
 
 let renderTree widgets =
     widgets |> List.collect (renderWidget 0 0)

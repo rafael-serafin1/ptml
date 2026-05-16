@@ -7,3 +7,5 @@ printfn "\x1b[6m RAPID BLINK \x1b[0m"
 printfn "\x1b[7m REVERSE \x1b[0m"
 printfn "\x1b[8m HIDDEN \x1b[0m"
 printfn "\x1b[9m STRIKETHROUGH \x1b[0m"
+
+printfn "\x1b[31m | \x1b[0m"

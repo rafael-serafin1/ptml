@@ -68,6 +68,20 @@ lightgray -- [1;37m
 ```
 **tenha em mente que essa tabela pode sofrer alterações e que são as cores esperadas para o renderer**
 
+#### *O atributo `font` faz a estilização da fonte através de valores possíveis descritos abaixo:*
+```
+0 -- reset
+1 -- bold
+2 -- dim
+3 -- italic
+4 -- underline
+5 -- slow blink
+6 -- rapid blink
+7 -- reverse                 (marked)
+8 -- conceal                 (hidden)
+9 -- strikethrough
+```
+
 ### OBS:
 Caracteres Unicode complexos como emojis por enquanto serão ignorados e apenas seu código será colocado na tela.
 
