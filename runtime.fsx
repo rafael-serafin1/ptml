@@ -8,10 +8,9 @@ open Layout         (*LAYOUT PASS*)
 open Render         (*TREE RENDER*)
 open Buffer         (*TERMINAL BUFFER*)
 
-
 let run() = 
-    let path: string = "index.ptml"
-    let input: string = File.ReadAllText(path)
+    let path: string array = Environment.GetCommandLineArgs()
+    let input: string = File.ReadAllText(path.[2])
     let tokens = lex input 0 []
     parser(tokens, [])
 

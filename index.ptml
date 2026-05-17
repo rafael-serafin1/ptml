@@ -1,5 +1,5 @@
 <?ptml encoding="UTF-8" terminal-resize="reflow"?>
-<block name="PTML">
-    <text>Hello World!</text>
+<block name="PTML" border="single">
+    <text foreground="gold">Hello World!</text>
 </block>
 <!-- Sintaxe corrigida -->

@@ -11,3 +11,6 @@
 /prompt
 /node_modules
 /.vscode
+
+# code runner logic
+runner.cpp
