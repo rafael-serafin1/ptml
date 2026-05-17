@@ -1,9 +1,6 @@
 #load "./extras/stacks.fsx"
 open Token
 
-// existing tags
-let tags = ["text"; "row"; "column"; "box"]
-
 let rec lex (input: string) (pos: int) (acc: list<LexToken>) : list<LexToken> =
     if pos >= input.Length then acc |> List.rev
     else

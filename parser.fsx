@@ -3,12 +3,12 @@ module Parser
 #load "lexer.fsx"
 open Token
 
-let validTags = Set.ofList ["text"; "row"; "column"; "box"]
+let validTags = Set.ofList ["text"; "row"; "column"; "box"; "block"]
 let colorValues = Set.ofList ["none"; "black"; "red"; "green"; "gold"; "blue"; "purple"; "cyan"; "fire"; "limegreen"; "yellow"; "lightblue"; "lilac"; "crystal"; "gray"; "lightgray"; "white"]
 let fontValues = Set.ofList ["none"; "bold"; "dim"; "italic"; "underline"; "slowblink"; "rapidblink"; "reverse"; "conceal"; "strikethrough"]
 let overflowValues = Set.ofList ["break"; "wrap"; "cut"; "clip"]
 let alignValues = Set.ofList ["start"; "center"; "end"]
-let borderValues = Set.ofList ["single"; "double"; "bold"; "rounded"; "ascii"; "none"]
+let borderValues = Set.ofList ["single"; "double"; "classic"; "bold"; "strange"; "rounded"; "ascii"; "none"]
 let terminalResizeValues = Set.ofList ["reflow"; "clip"; "static"]
 
 let validAttributes = Map.ofList [
@@ -28,6 +28,15 @@ let validAttributes = Map.ofList [
         "y-align", alignValues
     ]
     "box", Map.ofList [
+        "overflow", overflowValues
+        "border", borderValues
+        "width", Set.empty
+        "height", Set.empty
+        "border-color", colorValues
+        "align", alignValues
+    ]
+    "block", Map.ofList [
+        "name", Set.empty
         "overflow", overflowValues
         "border", borderValues
         "width", Set.empty
@@ -82,6 +91,8 @@ let rec parser(tokens, stack ) =
                                 if not (System.Int32.TryParse(value, &i)) then failwith $"Invalid {name}: {value}"
                         | _ -> ()
                 | None -> failwith $"Invalid attribute for {tag}: {name}"
+            if tag = "block" && not (List.exists (fun (name, _) -> name = "name") attrs) then
+                failwith "Missing required attribute for block: name"
         | None -> ()
         if selfClosing then
             parser(rest, stack)

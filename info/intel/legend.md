@@ -9,3 +9,5 @@ Green:
     Default Value
 Orange:
     Possible Value
+Purple:
+    Mandatory Declaration

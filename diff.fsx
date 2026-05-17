@@ -1,7 +1,6 @@
+(* DIFF ENGINE LOGIC *)
 #load "buffer.fsx"
 open Buffer
-
-(* DIFF ENGINE LOGIC *)
 
 type CellChange = {
     x: int
@@ -40,7 +39,8 @@ let diffBuffers (oldBuffer: Cell[,]) (newBuffer: Cell[,]) : CellChange list =
                     y = y
                     oldCell = oldCell
                     newCell = newCell
-                } ]
+                } 
+    ]
 
 let diffToLines diffs =
     diffs

@@ -19,7 +19,9 @@ type Align =
 type Border =
     | Single
     | Double
+    | Classic
     | Bold
+    | Strange
     | Rounded
     | Ascii
     | NoBorder
@@ -53,6 +55,7 @@ type Widget =
     | RowWidget of width:Dimension * border:Border * gap:int * align:Align option * children:Widget list
     | ColumnWidget of width:Dimension * border:Border * gap:int * yAlign:Align option * children:Widget list
     | BoxWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * align:Align option * children:Widget list
+    | BlockWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * name:string option * align:Align option * children:Widget list
 
 ///
 /// AST BUILDING
@@ -128,7 +131,9 @@ let private parseAlign = function
 let private parseBorder = function
     | "single" -> Single
     | "double" -> Double
+    | "classic" -> Classic
     | "bold" -> Bold
+    | "strange" -> Strange
     | "rounded" -> Rounded
     | "ascii" -> Ascii
     | "none" -> NoBorder
@@ -178,6 +183,14 @@ and buildWidget node =
             let borderColor = tryGetAttr "border-color" attrs
             let align = tryGetAttr "align" attrs |> Option.map parseAlign
             BoxWidget(width, height, border, borderColor, align, childrenWidgets)
+        | "block" ->
+            let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
+            let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
+            let border = tryGetAttr "border" attrs |> Option.map parseBorder |> Option.defaultValue Single
+            let borderColor = tryGetAttr "border-color" attrs
+            let name = tryGetAttr "name" attrs
+            let align = tryGetAttr "align" attrs |> Option.map parseAlign
+            BlockWidget(width, height, border, borderColor, name, align, childrenWidgets)
         | _ ->
             failwith $"Unsupported semantic tag: {tag}"
 

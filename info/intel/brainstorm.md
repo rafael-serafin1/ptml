@@ -169,50 +169,6 @@ Exemplo:
 |  Red John  |
 ```
 
-***connected***:
-Atributo booleano que define se os filhos do elemento-pai `<row>` teram continuidade ou não.
-
-Exemplo:
-**SEM**
-- Input
-```ptml
-<row>
-    <box border="single">
-        <text>Hello World!</text>
-    </box>
-    <box border="single">
-        <text>GoodBye World!</text>
-    </box>
-</row>
-```
-
-- Output
-```cmd
-┌────────────┐┌──────────────┐
-│Hello World!││GoodBye World!│
-└────────────┘└──────────────┘
-```
-
-**COM**
-- Input
-```ptml
-<row connected>
-    <box border="single">
-        <text>Hello World!</text>
-    </box>
-    <box border="single">
-        <text>GoodBye World!</text>
-    </box>
-</row>
-```
-
-- Output
-```cmd
-┌────────────┬──────────────┐
-│Hello World!│GoodBye World!│
-└────────────┴──────────────┘
-```
-
 ---
 ## Elemento `<column>`
 
@@ -288,107 +244,6 @@ Exemplo:
 | John|
 ```
 
-***connected***:
-Atributo booleano que define se os filhos do elemento-pai `<row>` teram continuidade ou não.
-
-Exemplo: <br />
-**SEM**
-- Input
-```ptml
-<column>
-    <row connected>
-        <box border="single">
-            <text>Hello World!</text>
-        </box>
-        <box border="single">
-            <text>GoodBye World!</text>
-        </box>
-    </row>
-    <row connected>
-        <box border="single">
-            <text>Hello World!</text>
-        </box>
-        <box border="single">
-            <text>GoodBye World!</text>
-        </box>
-    </row>
-</column>
-```
-
-- Output
-```cmd
-┌────────────┐┌──────────────┐
-│Hello World!││GoodBye World!│
-└────────────┘└──────────────┘
-┌────────────┐┌──────────────┐
-│Hello World!││GoodBye World!│
-└────────────┘└──────────────┘
-```
-
-**COM (APENAS NO COLUMN)**
-- Input
-```ptml
-<column connected>
-    <row>
-        <box border="single">
-            <text>Hello World!</text>
-        </box>
-        <box border="single">
-            <text>GoodBye World!</text>
-        </box>
-    </row>
-    <row>
-        <box border="single">
-            <text>Hello World!</text>
-        </box>
-        <box border="single">
-            <text>GoodBye World!</text>
-        </box>
-    </row>
-</column>
-```
-
-- Output
-```cmd
-┌────────────┐┌──────────────┐
-│Hello World!││GoodBye World!│
-├────────────┤├──────────────┤
-│Hello World!││GoodBye World!│
-└────────────┘└──────────────┘
-```
-
-**COM (ROW E COLUMN)**
-- Input
-```ptml
-<column connected>
-    <row connected>
-        <box border="single">
-            <text>Hello World!</text>
-        </box>
-        <box border="single">
-            <text>GoodBye World!</text>
-        </box>
-    </row>
-    <row connected>
-        <box border="single">
-            <text>Hello World!</text>
-        </box>
-        <box border="single">
-            <text>GoodBye World!</text>
-        </box>
-    </row>
-</column>
-```
-
-- Output
-```cmd
-┌────────────┬──────────────┐
-│Hello World!│GoodBye World!│
-├────────────┼──────────────┤
-│Hello World!│GoodBye World!│
-└────────────┴──────────────┘
-```
-
 ---
 <!-- IGNORE ESSE ELEMENTO -->
 ## Elemento `<depth>`
@@ -445,7 +300,9 @@ clip                                (recorta área renderizada final.)
 ```
 single              (┌ ┐ └ ┘ ─ │)
 double              (╔ ╗ ╚ ╝ ═ ║)
+semi-bold           (┍ ┑ ┕ ┙ ─ │)
 bold                (┏ ┓ ┗ ┛ ━ ┃)
+strange             ("╒", "╕", "╘", "╛", "═", "│" ) 
 rounded             (╭ ╮ ╰ ╯)
 ascii               (+ - |)
 none
@@ -479,3 +336,132 @@ end
 
 ### OBS:
 Textos crus existem, mas eles não causam inutilização do elemento `<text>` pelo fato de eles não possuírem outra forma de serem estilizados, mas no fim eles acabam virando nó padrão de `<text>`.
+
+--- 
+## Elemento `<block>`
+
+`<block></block>`
+Define um bloco nomeado através de um atributo obrigatório chamado `name`.
+
+Exemplo:
+- Input
+```ptml
+<block name="Status">
+    <column>
+        <text>CPU  ███████░░ 73%</text>
+        <text>RAM  ████░░░░ 41%</text>
+        <text>NET  ▲ 12MB/s</text>
+    </column>
+</block>
+```
+
+- Output
+```cmd
+┌──Status───────────┐
+│ CPU  ███████░░ 73%│
+│ RAM  ████░░░░ 41% │
+│ NET  ▲ 12MB/s     │
+└───────────────────┘
+```
+
+### **Atributos**:
+
+***name***:
+Define o nome do bloco, sendo um atributo obrigatório de ter na declaração, mas seu valor pode ser nulo.
+```ptml
+<block name="">
+    <text>Hello World!</text>
+</block>
+```
+
+***overflow***:
+Atributo que define o comportamento do container em caso de overflow de conteúdo. Caso não seja explicitado o resoluto em caso de overflow, o valor por padrão é o `break` (quebra o conteudo em uma nova linha). Valores possíveis:
+```
+break                               (quebra em qualquer caractere)
+wrap                                (quebra respeitando palavras)
+cut                                 (corta texto bruto)
+clip                                (recorta área renderizada final.)
+```
+
+***border***:
+É um renderer preset que define como a borda vai ser. Em caso de não declaração, o valor padrão é `single`. Valores possíveis:
+```
+single              (┌ ┐ └ ┘ ─ │)
+double              (╔ ╗ ╚ ╝ ═ ║)
+semi-bold           (┍ ┑ ┕ ┙ ─ │)
+bold                (┏ ┓ ┗ ┛ ━ ┃)
+strange             ("╒", "╕", "╘", "╛", "═", "│" ) 
+rounded             (╭ ╮ ╰ ╯)
+ascii               (+ - |)
+none
+```
+
+***width/height***:
+Corresponde a largura e altura do componente. Seus valores são numéricos inteiros ou específicos. Em caso de não declaração, o valor padrão é `auto` (renderiza no tamanho necessário para confortar o texto). Valores não-numéricos específicos:
+```
+auto                                    (renderiza do tamanho necessário)
+Nº%                                     (valor associado ao elemento-pai substituindo Nº por número --> percentage. Exemplo: 40%)
+```
+
+Em caso de não possuir um elemento-pai, a porcentagem será tirada do tamanho total do terminal.
+Exemplo:
+- Input
+```ptml
+<!ptml enconding="UTF-8" terminal-resize="reflow"?>
+<box width="50%" height="50%"></box>                 <!-- ocupa 50% do tamanho total do terminal, já que não possui elemento-pai -->
+```
+
+***border-color***:
+Define a cor da borda. Os valores possíveis são os mesmos do `<text>`.
+
+***align***:
+Atributo que alinha um conteúdo horizontalmente pela largura disponível do container pai. Valores possíveis:
+```
+start               (valor padrão/default)
+center 
+end
+```
+
+Exemplo:
+- Input
+```ptml
+<block name="Name" align="start">
+    <text foreground="red">Red</text>
+    <text>John</text>
+</block>
+```
+
+- Output (exemplo em terminal 12cols)
+```terminal
+┌ Name ───┐
+│Red John │
+└─────────┘
+```
+
+--- 
+## Elemento `<div>`
+
+`<div></div>`
+Faz a divisão do elemento-pai conforme a quantidade de seus irmãos. 
+
+Exemplo:
+- Input
+```ptml
+<block name="Cardapio">
+    <div>
+        <text>Tilapia Cozida</text>
+    </div>
+    <div>
+        <text>Pao de Batata</text>
+    </div>
+</block>
+```
+
+- Output
+```cmd
+┌ Cardapio ──────┐
+│ Tilapia Cozida │
+├────────────────┤
+│ Pao de Batata  │
+└────────────────┘
+```

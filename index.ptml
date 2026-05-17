@@ -1,20 +1,5 @@
 <?ptml encoding="UTF-8" terminal-resize="reflow"?>
-<column>
-    <row>
-        <box border="single">
-            <text foreground="red" font="italic">Hello World!</text>
-        </box>
-        <box border="single">
-            <text foreground="gold" font="italic">GoodBye World!</text>
-        </box>
-    </row>
-    <row>
-        <box border="single">
-            <text foreground="red" font="italic">Hello World!</text>
-        </box>
-        <box border="single">
-            <text foreground="gold" font="italic">GoodBye World!</text>
-        </box>
-    </row>
-</column>
+<block name="PTML">
+    <text>Hello World!</text>
+</block>
 <!-- Sintaxe corrigida -->

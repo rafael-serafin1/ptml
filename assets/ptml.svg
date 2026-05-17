@@ -1,0 +1,35 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Terminal Window -->
+  <rect x="38" y="60" width="436" height="392" rx="18" fill="#323234"/>
+
+  <!-- Top Bar -->
+  <path d="M38 78C38 68.0589 46.0589 60 56 60H183V116H38V78Z" fill="#193F9F"/>
+  <rect x="183" y="60" width="147" height="56" fill="#4A72BE"/>
+  <path d="M330 60H456C465.941 60 474 68.0589 474 78V116H330V60Z" fill="#6079CF"/>
+
+  <!-- Right part of > -->
+  <path
+    d="M181 202L120 263L181 324"
+    stroke="#E7E7E7"
+    stroke-width="30"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Slash -->
+  <path
+    d="M274 176L238 350"
+    stroke="#D8D8D8"
+    stroke-width="24"
+    stroke-linecap="round"
+  />
+
+  <!-- Closing > -->
+  <path
+    d="M334 202L395 263L334 324"
+    stroke="#E7E7E7"
+    stroke-width="30"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
