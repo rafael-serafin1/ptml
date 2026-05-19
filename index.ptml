@@ -1,5 +1,5 @@
 <?ptml encoding="UTF-8" terminal-resize="reflow"?>
-<terminal x-align="center">
+<terminal x-align="start">
 <block title="PTML" border="rounded">
     <column>
         <row>

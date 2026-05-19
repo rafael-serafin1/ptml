@@ -3,7 +3,7 @@
 *.log
 *.tmp
 *.temp
-.fake
+*.fake
 
 # dirs
 /logs
@@ -11,6 +11,5 @@
 /prompt
 /node_modules
 /.vscode
-
-# code runner logic
-runner.cpp
+*/bin
+*/obj

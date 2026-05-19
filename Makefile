@@ -1,18 +1,16 @@
 #!/bin/bash
 
-run:
-	dotnet fsi runtime.fsx $(ARGS)
 
 debug:
-	dotnet fsi debug.fsx
+	dotnet fsi ./playground/debug/debug.fsx
+
+script:
+	dotnet fsi ./playground/scripting/runtime.fsx "index.ptml"
+
+pub:
+	cd ./src
+	dotnet build
+	dotnet publish -c Release -r win-x64 --self-contained true -o ./build
 
 test:
-	dotnet fsi runtime.fsx 
-
-#ignore these
-play:
-	dotnet fsi ./playground/argv/args.fsx $(ARGS)
-	dotnet fsi ./playground/terminal/terminal.fsx
-
-layout:
-	dotnet fsi ./tests/layout-test/test.fsx
+	./build/ptml run "index.ptml"

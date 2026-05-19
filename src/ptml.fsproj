@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutPath>build\</OutPath>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Token.fs" />
+    <Compile Include="Lexer.fs" />
+    <Compile Include="Parser.fs" />
+    <Compile Include="Tree.fs" />
+    <Compile Include="Layout.fs" />
+    <Compile Include="Render.fs" />
+    <Compile Include="Buffer.fs" />
+    <Compile Include="Diff.fs" />
+    <Compile Include="Output.fs" />
+    <Compile Include="Runner.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+</Project>
