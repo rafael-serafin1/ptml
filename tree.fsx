@@ -56,6 +56,7 @@ type Widget =
     | ColumnWidget of width:Dimension * border:Border * gap:int * yAlign:Align option * children:Widget list
     | BoxWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * align:Align option * children:Widget list
     | BlockWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * name:string option * align:Align option * children:Widget list
+    | TerminalWidget of width: Dimension * height: Dimension * alignX: Align option * alignY: Align option * children: Widget list
 
 ///
 /// AST BUILDING
@@ -188,9 +189,15 @@ and buildWidget node =
             let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
             let border = tryGetAttr "border" attrs |> Option.map parseBorder |> Option.defaultValue Single
             let borderColor = tryGetAttr "border-color" attrs
-            let name = tryGetAttr "name" attrs
+            let name = tryGetAttr "title" attrs
             let align = tryGetAttr "align" attrs |> Option.map parseAlign
             BlockWidget(width, height, border, borderColor, name, align, childrenWidgets)
+        | "terminal" ->
+            let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
+            let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
+            let xAlign = tryGetAttr "x-align" attrs |> Option.map parseAlign
+            let yAlign = tryGetAttr "y-align" attrs |> Option.map parseAlign
+            TerminalWidget(width, height, xAlign, yAlign, childrenWidgets)
         | _ ->
             failwith $"Unsupported semantic tag: {tag}"
 

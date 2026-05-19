@@ -16,6 +16,17 @@ let private borderChars(border: Border) =
     | Ascii -> ("+", "+", "+", "+", "-", "|")
     | NoBorder -> ("", "", "", "", "", "")
 
+let private borderCharsContinuity(border: Border) =
+    match border with
+    | Single -> ("├", "┤", "┬", "┴", "┼")
+    | Double -> ("╟", "╢", "╤", "╧", "╪")
+    | Classic -> ("┝", "┥", "┯", "┷", "┿")
+    | Bold -> ("┝", "┥", "┯", "┷", "┿")
+    | Strange -> ("╞", "╡", "╤", "╧", "╪")
+    | Rounded -> ("├", "┤", "┬", "┴", "┼")
+    | Ascii -> ("+", "+", "+", "+", "+")
+    | NoBorder -> ("", "", "", "", "")
+
 let private drawHorizontal xStart xEnd y char fore =
     [ for x in xStart .. xEnd -> DrawChar(char, x, y, fore, None, None) ]
 
@@ -107,6 +118,12 @@ let rec private renderWidget offsetX offsetY widget =
         let childBaseY = if border <> NoBorder then baseY + 1 else baseY
         let childOps = children |> List.collect (renderWidget childBaseX childBaseY)
         borderOps @ childOps
+
+    | PositionedTerminalWidget(_, _, alignX, alignY, metrics, children) ->
+        let baseX = offsetX + metrics.x
+        let baseY = offsetY + metrics.y
+        children |> List.collect (renderWidget baseX baseY)
+        
 
 let renderTree widgets =
     widgets |> List.collect (renderWidget 0 0)

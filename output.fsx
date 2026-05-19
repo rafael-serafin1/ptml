@@ -47,11 +47,11 @@ let private fontCode = function
     | Some "dim" -> Some "2"
     | Some "italic" -> Some "3"
     | Some "underline" -> Some "4"
-    | Some "slowblink" -> Some "5"
-    | Some "rapidblink" -> Some "6"
+    | Some "slow-blink" -> Some "5"
+    | Some "rapid-blink" -> Some "6"
     | Some "reverse" -> Some "7"
     | Some "conceal" -> Some "8"
-    | Some "strikethrough" -> Some "9"
+    | Some "strike-through" -> Some "9"
     | _ -> None
 
 let private styleCodes (cell: Cell) =

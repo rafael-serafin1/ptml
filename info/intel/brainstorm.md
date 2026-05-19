@@ -245,17 +245,109 @@ Exemplo:
 ```
 
 ---
-<!-- IGNORE ESSE ELEMENTO -->
 ## Elemento `<depth>`
 
 `<depth></depth>`
+Faz juz a profundidade. Seus filhos são distribuídos por índice da 3º dimensão espacial.
 
+Exemplo .1:
+- Input
+```ptml
+<depth>
+    <box index="0">
+        <text>Hello World!</text>
+    </box>
+    <box index="-1">
+        <text>GoodBye World!</text>
+    </box>
+    <box index="-2">
+        <text>Hello Again!</text>
+    </box>
+</depth>
+```
 
+- Output
 ```cmd
 ┌────────────┐
 │┌───────────┴┐
-└┤Hello World!│
- └────────────┘
+└│┌───────────┴┐
+ └┤Hello World!│
+  └────────────┘
+```
+
+### **Disclaimer** --> o conteúdo dos índices -1 e -2 não foram perdido, apenas sobrescrito, ainda é possível acessar eles.
+
+Exemplo .(1.5):
+- Input
+```ptml
+<depth>
+    <box index="0">
+        <text>Hello World!</text>
+    </box>
+    <box index="0">
+        <text>GoodBye World!</text>
+    </box>
+</depth>
+```
+
+- Output
+```cmd
+Erro: não pode haver dois filhos com índice de mesmo valor!
+```
+
+Exemplo .2:
+- Input
+```ptml
+<depth>
+    <column index="0">
+        <row>
+            <box border="single">
+                <text foreground="gold">Hello World!</text>
+            </box>
+            <box border="single">
+                <text>GoodBye World!</text>
+            </box>
+        </row>
+        <row>
+            <box border="single">
+                <text foreground="gold">Hello World!</text>
+            </box>
+            <box border="single">
+                <text>GoodBye World!</text>
+            </box>
+        </row>
+    </column>
+    <column index="-1">
+        <row>
+            <box border="single">
+                <text foreground="gold">Hello World!</text>
+            </box>
+            <box border="single">
+                <text>GoodBye World!</text>
+            </box>
+        </row>
+        <row>
+            <box border="single">
+                <text foreground="gold">Hello World!</text>
+            </box>
+            <box border="single">
+                <text>GoodBye World!</text>
+            </box>
+        </row>
+    </column>
+</depth>
+```
+
+- Output
+```cmd
+┌────────────┐  ┌──────────────┐
+│┌───────────┴┐ │┌─────────────┴┐
+└│Hello World!│ └│GoodBye World!│
+ └────────────┘  └──────────────┘
+┌────────────┐  ┌──────────────┐ 
+│┌───────────┴┐ │┌─────────────┴┐
+└│Hello World!│ └│GoodBye World!│
+ └────────────┘  └──────────────┘
 ```
 
 ---
@@ -334,6 +426,14 @@ center
 end
 ```
 
+***index***:
+Atributo que define o índice da dimensão Z em que o elemento ficará.
+```ptml
+<box index="1">
+    <text>Olá</text>
+</box>
+```
+
 ### OBS:
 Textos crus existem, mas eles não causam inutilização do elemento `<text>` pelo fato de eles não possuírem outra forma de serem estilizados, mas no fim eles acabam virando nó padrão de `<text>`.
 
@@ -346,7 +446,7 @@ Define um bloco nomeado através de um atributo obrigatório chamado `name`.
 Exemplo:
 - Input
 ```ptml
-<block name="Status">
+<block title="Status">
     <column>
         <text>CPU  ███████░░ 73%</text>
         <text>RAM  ████░░░░ 41%</text>
@@ -366,10 +466,10 @@ Exemplo:
 
 ### **Atributos**:
 
-***name***:
+***title***:
 Define o nome do bloco, sendo um atributo obrigatório de ter na declaração, mas seu valor pode ser nulo.
 ```ptml
-<block name="">
+<block title="">
     <text>Hello World!</text>
 </block>
 ```
@@ -390,7 +490,8 @@ single              (┌ ┐ └ ┘ ─ │)
 double              (╔ ╗ ╚ ╝ ═ ║)
 semi-bold           (┍ ┑ ┕ ┙ ─ │)
 bold                (┏ ┓ ┗ ┛ ━ ┃)
-strange             ("╒", "╕", "╘", "╛", "═", "│" ) 
+strange             (╒ ╕ ╘ ╛ ═ │) 
+classic             (┍ ┑ ┕ ┙ ─ │)
 rounded             (╭ ╮ ╰ ╯)
 ascii               (+ - |)
 none
@@ -425,7 +526,7 @@ end
 Exemplo:
 - Input
 ```ptml
-<block name="Name" align="start">
+<block title="Name" align="start">
     <text foreground="red">Red</text>
     <text>John</text>
 </block>
@@ -438,22 +539,48 @@ Exemplo:
 └─────────┘
 ```
 
+***index***:
+Atributo que define o índice da dimensão Z em que o elemento ficará.
+```ptml
+<block title="PopUp" index="1">
+    <text>Olá</text>
+</block>
+```
+
 --- 
-## Elemento `<div>`
+## Elemento `<terminal>`
 
-`<div></div>`
-Faz a divisão do elemento-pai conforme a quantidade de seus irmãos. 
+`<terminal></terminal>`
+Referencia ao terminal, servindo como um viewport root.
 
-Exemplo:
+### **Atributos**:
+
+***x-align/y-align***:
+Atributo que alinha um conteúdo horizontalmente/verticalmente pela largura/altura do terminal respectivamente. Valores possíveis:
+```
+start
+center
+end
+```
+
+---
+## Elemento `<cell>`
+
+`<cell></cell>`
+Faz a divisão do elemento-pai concreto (elemento-pai de layout (block/box)) conforme a quantidade de seus irmãos. 
+
+Exemplo .1:
 - Input
 ```ptml
-<block name="Cardapio">
-    <div>
-        <text>Tilapia Cozida</text>
-    </div>
-    <div>
-        <text>Pao de Batata</text>
-    </div>
+<block title="Cardapio">
+    <column>
+        <cell>
+            <text>Tilapia Cozida</text>
+        </cell>
+        <cell>
+            <text>Pao de Batata</text>
+        </cell>
+    </column>
 </block>
 ```
 
@@ -464,4 +591,178 @@ Exemplo:
 ├────────────────┤
 │ Pao de Batata  │
 └────────────────┘
+```
+
+Exemplo .2:
+- Input
+```ptml
+<block title="Cardapio">
+    <row>
+        <cell>
+            <text>Tilapia Cozida</text>
+        </cell>
+        <cell>
+            <text>Pao de Batata</text>
+        </cell>
+    </row>
+</block>
+```
+
+- Output
+```cmd
+┌ Cardapio ────┬─────────────┐
+│Tilapia Cozida│Pao de Batata|
+└──────────────┴─────────────┘
+```
+
+Exemplo .3:
+- Input
+```ptml
+<block title="Cardapio">
+    <column>
+        <row>
+            <cell>
+                <text>Tilapia Cozida</text>
+            </cell>
+            <cell>
+                <text>Pao de Batata</text>
+            </cell>
+        </row>
+    </column>
+    <column>
+        <row>
+            <cell>
+                <text>Tilapia, Ervas.</text>
+            </cell>
+            <cell>
+                <text>Pao, Batata.</text>
+            </cell>
+        </row>
+    </column>
+</block>
+```
+
+- Output
+```cmd
+┌ Cardapio ──────┬────────────────┐
+│ Tilapia Cozida │ Tilapia, Ervas.│
+├────────────────┼────────────────┤         
+│ Pao de Batata  │ Pao, Batata.   │
+└────────────────┴────────────────┘
+```
+
+---
+## Elemento `<input>`
+
+`<input></input>` ou `<input />`
+Elemento que recebe valores e/ou escuta eventos.
+
+Exemplo:
+- Input
+```ptml
+<input type="button" event="single-click" handler="handleClick()" placeholder="Click here!"/>
+```
+
+- Output
+```cmd
+┌──────────────┐
+│Click here!   |
+└──────────────┘
+```
+
+### **Atributos**:
+
+***type***:
+Define o tipo do input. Valores possíveis:
+```
+button
+scan
+...
+```
+
+***event***:
+Define o tipo de evento que o input vai ser ativado por. Valores possíveis:
+```
+single-click
+double-click
+hold-click
+...
+```
+
+***handler***:
+Define a função que será executada ao detectar que o evento foi chamado. A função deve ser declarada dentro do escopo do PTML através do elemento `<f-sharp></f-sharp>`.
+
+***placeholder***:
+Coloca um texto explícito em formatação DIM dentro do input.
+
+---
+### IGNORE POR ENQUANTO!
+## Elemento `<output>`
+
+`<output></output>` ou `<output/>`
+É um campo específico onde o valor retornado do elemento `<input />` será mostrado.
+
+---
+### IGNORE POR ENQUANTO!
+## Elemento `<coordinates>`
+
+`<coordinates></coordinates>` ou `<coordinates />`
+Representa um plano cartesiano de coordenadas no terminal.
+
+### **Atributos**:
+
+***x-limit/y-limit***:
+Define o valor limite para o crescimento do plano.
+
+Exemplo:
+- Input
+```ptml
+<coordinates x-limit="15" y-limit="30" />
+```
+
+- Output
+```cmd
+   y
+   ↑
+30 ┼
+   │
+   │
+   │
+   ┼────────────┼→ x
+  0             15
+``` 
+
+***function***:
+Define a função base do plano. Exemplos de alguns valores possíveis, podendo trocar 'N' por qualquer número:
+```
+x
+Nx
+x^N
+x*N
+x/N
+x-N
+x^N + N*x + C
+log(2, x)
+log(10, x)
+ln(x)
+...
+```
+
+> **C** significa constante e deve ser trocada por um número qualquer 
+
+Exemplo: 
+- Input
+```ptml
+<coordinates x-limit="15" function="log(10, x)"/>
+```
+
+- Output
+```cmd
+     y
+     ↑
+1,17 ┼           ○
+   1 ┼       ○
+0,69 ┼   ○ 
+     ┼───┼───┼───┼→ x
+    0    5    10  15
 ```

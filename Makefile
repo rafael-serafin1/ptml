@@ -12,6 +12,7 @@ test:
 #ignore these
 play:
 	dotnet fsi ./playground/argv/args.fsx $(ARGS)
+	dotnet fsi ./playground/terminal/terminal.fsx
 
 layout:
 	dotnet fsi ./tests/layout-test/test.fsx

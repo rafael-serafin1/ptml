@@ -1,6 +1,23 @@
 module Layout
 #load "tree.fsx"
 open Tree
+open System
+
+type TerminalViewport = {
+    ViewWidth: int
+    ViewHeight: int
+
+    SafeWidth: int
+    SafeHeight: int
+}
+
+let getViewport () = {
+    ViewWidth = Console.WindowWidth
+    ViewHeight = Console.WindowHeight
+
+    SafeWidth = Console.WindowWidth - 1
+    SafeHeight = Console.WindowHeight - 1
+}
 
 type Metrics = {
     x: int
@@ -15,12 +32,13 @@ type PositionedWidget =
     | PositionedColumnWidget of width:Dimension * border:Border * gap:int * yAlign:Align option * metrics:Metrics * children:PositionedWidget list
     | PositionedBoxWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * align:Align option * metrics:Metrics * children:PositionedWidget list
     | PositionedBlockWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * name:string option * align:Align option * metrics:Metrics * children:PositionedWidget list
+    | PositionedTerminalWidget of width:Dimension * height:Dimension * xAlign:Align option * yAlign:Align option * metrics:Metrics * children:PositionedWidget list
 
 let private charWidth = 1
 let private lineHeight = 1
 
-let private resolveDimension width parentSize fallback =
-    match width with
+let private resolveDimension dimension parentSize fallback =
+    match dimension with
     | Auto -> fallback
     | Fixed value -> value
     | Percent p ->
@@ -40,6 +58,8 @@ let rec private shiftWidget dx dy widget =
         PositionedBoxWidget(width, height, border, borderColor, align, shiftMetrics metrics, children)
     | PositionedBlockWidget(width, height, border, borderColor, name, align, metrics, children) ->
         PositionedBlockWidget(width, height, border, borderColor, name, align, shiftMetrics metrics, children)
+    | PositionedTerminalWidget(width, height, xAlign, yAlign, metrics, children) ->
+        PositionedTerminalWidget(width, height, xAlign, yAlign, shiftMetrics metrics, children)
 
 
 let private alignOffset containerSize childSize alignOption =
@@ -55,7 +75,8 @@ let rec layoutWidget widget parentWidth parentHeight =
         | PositionedRowWidget(_, _, _, _, m, _)
         | PositionedColumnWidget(_, _, _, _, m, _)
         | PositionedBoxWidget(_, _, _, _, _, m, _)
-        | PositionedBlockWidget(_, _, _, _, _, _, m, _) -> m
+        | PositionedBlockWidget(_, _, _, _, _, _, m, _) 
+        | PositionedTerminalWidget(_, _, _, _, m, _) -> m
 
     let totalWidth widget =
         let metrics = metricsOf widget
@@ -85,12 +106,16 @@ let rec layoutWidget widget parentWidth parentHeight =
 
     | RowWidget(width, border, gap, align, children) ->
         let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
+
         let childWidths = positionedChildren |> List.map totalWidth
         let childHeights = positionedChildren |> List.map totalHeight
+
         let totalChildWidth = if List.isEmpty childWidths then 0 else List.sum childWidths + gap * (List.length childWidths - 1)
         let maxChildHeight = if List.isEmpty childHeights then 0 else List.max childHeights
+
         let resolvedWidth = resolveDimension width parentWidth totalChildWidth
         let resolvedHeight = max maxChildHeight lineHeight
+
         let positionedChildren =
             let rec place children xOffset acc =
                 match children with
@@ -129,12 +154,16 @@ let rec layoutWidget widget parentWidth parentHeight =
 
     | BoxWidget(width, height, border, borderColor, align, children) ->
         let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
+
         let childWidths = positionedChildren |> List.map totalWidth
         let childHeights = positionedChildren |> List.map totalHeight
+
         let maxChildWidth = if List.isEmpty childWidths then 0 else List.max childWidths
         let totalChildHeight = if List.isEmpty childHeights then 0 else List.max childHeights
+
         let resolvedWidth = resolveDimension width parentWidth maxChildWidth
         let resolvedHeight = resolveDimension height parentHeight totalChildHeight
+
         let positionedChildren =
             positionedChildren
             |> List.map (fun child ->
@@ -144,17 +173,22 @@ let rec layoutWidget widget parentWidth parentHeight =
         PositionedBoxWidget(width, height, border, borderColor, align, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
     | BlockWidget(width, height, border, borderColor, name, align, children) ->
         let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
+
         let childWidths = positionedChildren |> List.map totalWidth
         let childHeights = positionedChildren |> List.map totalHeight
+        
         let maxChildWidth = if List.isEmpty childWidths then 0 else List.max childWidths
         let titleWidth =
             match name with
             | Some t -> t.Length
             | None -> 0
+
         let contentWidth = max maxChildWidth titleWidth
         let totalChildHeight = if List.isEmpty childHeights then 0 else List.max childHeights
+
         let resolvedWidth = resolveDimension width parentWidth contentWidth
         let resolvedHeight = resolveDimension height parentHeight totalChildHeight
+
         let positionedChildren =
             positionedChildren
             |> List.map (fun child ->
@@ -162,6 +196,31 @@ let rec layoutWidget widget parentWidth parentHeight =
                 let xOffset = alignOffset resolvedWidth childTotalWidth align
                 shiftWidget xOffset 0 child)
         PositionedBlockWidget(width, height, border, borderColor, name, align, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
+    | TerminalWidget(width, height, alignX, alignY, children) -> 
+        let cmd = getViewport()
+
+        let positionedChildren = children |> List.map (fun child -> layoutWidget child (Some cmd.SafeWidth) (Some cmd.SafeHeight))
+
+        let childWidths = positionedChildren |> List.map totalWidth
+        let childHeights = positionedChildren |> List.map totalHeight
+
+        let maxChildWidth = if List.isEmpty childWidths then 0 else List.max childWidths
+        let totalChildHeight = if List.isEmpty childHeights then 0 else List.max childHeights
+
+        let resolvedWidth = resolveDimension width (Some cmd.SafeWidth) maxChildWidth
+        let resolvedHeight = resolveDimension height (Some cmd.SafeHeight) totalChildHeight
+
+        let positionedChildren =
+            positionedChildren
+            |> List.map (fun child ->
+                let childTotalWidth = totalWidth child
+                let childTotalHeight = totalHeight child
+
+                let xOffset = alignOffset cmd.SafeWidth childTotalWidth alignX
+                let yOffset = alignOffset cmd.SafeHeight childTotalHeight alignY
+                // offsets = (0, 0) com resolvedWidt e resolvedHeight 
+                shiftWidget xOffset yOffset child)
+        PositionedTerminalWidget(width, height, alignX, alignY, { x = 0; y = 0; w = cmd.SafeWidth; h = cmd.SafeHeight }, positionedChildren)
 
 let layoutTree widgets =
     widgets |> List.map (fun widget -> layoutWidget widget None None)

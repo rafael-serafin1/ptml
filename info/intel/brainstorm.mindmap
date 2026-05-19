@@ -669,7 +669,7 @@
         "children": [
           {
             "id": "ca96a5b3-8366-46f2-9909-30bb0908ca18",
-            "topic": "name",
+            "topic": "title",
             "style": {
               "fontSize": "16px",
               "color": "#9B59B6"
@@ -885,18 +885,114 @@
         },
         "layoutSide": "right",
         "isFolded": false
+      },
+      {
+        "id": "7ef5926c-245f-4a32-93c9-9f185a9a7dd7",
+        "topic": "<terminal>",
+        "children": [
+          {
+            "id": "30275187-af9f-4f4f-985b-083b82ca983f",
+            "topic": "x-align",
+            "children": [
+              {
+                "id": "c2c0f17b-6319-440e-884f-eb1cb5d4b94b",
+                "topic": "start",
+                "style": {
+                  "fontSize": "16px",
+                  "color": "#2ECC71"
+                },
+                "isFolded": false
+              },
+              {
+                "id": "44efa031-acb1-4812-aa04-e35fb53fc0f8",
+                "topic": "center",
+                "style": {
+                  "fontSize": "16px",
+                  "color": "#E67E22"
+                },
+                "isFolded": false
+              },
+              {
+                "id": "4a916eee-8c14-422e-9490-1ecc1202c18d",
+                "topic": "end",
+                "style": {
+                  "fontSize": "16px",
+                  "color": "#E67E22"
+                },
+                "isFolded": false
+              }
+            ],
+            "style": {
+              "fontSize": "16px"
+            },
+            "isFolded": false
+          },
+          {
+            "id": "a360d8a4-190c-4e67-9d0f-da1de16fa8c2",
+            "topic": "y-align",
+            "children": [
+              {
+                "id": "dee3f37c-fbc8-4810-bf51-8a5839c56673",
+                "topic": "start",
+                "style": {
+                  "fontSize": "16px",
+                  "color": "#2ECC71"
+                },
+                "isFolded": false
+              },
+              {
+                "id": "dca3f76f-0ff3-4dbc-8ef6-e2685dbe2e0c",
+                "topic": "center",
+                "style": {
+                  "fontSize": "16px",
+                  "color": "#E67E22"
+                },
+                "isFolded": false
+              },
+              {
+                "id": "f3a791bd-4860-46b7-afd5-6cb4b6036d37",
+                "topic": "end",
+                "style": {
+                  "fontSize": "16px",
+                  "color": "#E67E22"
+                },
+                "isFolded": false
+              }
+            ],
+            "style": {
+              "fontSize": "16px"
+            },
+            "isFolded": false
+          }
+        ],
+        "style": {
+          "fontSize": "24px",
+          "color": "#3498DB"
+        },
+        "layoutSide": "left",
+        "isFolded": false
+      },
+      {
+        "id": "2f63ea84-f308-4f19-a188-81edb8ca06fc",
+        "topic": "<depth>",
+        "style": {
+          "fontSize": "24px",
+          "color": "#3498DB"
+        },
+        "layoutSide": "right",
+        "isFolded": false
       }
     ],
     "style": {
-      "fontSize": "24px",
+      "fontSize": "32px",
       "color": "#F1C40F",
       "fontWeight": "bold"
     },
     "isFolded": false
   },
   "theme": "colorful",
-  "selectedId": "f90cfd71-20f6-4b63-827c-4a73a0225e5e",
+  "selectedId": "2f63ea84-f308-4f19-a188-81edb8ca06fc",
   "selectedIds": [
-    "f90cfd71-20f6-4b63-827c-4a73a0225e5e"
+    "2f63ea84-f308-4f19-a188-81edb8ca06fc"
   ]
 }
