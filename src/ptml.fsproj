@@ -9,17 +9,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Token.fs" />
-    <Compile Include="Lexer.fs" />
-    <Compile Include="Parser.fs" />
-    <Compile Include="Tree.fs" />
-    <Compile Include="Layout.fs" />
-    <Compile Include="Render.fs" />
-    <Compile Include="Buffer.fs" />
-    <Compile Include="Diff.fs" />
-    <Compile Include="Output.fs" />
-    <Compile Include="Runner.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="Token.fs"                />
+    <Compile Include="Lexer.fs"                />
+    <Compile Include="Parser.fs"               />
+    <Compile Include="Tree.fs"                 />
+    <Compile Include="Layout.fs"               />
+    <Compile Include="Render.fs"               />
+    <Compile Include="Buffer.fs"               />
+    <Compile Include="Diff.fs"                 />
+    <Compile Include="DiffRenderer.fs"         />
+    <Compile Include="Output.fs"               />
+    <Compile Include="Runner.fs"               />
+    <Compile Include="Watch.fs"                />
+    <Compile Include="Program.fs"              />
   </ItemGroup>
 
 </Project>

@@ -10,6 +10,7 @@ open PTML.Layout
 open PTML.Buffer
 open PTML.Render
 open PTML.Runner
+open PTML.Watch
 
 module Program =
     type Command = 
@@ -69,6 +70,10 @@ module Program =
             | Some file -> 
                 S <- Some (run(file))
             | None -> ()
-        | Some Watch -> printfn "Eae"
+        | Some Watch -> 
+            match config.filePath with
+            | Some file -> 
+                S <- Some (watch(file))
+            | None -> ()
         | None -> ()
         0

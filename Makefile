@@ -12,5 +12,10 @@ pub:
 	dotnet build
 	dotnet publish -c Release -r win-x64 --self-contained true -o ./build
 
-test:
+testr: pub run
+testw: pub watch
+
+run:
 	./build/ptml run "index.ptml"
+watch:
+	./build/ptml watch "index.ptml"

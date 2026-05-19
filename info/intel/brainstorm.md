@@ -276,6 +276,7 @@ Exemplo .1:
 ```
 
 ### **Disclaimer** --> o conteúdo dos índices -1 e -2 não foram perdido, apenas sobrescrito, ainda é possível acessar eles.
+### **OBS** --> Em caso de o usuário utilizar outros valores para representar a superfície (0), um aviso aparecerá no terminal, mas isso não impedirá a execução do código.
 
 Exemplo .(1.5):
 - Input

@@ -64,7 +64,7 @@ module Output =
         | codes -> Some(sprintf "%s[%sm" escape (String.concat ";" codes))
 
     let private shouldRenderCell (cell: Cell) =
-        cell.char <> " "
+        cell.char <> ' '
         || Option.isSome (foregroundCode cell.foreground)
         || Option.isSome (backgroundCode cell.background)
         || Option.isSome (fontCode cell.font)

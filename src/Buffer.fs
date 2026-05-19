@@ -2,32 +2,9 @@ namespace PTML
 open PTML.Render
 
 module Buffer =
-    type ConsoleColor = 
-        | None = 0
-        | Black = 30
-        | Red = 31
-        | Green = 32
-        | Gold = 33
-        | Blue = 34 
-        | Purple = 35
-        | Cyan = 36
-
-    (* ENUM PARA FORMATAÇÃO DE FONTE *)
-    type ConsoleFont = 
-        | None = 0
-        | Bold = 1
-        | Dim = 2
-        | Italic = 3
-        | UnderLine = 4
-        | SlowBlink = 5
-        | RapidBlink = 6
-        | Marked = 7
-        | Conceal = 8
-        | StrikeThrough = 9
-
     (* BUFFER *)
     type Cell = {
-        char: string
+        char: char
         foreground: string option
         background: string option
         font: string option
@@ -35,7 +12,7 @@ module Buffer =
 
     (* EMPTY CELL *)
     let emptyCell: Cell = {
-        char = " "
+        char = ' '
         foreground = None
         background = None
         font = None
@@ -74,7 +51,7 @@ module Buffer =
             | Render.DrawChar(text, x, y, fg, bg, font) ->
                 text
                     |> Seq.iteri (fun offset ch ->
-                        setCell buffer (x + offset) y (string ch) fg bg font)
+                        setCell buffer (x + offset) y (char ch) fg bg font)
         )
         buffer
 
