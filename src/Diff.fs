@@ -5,8 +5,8 @@ module Diff =
     type CellChange = {
         x: int
         y: int
-        oldCell: Cell
-        newCell: Cell
+        oldCell: Cell option
+        newCell: Cell option
     }
 
     let private cellEquals (a: Cell) (b: Cell) =
@@ -45,15 +45,23 @@ module Diff =
                         yield {
                             x = x
                             y = y
-                            oldCell = oldCell
-                            newCell = newCell
+                            oldCell = Some oldCell
+                            newCell = Some newCell
                         }
         ]
 
+    let escape = "\x1b[0m"
     let diffToLines diffs =
         diffs
         |> List.map (fun diff ->
-            sprintf "(%d,%d): '%c' -> '%c'" diff.x diff.y diff.oldCell.char diff.newCell.char)
+            match diff.oldCell, diff.newCell with   
+            | None, None -> ""
+            | Some o, None ->
+                sprintf "(%d, %d): '%c' -> None%s" diff.x diff.y o.char escape
+            | None, Some n -> 
+                sprintf "(%d, %d): None -> '%c'%s" diff.x diff.y n.char escape
+            | Some o, Some n ->
+                sprintf "(%d,%d): '%c' -> '%c'%s" diff.x diff.y o.char n.char escape)
 
     let printDiffs oldBuffer newBuffer =
         diffBuffers oldBuffer newBuffer

@@ -59,8 +59,40 @@ module DiffRenderer =
         | [] -> sprintf "%s0m" ansi
         | codes -> sprintf "%s%sm" ansi (String.concat ";" codes)
 
-    let renderDiffs (diff: Diff.CellChange) =
-        Console.SetCursorPosition(diff.x, diff.y)
+    let private reset = "\x1b[0m"
+    let mutable currentCursorPos: ValueTuple<int, int> option = None
+    let newDiffs (diff: Diff.CellChange) =  
+        async { 
+            currentCursorPos <- Some (Console.GetCursorPosition())
+            Console.SetCursorPosition(diff.x, diff.y)
+            match diff.newCell with
+            | Some n ->
+                Console.Write(ansiStyle n)
+                Console.Write($"{n.char}{reset}")
+                match currentCursorPos with
+                | Some (x, y) -> Console.SetCursorPosition(x, y)
+                | None -> ()
+            | None -> ()
+        }
+    let unrenderOldCell(X: int, Y: int) = 
+        async {
+            currentCursorPos <- Some (Console.GetCursorPosition())
+            Console.SetCursorPosition(X, Y)
+            Console.Write " "
+            match currentCursorPos with
+            | Some (x, y) -> Console.SetCursorPosition(x, y)
+            | None -> ()
+        }
 
-        Console.Write(ansiStyle diff.newCell)
-        Console.Write(diff.newCell.char)
+    let renderDiffs (diff: Diff.CellChange) =
+        match diff.oldCell, diff.newCell with 
+        | Some o, None -> 
+            unrenderOldCell(diff.x, diff.y) |> Async.RunSynchronously
+        | None, Some n -> 
+            newDiffs diff |> Async.RunSynchronously 
+        | Some o, Some n -> 
+            if o <> n then 
+                newDiffs(diff) |> Async.RunSynchronously
+            else 
+                ()
+        | None, None -> ()

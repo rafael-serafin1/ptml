@@ -25,6 +25,9 @@ module Watch =
             Thread.Sleep(50)
             readWhenReady path (retries - 1)
 
+    // antigo buffer
+    let mutable previousBuffer = 
+        createBuffer (getViewport().SafeWidth) (getViewport().SafeHeight)
     let asyncSetting(terminal: Terminal, path) = 
         async {
             let input: string = readWhenReady path 10
@@ -35,11 +38,13 @@ module Watch =
             let semantic: Widget list = buildSemanticTree(ast)
             let layout = layoutTree semantic
             let renderOps = renderTree layout
-            let buffer = processRenderTree renderOps terminal.SafeWidth terminal.SafeWidth
-            let emptyBuffer = createBuffer terminal.SafeWidth terminal.SafeWidth
 
-            Diff.diffBuffers emptyBuffer buffer 
+            let buffer = processRenderTree renderOps terminal.SafeWidth terminal.SafeHeight
+
+            Diff.diffBuffers previousBuffer buffer 
                 |> List.iter (DiffRenderer.renderDiffs)
+            
+            previousBuffer <- buffer
         }
 
     let setWatcher(path: string) =
@@ -57,16 +62,7 @@ module Watch =
         watcher.Filter <- fileName
         watcher.NotifyFilter <- NotifyFilters.LastWrite
 
-        let input: string = File.ReadAllText(path)
-        let tokens = lex input 0 []
-        parser(tokens, [])
-
-        let ast: AstNode list = buildAst(tokens)
-        let semantic: Widget list = buildSemanticTree(ast)
-        let layout = layoutTree semantic
-        let renderOps = renderTree layout
-        let buffer = processRenderTree renderOps terminal.SafeWidth terminal.SafeWidth
-        let emptyBuffer = createBuffer terminal.SafeWidth terminal.SafeWidth
+        asyncSetting(terminal, path) |> Async.RunSynchronously
 
         watcher.Changed.Add(fun _ ->
             asyncSetting(terminal, path) |> Async.RunSynchronously

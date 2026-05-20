@@ -1,5 +1,6 @@
 module Output       
 #load "diff.fsx"
+#load "diffrenderer.fsx"
 open System
 open System.Text
 open Buffer
@@ -65,7 +66,7 @@ let private ansiStyle cell =
     | codes -> Some(sprintf "%s[%sm" escape (String.concat ";" codes))
 
 let private shouldRenderCell (cell: Cell) =
-    cell.char <> " "
+    cell.char <> ' '
     || Option.isSome (foregroundCode cell.foreground)
     || Option.isSome (backgroundCode cell.background)
     || Option.isSome (fontCode cell.font)

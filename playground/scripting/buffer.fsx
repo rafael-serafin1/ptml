@@ -30,7 +30,7 @@ type ConsoleFont =
 
 (* BUFFER *)
 type Cell = {
-    char: string
+    char: char
     foreground: string option
     background: string option
     font: string option
@@ -38,7 +38,7 @@ type Cell = {
 
 (* EMPTY CELL *)
 let emptyCell: Cell = {
-    char = " "
+    char = ' '
     foreground = None
     background = None
     font = None
@@ -77,7 +77,7 @@ let renderToBuffer buffer renderOps =
         | Render.DrawChar(text, x, y, fg, bg, font) ->
             text
                 |> Seq.iteri (fun offset ch ->
-                    setCell buffer (x + offset) y (string ch) fg bg font)
+                    setCell buffer (x + offset) y (char ch) fg bg font)
     )
     buffer
 

@@ -1,6 +1,7 @@
 #load "../scripting/output.fsx"
 open System
 open System.IO
+open System.Threading
 open Lexer          (*LEXER*)
 open Parser         (*PARSER*)
 open Tree           (*AST & SEMANTIC TREE*)
@@ -9,56 +10,89 @@ open Render         (*TREE RENDER*)
 open Buffer         (*TERMINAL BUFFER*)
 open Diff           (*DIFF ENGINE*)
 open Output        
+open Diffrenderer
 
-type Terminal = {
-    W: int
-    H: int
-}
+type Status =
+    | Success = 0
+    | Failure = 1
 
-let getViewport(): Terminal = 
-    let w = Console.WindowWidth - 2
-    let h = Console.WindowHeight - 2
-    { W = w; H = h }
+let rec readWhenReady path retries =
+    try
+        File.ReadAllText(path)
+    with
+    | :? IOException ->
+        if retries <= 0 then
+            reraise()
+        Thread.Sleep(50)
+        readWhenReady path (retries - 1)
 
-type Status = 
-    | SUCCESS = 0
-    | FAILURE = 1
+// buffer anterior
+let mutable previousBuffer = 
+    createBuffer (getViewport().SafeWidth) (getViewport().SafeHeight)
 
-let run(): Status =
-    let t: Terminal = getViewport()
-    let path: string = "index.ptml"
+let asyncSetting(terminal: TerminalViewport, path) = 
+    async {
+        let input: string = readWhenReady path 10
+        let tokens = lex input 0 []
+        parser(tokens, [])
+
+        let ast: AstNode list = buildAst(tokens)
+        let semantic: Widget list = buildSemanticTree(ast)
+        let layout = layoutTree semantic
+        let renderOps = renderTree layout
+
+        let buffer = processRenderTree renderOps terminal.SafeWidth terminal.SafeHeight
+
+        Diff.diffBuffers previousBuffer buffer
+            |> List.iter renderDiffs
+
+        previousBuffer <- buffer
+    }
+let setWatcher(path: string) =
+    let terminal: TerminalViewport = getViewport()
+    let mutable fullPath = Path.GetFullPath(path)   // ele morre aqui
+    if fullPath = "" then   
+        fullPath <- "../" + path
+    else    
+    let directory = Path.GetDirectoryName(fullPath)
+    let fileName = Path.GetFileName(fullPath)
+
+    let watcher = new FileSystemWatcher()
+    watcher.Path <- directory
+    watcher.Filter <- fileName
+    watcher.NotifyFilter <- NotifyFilters.LastWrite
+
+    asyncSetting(terminal, path) |> Async.RunSynchronously
+
+    watcher.Changed.Add(fun _ ->
+        asyncSetting(terminal, path) |> Async.RunSynchronously
+    )
+    watcher.EnableRaisingEvents <- true
+    Console.ReadLine() |> ignore
+
+let run(path: string): Status =
+    let terminal = getViewport()
+
     let input: string = File.ReadAllText(path)
     let tokens = lex input 0 []
     parser(tokens, [])
 
     let ast: AstNode list = buildAst(tokens)
     let semantic: Widget list = buildSemanticTree(ast)
+
     let layout = layoutTree semantic
     let renderOps = renderTree layout
-    let buffer = processRenderTree renderOps t.W t.H
-    let emptyBuffer = createBuffer t.W t.H
 
-    printfn "Tokens:\n%A" tokens
-    printfn "\nAST:\n%A" ast
-    printfn "\nSemantic tree:\n%A" semantic
-    printfn "\nLayout:\n%A" layout
-    printfn "\nRender tree:\n%A" renderOps
-    printfn "\nTerminal Buffer (first 6 rows):"
-    for y in 0 .. min 7 (Array2D.length1 buffer - 1) do
-        for x in 0 .. Array2D.length2 buffer - 1 do
-            printf "%s" buffer.[y, x].char
-        printfn ""
-
-    printfn "\nDiff from empty screen to current screen:"
-    Diff.diffBuffers emptyBuffer buffer
-    |> Diff.diffToLines
-    |> List.iter (printfn "%s")
-
-    printfn "\nRendering ANSI output to terminal..."
+    let buffer = processRenderTree renderOps (terminal.ViewWidth) (terminal.ViewHeight)
     Console.Write("\x1b[2J\x1b[H")
-    Output.printAnsiBuffer buffer
+    Output.printAnsiBuffer(buffer)
     printfn ""
+    Status.Success
 
-    Status.SUCCESS
+let watch(path: string): Status = 
+    let mutable S: Status = run(path)
+    setWatcher(path) 
+    S
 
-run()
+let path = "./index.ptml"
+let S: Status = watch(path)
