@@ -270,13 +270,13 @@ Exemplo .1:
 ```cmd
 ┌────────────┐
 │┌───────────┴┐
-└│┌───────────┴┐
+└┤┌───────────┴┐
  └┤Hello World!│
   └────────────┘
 ```
 
 ### **Disclaimer** --> o conteúdo dos índices -1 e -2 não foram perdido, apenas sobrescrito, ainda é possível acessar eles.
-### **OBS** --> Em caso de o usuário utilizar outros valores para representar a superfície (0), um aviso aparecerá no terminal, mas isso não impedirá a execução do código.
+### **OBS** N1--> Em caso de o usuário utilizar outros valores para representar a superfície (0), um aviso aparecerá no terminal, mas isso não impedirá a execução do código.
 
 Exemplo .(1.5):
 - Input
@@ -343,12 +343,120 @@ Exemplo .2:
 ```cmd
 ┌────────────┐  ┌──────────────┐
 │┌───────────┴┐ │┌─────────────┴┐
-└│Hello World!│ └│GoodBye World!│
+└┤Hello World!│ └┤GoodBye World!│
  └────────────┘  └──────────────┘
 ┌────────────┐  ┌──────────────┐ 
 │┌───────────┴┐ │┌─────────────┴┐
-└│Hello World!│ └│GoodBye World!│
+└┤Hello World!│ └┤GoodBye World!│
  └────────────┘  └──────────────┘
+```
+
+### **Atributos**:
+
+***index*** (específico para os filhos e obrigatório):
+Define o índice de profundidade do elemento-filho.
+
+Exemplo:
+- Input
+```ptml
+<depth>
+    <column index="0">
+        <box>
+            <text>Hello World!</text>
+        </box>
+    </column>
+    <column index="-1">
+        <box>
+            <text>GoodBye World!</text>
+        </box>
+    </column>
+</depth>
+```
+
+- Output
+```cmd
+┌───────────┐
+│┌──────────┴─┐
+└┤Hello World!│
+ └────────────┘
+```
+
+***z-align***:
+Atributo que alinha um conteúdo dimensionalmente pela profundidade disponível do container pai. Valores possíveis:
+```
+start       (valor default)
+center 
+end         (valor default APENAS para o cenário descrito na observação N2)
+```
+
+Exemplo
+- Input
+```ptml
+<depth z-align="center">
+    <column index="0">
+        <text>Hello World!</text>
+    </column>
+    <column index="-1">
+        <text>Bye World!</text>
+    </column>
+</depth>
+```
+
+- Output
+```cmd
+  ┌──────────┐
+ ┌┴──────────┴┐
+ │Hello World!│
+ └────────────┘
+```
+
+
+***gap***:
+Define o espaçamento entre um filho e outro no layout. O valor deve ser numérico e inteiro.
+
+Exemplo:
+- Input
+```ptml
+<depth gap="1">
+    <column index="0">
+        <text>Hello World!</text>
+    </column>
+    <column index="-1">
+        <text>Bye World!</text>
+    </column>
+</depth>
+```
+
+- Output
+```cmd
+┌────────────┐  
+│Bye World!  │        
+└┬───────────┴┐ 
+ │Hello World!│ 
+ └────────────┘ 
+```
+
+### **OBS** N2 --> Caso o elemento `<depth>` tenha gap igual ou maior que 1 ***E*** o conteúdo do elemento `<column>`, de índice menor que a da superfície, for maior que o conteúdo do elemento da superfície, um aviso deve ser gerado no terminal e a coluna deve ser exibida da seguinte forma:
+
+- Input 
+```ptml
+<depth gap="1">
+    <column index="0">
+        <text>Hello World!</text>
+    </column>
+    <column index="-1">
+        <text>GoodBye World!</text>
+    </column>
+</depth>
+```
+
+- Output
+```cmd
+ ┌──────────────┐  
+ │GoodBye World!│        
+┌┴───────────┬──┘
+│Hello World!│ 
+└────────────┘ 
 ```
 
 ---
@@ -442,7 +550,7 @@ Textos crus existem, mas eles não causam inutilização do elemento `<text>` pe
 ## Elemento `<block>`
 
 `<block></block>`
-Define um bloco nomeado através de um atributo obrigatório chamado `name`.
+Define um bloco nomeado através de um atributo obrigatório chamado `title`.
 
 Exemplo:
 - Input
@@ -568,9 +676,32 @@ end
 ## Elemento `<cell>`
 
 `<cell></cell>`
-Faz a divisão do elemento-pai concreto (elemento-pai de layout (block/box)) conforme a quantidade de seus irmãos. 
+Faz a divisão do elemento-pai concreto (elemento-pai que desenha no cmd (block/box). Column e Row são apenas elementos de display, como seus filhos serão dispostos) conforme a quantidade de seus irmãos. 
 
-Exemplo .1:
+Exemplo .1 Sem Cell:
+- Input
+```ptml
+<block title="Cardapio">
+    <column>
+        <row>
+            <text>Tilapia Cozida</text>
+        </row>
+        <row>
+            <text>Pao de Batata</text>
+        </row>
+    </column>
+</block>
+```
+
+- Output
+```cmd
+┌ Cardapio ──────┐
+│ Tilapia Cozida │
+│ Pao de Batata  │
+└────────────────┘
+```
+
+Exemplo .1 Com Cell:
 - Input
 ```ptml
 <block title="Cardapio">
@@ -594,7 +725,29 @@ Exemplo .1:
 └────────────────┘
 ```
 
-Exemplo .2:
+Exemplo .2 Sem Cell:
+- Input
+```ptml
+<block title="Cardapio">
+    <row gap="1">
+        <cell>
+            <text>Tilapia Cozida</text>
+        </cell>
+        <cell>
+            <text>Pao de Batata</text>
+        </cell>
+    </row>
+</block>
+```
+
+- Output
+```cmd
+┌ Cardapio ──────────────────┐
+│Tilapia Cozida Pao de Batata|
+└────────────────────────────┘
+```
+
+Exemplo .2 Com Cell:
 - Input
 ```ptml
 <block title="Cardapio">
@@ -705,20 +858,20 @@ Coloca um texto explícito em formatação DIM dentro do input.
 
 ---
 ### IGNORE POR ENQUANTO!
-## Elemento `<coordinates>`
+## Elemento `<graphs>`
 
-`<coordinates></coordinates>` ou `<coordinates />`
+`<graphs></graphs>` ou `<graphs />`
 Representa um plano cartesiano de coordenadas no terminal.
 
 ### **Atributos**:
 
-***x-limit/y-limit***:
+***x-coordinates/y-coordinates***:
 Define o valor limite para o crescimento do plano.
 
 Exemplo:
 - Input
 ```ptml
-<coordinates x-limit="15" y-limit="30" />
+<graphs x-coordinates="15" y-coordinates="30" />
 ```
 
 - Output
@@ -732,6 +885,13 @@ Exemplo:
    ┼────────────┼→ x
   0             15
 ``` 
+
+***scale***:
+Escala o tamanho do gráfico conforme o número entrado. Valores possíveis:
+```
+auto                                    (renderiza do tamanho necessário)
+Nº%                                     (valor associado ao elemento-pai substituindo Nº por número --> percentage. Exemplo: 40%)
+```
 
 ***function***:
 Define a função base do plano. Exemplos de alguns valores possíveis, podendo trocar 'N' por qualquer número:
@@ -754,7 +914,7 @@ ln(x)
 Exemplo: 
 - Input
 ```ptml
-<coordinates x-limit="15" function="log(10, x)"/>
+<graphs x-coordinates="15" function="log(10, x)"/>
 ```
 
 - Output

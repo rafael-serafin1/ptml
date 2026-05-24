@@ -3,7 +3,7 @@ open PTML.Lexer
 open PTML.Token
 
 module Parser =
-    let validTags = Set.ofList ["text"; "row"; "column"; "box"; "block"; "terminal"]
+    let validTags = Set.ofList ["text"; "row"; "column"; "depth"; "box"; "block"; "terminal"; "cell"]
     let colorValues = Set.ofList ["none"; "black"; "red"; "green"; "gold"; "blue"; "purple"; "cyan"; "fire"; "limegreen"; "yellow"; "lightblue"; "lilac"; "crystal"; "gray"; "lightgray"; "white"]
     let fontValues = Set.ofList ["none"; "bold"; "dim"; "italic"; "underline"; "slow-blink"; "rapid-blink"; "reverse"; "conceal"; "strike-through"]
     let overflowValues = Set.ofList ["break"; "wrap"; "cut"; "clip"]
@@ -23,9 +23,14 @@ module Parser =
             "align", alignValues
         ]
         "column", Map.ofList [
+            "index", Set.empty
             "overflow", overflowValues
             "gap", Set.empty
             "y-align", alignValues
+        ]
+        "depth", Map.ofList [
+            "z-align", alignValues
+            "gap", Set.empty
         ]
         "box", Map.ofList [
             "overflow", overflowValues
@@ -48,6 +53,7 @@ module Parser =
             "x-align", alignValues
             "y-align", alignValues
         ]
+        "cell", Map.ofList []       // no attrs for now
     ]
 
     let parsePiAttrs (pi: string) =
@@ -61,6 +67,10 @@ module Parser =
                 let value = part.[eqIdx + 2..part.Length - 2]
                 attrs <- (name, value) :: attrs
         attrs |> List.rev
+
+    let negative (number: int): bool =
+        if number <= 0 then true
+        else false 
 
     let rec parser(tokens, stack ) =
         match tokens with
@@ -86,6 +96,9 @@ module Parser =
                             if not (Set.contains value valueSet) then failwith $"Invalid value for {name}: {value}"
                         else
                             match name with
+                            | "index" -> 
+                                let mutable i = 0
+                                if not (System.Int32.TryParse(value, &i)) && not(negative i) then failwith $"Index must be signed int: {value}"
                             | "gap" -> 
                                 let mutable i = 0
                                 if not (System.Int32.TryParse(value, &i)) then failwith $"Gap must be int: {value}"

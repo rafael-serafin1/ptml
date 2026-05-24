@@ -7,14 +7,18 @@ debug:
 script:
 	dotnet fsi ./playground/scripting/runtime.fsx "index.ptml"
 
-pub:
+build_fs: 
 	dotnet build
+
+pub:
 	dotnet publish -c Release -r win-x64 --self-contained true -o ./build
 
-testr: pub run
-testw: pub watch
+testr_rapid: pub run
+testr: build_fs pub run
+testw_rapid: pub watch
+testw: build_fs pub watch
 
 run:
-	./build/ptml run "index.ptml"
+	ptml run "index.ptml"
 watch:
-	./build/ptml watch "index.ptml"
+	ptml watch "index.ptml"

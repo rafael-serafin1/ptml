@@ -14,6 +14,10 @@ module Runner =
     let run(path: string): Status =
         let terminal = getViewport()
         let input: string = File.ReadAllText(path)
+        if input = "" then  
+            printfn "\x1b[31mError\x1b[0m -- PTML File is empty."
+            Status.Error
+        else
 
         let tokens = lex input 0 []
         parser(tokens, [])

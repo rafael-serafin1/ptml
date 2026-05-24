@@ -122,6 +122,11 @@ module Render =
             let childOps = children |> List.collect (renderWidget childBaseX childBaseY)
             borderOps @ childOps
 
+        | PositionedCellWidget(_, _, orientation, total, border, metrics, children) ->
+            let baseX = offsetX + metrics.x
+            let baseY = offsetY + metrics.y
+            children |> List.collect (renderWidget baseX baseY)
+
         | PositionedTerminalWidget(_, _, alignX, alignY, metrics, children) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y

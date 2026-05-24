@@ -20,6 +20,7 @@
     <Compile Include="DiffRenderer.fs"         />
     <Compile Include="Output.fs"               />
     <Compile Include="Runner.fs"               />
+    <Compile Include="ErrorHandling.fs"        />
     <Compile Include="Watch.fs"                />
     <Compile Include="Program.fs"              />
   </ItemGroup>

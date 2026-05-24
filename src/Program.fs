@@ -76,4 +76,7 @@ module Program =
                 S <- Some (watch(file))
             | None -> ()
         | None -> ()
-        0
+
+        match S with
+        | Some s -> defineStatus(s)
+        | None -> 404

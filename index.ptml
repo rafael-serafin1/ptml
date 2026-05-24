@@ -1,24 +1,32 @@
 <?ptml encoding="UTF-8" terminal-resize="reflow"?>
 <terminal x-align="start">
-<block title="PTML" border="rounded">
-    <column>
-        <row>
-            <box border="single">
-                <text foreground="gold">Hello World!</text>
-            </box>
-            <box border="single">
-                <text>GoodBye World!</text>
-            </box>
-        </row>
-        <row>
-            <box border="single">
-                <text foreground="gold">Hello World!</text>
-            </box>
-            <box border="single">
-                <text>GoodBye World!</text>
-            </box>
-        </row>
-    </column>
-</block>
+<column>
+    <block title="PTML" border="rounded" border-color="gray">
+        <column>
+            <row>
+                <box border="single">
+                    <text foreground="gold">Hello World!</text>
+                </box>
+                <box border="single">
+                    <text font="italic">Hello Again!</text>
+                </box>
+                <box border="single">
+                    <text>GoodBye World!</text>
+                </box>
+            </row>
+            <row>
+                <box border="single">
+                    <text foreground="gold">Hello World!</text>
+                </box>
+                <box border="single">
+                    <text font="italic">Hello Again!</text>
+                </box>
+                <box border="single">
+                    <text>GoodBye World!</text>
+                </box>
+            </row>
+        </column>
+    </block>
+</column>
 </terminal>
 <!-- Sintaxe corrigida -->

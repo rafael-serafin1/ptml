@@ -17,6 +17,7 @@ module Layout =
         | PositionedColumnWidget of width:Dimension * border:Border * gap:int * yAlign:Align option * metrics:Metrics * children:PositionedWidget list
         | PositionedBoxWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * align:Align option * metrics:Metrics * children:PositionedWidget list
         | PositionedBlockWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * name:string option * align:Align option * metrics:Metrics * children:PositionedWidget list
+        | PositionedCellWidget of width: Dimension * height: Dimension * direction: CellOrientation * hasNextSibling: bool * border: Border * metrics: Metrics * children: PositionedWidget list
         | PositionedTerminalWidget of width:Dimension * height:Dimension * xAlign:Align option * yAlign:Align option * metrics:Metrics * children:PositionedWidget list
 
     let private charWidth = 1
@@ -39,6 +40,8 @@ module Layout =
             PositionedRowWidget(width, border, gap, align, shiftMetrics metrics, children)
         | PositionedColumnWidget(width, border, gap, yAlign, metrics, children) ->
             PositionedColumnWidget(width, border, gap, yAlign, shiftMetrics metrics, children)
+        | PositionedCellWidget(width, height, direction, hasNextSibling, border, metrics, children) ->
+            PositionedCellWidget(width, height, direction, hasNextSibling, border, shiftMetrics metrics, children)
         | PositionedBoxWidget(width, height, border, borderColor, align, metrics, children) ->
             PositionedBoxWidget(width, height, border, borderColor, align, shiftMetrics metrics, children)
         | PositionedBlockWidget(width, height, border, borderColor, name, align, metrics, children) ->
@@ -59,6 +62,7 @@ module Layout =
             | PositionedTextWidget(_, _, _, _, m)
             | PositionedRowWidget(_, _, _, _, m, _)
             | PositionedColumnWidget(_, _, _, _, m, _)
+            | PositionedCellWidget(_, _, _, _, _, m, _)
             | PositionedBoxWidget(_, _, _, _, _, m, _)
             | PositionedBlockWidget(_, _, _, _, _, _, m, _) 
             | PositionedTerminalWidget(_, _, _, _, m, _) -> m
@@ -181,6 +185,27 @@ module Layout =
                     let xOffset = alignOffset resolvedWidth childTotalWidth align
                     shiftWidget xOffset 0 child)
             PositionedBlockWidget(width, height, border, borderColor, name, align, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
+        | CellWidget(width, height, orientation, total, border, children) ->
+            let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
+
+            let childWidths = positionedChildren |> List.map totalWidth
+            let childHeights = positionedChildren |> List.map totalHeight
+            
+            let maxChildWidth = if List.isEmpty childWidths then 0 else List.max childWidths
+
+            let totalChildWidth = if List.isEmpty childWidths then 0 else List.max childWidths
+            let totalChildHeight = if List.isEmpty childHeights then 0 else List.max childHeights
+
+            let resolvedWidth = resolveDimension width parentWidth totalChildWidth
+            let resolvedHeight = resolveDimension height parentHeight totalChildHeight
+
+            let positionedChildren =
+                positionedChildren
+                |> List.map (fun child ->
+                    let childTotalWidth = totalWidth child
+                    let xOffset = alignOffset resolvedWidth childTotalWidth None
+                    shiftWidget xOffset 0 child)
+            PositionedCellWidget(width, height, orientation, total, border, { x = 0; y = 0; w = 10; h = 10}, positionedChildren)
         | TerminalWidget(width, height, alignX, alignY, children) -> 
             let cmd = getViewport()
 

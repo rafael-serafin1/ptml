@@ -11,6 +11,10 @@ module Tree =
         | Percent of int
         | Fixed of int
 
+    type CellOrientation =
+        | Horizontal
+        | Vertical
+
     type Align =
         | Start
         | Center
@@ -54,8 +58,10 @@ module Tree =
         | TextWidget of text:string * foreground:string option * background:string option * font:string option
         | RowWidget of width:Dimension * border:Border * gap:int * align:Align option * children:Widget list
         | ColumnWidget of width:Dimension * border:Border * gap:int * yAlign:Align option * children:Widget list
+        | DepthWidget of zAlign: Align option * gap: int * children: Widget list
         | BoxWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * align:Align option * children:Widget list
         | BlockWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * name:string option * align:Align option * children:Widget list
+        | CellWidget of width: Dimension * height: Dimension * direction: CellOrientation * hasNextSibling: bool * border: Border * children: Widget list
         | TerminalWidget of width: Dimension * height: Dimension * alignX: Align option * alignY: Align option * children: Widget list
 
     ///
@@ -147,6 +153,7 @@ module Tree =
             | _ -> None)
         |> String.concat ""
 
+    let mutable previousTag: AstNode option = None
     /// builder
     let rec buildSemanticTree ast =
         ast |> List.map buildWidget
@@ -177,6 +184,10 @@ module Tree =
                 let gap = parseIntAttr "gap" 0 attrs
                 let yAlign = tryGetAttr "y-align" attrs |> Option.map parseAlign
                 ColumnWidget(width, border, gap, yAlign, childrenWidgets)
+            | "depth" ->
+                let gap = parseIntAttr "gap" 0 attrs
+                let zAlign = tryGetAttr "z-align" attrs |> Option.map parseAlign
+                DepthWidget(zAlign, gap, childrenWidgets)
             | "box" ->
                 let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
                 let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
@@ -192,6 +203,12 @@ module Tree =
                 let name = tryGetAttr "title" attrs
                 let align = tryGetAttr "align" attrs |> Option.map parseAlign
                 BlockWidget(width, height, border, borderColor, name, align, childrenWidgets)
+            | "cell" -> 
+                let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
+                let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
+                let direction = CellOrientation.Vertical
+                let border = tryGetAttr "border" attrs |> Option.map parseBorder |> Option.defaultValue Single
+                CellWidget(width, height, direction, false, border, childrenWidgets)
             | "terminal" ->
                 let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
                 let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto

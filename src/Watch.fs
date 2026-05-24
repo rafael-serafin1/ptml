@@ -12,6 +12,7 @@ open PTML.Buffer
 open PTML.Render
 open PTML.Buffer
 open PTML.DiffRenderer
+open PTML.ErrorHandle
 
 module Watch =
     let rec readWhenReady path retries =
@@ -47,16 +48,19 @@ module Watch =
             previousBuffer <- buffer
         }
 
+    // previous error message
+    let mutable msn: string = ""
     let setWatcher(path: string) =
         let terminal: Terminal = getViewport()
 
-        let mutable fullPath = Path.GetFullPath(path)   // ele morre aqui
-        if fullPath = "" then   
+        let mutable fullPath = Path.GetFullPath(path) 
+        if fullPath = "" then                           // this is inconsistent, but works ¯\_(ツ)_/¯
             fullPath <- "../" + path
         else    
         let directory = Path.GetDirectoryName(fullPath)
         let fileName = Path.GetFileName(fullPath)
 
+        // setting watcher 
         let watcher = new FileSystemWatcher()
         watcher.Path <- directory
         watcher.Filter <- fileName
@@ -64,8 +68,14 @@ module Watch =
 
         asyncSetting(terminal, path) |> Async.RunSynchronously
 
+        // do smthng when file is changed
         watcher.Changed.Add(fun _ ->
-            asyncSetting(terminal, path) |> Async.RunSynchronously
+            try
+                asyncSetting(terminal, path) |> Async.RunSynchronously
+                ErrorHandle.clearError msn      // clear previous error message from 'with'
+            with ex ->
+                ErrorHandle.renderError (ex.Message)
+                msn <- ex.Message
         )
 
         watcher.EnableRaisingEvents <- true
@@ -73,6 +83,9 @@ module Watch =
 
     let watch(path: string): Status = 
         let mutable S: Status = Runner.run(path)
-        setWatcher(path) 
-        S
+        if S = Status.Error then
+            Status.Error
+        else
+            setWatcher(path) 
+            S
 
