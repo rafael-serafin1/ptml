@@ -697,7 +697,7 @@ end
 ## Elemento `<cell>`
 
 `<cell></cell>`
-Faz a divisão do elemento-pai concreto (elemento-pai que desenha no cmd (block/box). Column e Row são apenas elementos de display, como seus filhos serão dispostos) conforme a quantidade de seus irmãos. 
+Faz a divisão do elemento-pai concreto (elemento-pai que desenha no CMD (block/box). Column e Row são apenas elementos de display, como seus filhos serão dispostos) conforme a quantidade de seus irmãos. 
 
 Exemplo .1 Sem Cell:
 - Input
@@ -831,6 +831,24 @@ Exemplo .3:
 ```
 
 ---
+## Elemento `<f-sharp>`
+
+`<f-sharp></f-sharp>`
+Elemento usado para inferir ou referenciar scripts executáveis.
+
+### **Atributos**:
+
+***src***:
+Define o caminho para um arquivo de script externo.
+
+***execute***:
+Define como o script externo deve ser carregado e executado. Valores possíveis:
+```
+defer               (em paralelo, mas apenas se o PTML ja foi totalmente processado)
+async               (de forma assíncrona)
+```
+
+--- 
 ## Elemento `<input>`
 
 `<input></input>` ou `<input />`
@@ -844,9 +862,9 @@ Exemplo:
 
 - Output
 ```cmd
-┌──────────────┐
-│Click here!   |
-└──────────────┘
+┌───────────┐
+│Click here!|
+└───────────┘
 ```
 
 ### **Atributos**:
@@ -894,9 +912,9 @@ Representa uma entidade no terminal.
 Define o nome da entidade.
 
 ---
-## Elemento `<point>`
+## Elemento `<bind>`
 
-`<point></point>` ou `<point />`
+`<bind></bind>` ou `<bind />`
 
 ### **Atributos**:
 

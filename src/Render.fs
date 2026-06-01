@@ -202,7 +202,7 @@ module Render =
                 children
                 |> List.collect (fun grid ->
                     grid.cells
-                    |> List.collect (fun cell -> renderWidget baseX baseY cell.widget))
+                    |> List.collect (fun cell -> renderWidget (baseX + cell.metrics.x) (baseY + cell.metrics.y) cell.widget))
 
             separatorOps @ childOps
 

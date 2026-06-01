@@ -1,26 +1,41 @@
+<!-- XML like definition -->
 <?ptml encoding="UTF-8" terminal-resize="reflow"?>
+
+<!-- Terminal Window Reference -->
 <terminal x-align="start">
-<column>
-    <block title="PTML" border="rounded" border-color="gray">
-        <column>
-            <row>
-                <box border="single">
-                    <text foreground="gold">Hello World!</text>
-                </box>
-                <box border="single">
-                    <text>GoodBye World!</text>
-                </box>
-            </row>
-            <row>
-                <box border="single">
-                    <text foreground="gold">Hello World!</text>
-                </box>
-                <box border="single">
-                    <text>GoodBye World!</text>
-                </box>
-            </row>
-        </column>
-    </block>
-</column>
+<!-- Simple Box with a Title -->
+<block title="PTML" border="rounded">
+    <!-- Children are distributed in column pattern -->
+    <column>
+        <!-- Children are distributed in row pattern -->
+        <row>
+            <!-- Divide first concret parent by the number of cells -->
+            <cell>
+               <box border-color="gray">
+                   <!-- Prints out a text -->
+                   <text foreground="gold">Hello World!</text>
+               </box>
+            </cell>
+            <cell>
+               <box border-color="gray">
+                   <text>GoodBye World!</text>
+               </box>
+            </cell>
+        </row>
+        <row>
+            <cell>
+               <box border-color="gray">
+                   <text foreground="gold">Hello World!</text>
+               </box>
+            </cell>
+            <cell>
+               <box border-color="gray">
+                   <text>GoodBye World!</text>
+               </box>
+            </cell>
+        </row>
+    </column>
+</block>
 </terminal>
-<!-- Sintaxe corrigida -->
+
+<!-- THIS IS A PTML TEST FILE -->
