@@ -1,0 +1,11 @@
+<?ptml encoding="UTF-8" terminal-resize="reflow"?>
+<box>
+    <row>
+        <cell>
+            <text foreground="blue">1</text>
+        </cell>
+        <cell>
+            <text foreground="red">2</text>
+        </cell>
+    </row>
+</box>

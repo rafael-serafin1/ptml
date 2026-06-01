@@ -11,11 +11,24 @@ open PTML.Buffer
 open PTML.Render
 open PTML.Runner
 open PTML.Watch
+open PTML.Debug
 
 module Program =
+    let help: string = """Comandos:
+- run <PATH>   :: Roda um arquivo PTML.
+- watch <PATH> :: Roda e observa mudanças e atualiza o terminal automaticamente.
+- debug <PATH> :: Ferramenta para debug do pipeline (uso para desenvolvedores). 
+----------------------------------------------------------------------------------
+Flags:
+"--help" ou "-h" -> Printar esse comando.
+"--version" ou "-v" -> Printa a versão do projeto.
+                    """
+    let version: string = "Versão do projeto :: 0.1.1"
+
     type Command = 
         | Run
         | Watch
+        | Debug
 
     type Flag =
         | Help of bool
@@ -47,14 +60,22 @@ module Program =
             //commands
             | "run" -> config <- { config with command = Some Run }
             | "watch" -> config <- { config with command = Some Watch }
+            | "debug" -> config <- { config with command = Some Debug }
             //file path
             | _ when arg.EndsWith(".ptml") -> config <- { config with filePath = Some arg }
             | _ -> printfn "Unknown argument: %s" arg
 
         match config.command with
         | None -> 
-            printfn "No command provided. Use --help for usage information."
-            Environment.Exit(defineStatus(Status.Error))
+            if config.flags.IsEmpty = false then
+                for flag: Flag in config.flags do
+                    match flag with
+                    | Help h -> printfn "%s" help
+                    | Version v -> printfn "%s" version
+            else 
+                printfn "No command provided. Use --help for usage information."
+                Environment.Exit(defineStatus(Status.Error))
+
         | Some _ -> ()
         
         match config.filePath with
@@ -75,7 +96,18 @@ module Program =
             | Some file -> 
                 S <- Some (watch(file))
             | None -> ()
+        | Some Debug ->
+            match config.filePath with 
+            | Some file -> 
+                S <- Some (debug(file))
+            | None -> ()
         | None -> ()
+
+        for flag: Flag in config.flags do
+            match flag with
+            | Help h -> printfn "%s" help
+            | Version v -> printfn "%s" version
+            
 
         match S with
         | Some s -> defineStatus(s)

@@ -10,8 +10,12 @@
 /hazard
 /prompt
 /node_modules
-/.vscode
 */bin
 */obj
+*/testing
+/extras
+extras/
+testing/
+.vscode/
 
 .fake

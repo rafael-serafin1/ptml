@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="utils/Utils.fs"          />
     <Compile Include="Token.fs"                />
     <Compile Include="Lexer.fs"                />
     <Compile Include="Parser.fs"               />
@@ -19,9 +20,10 @@
     <Compile Include="Diff.fs"                 />
     <Compile Include="DiffRenderer.fs"         />
     <Compile Include="Output.fs"               />
-    <Compile Include="Runner.fs"               />
+    <Compile Include="main/Runner.fs"          />
     <Compile Include="ErrorHandling.fs"        />
-    <Compile Include="Watch.fs"                />
+    <Compile Include="main/Watch.fs"           />
+    <Compile Include="main/Debug.fs"           />
     <Compile Include="Program.fs"              />
   </ItemGroup>
 

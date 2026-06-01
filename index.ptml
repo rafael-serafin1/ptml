@@ -8,18 +8,12 @@
                     <text foreground="gold">Hello World!</text>
                 </box>
                 <box border="single">
-                    <text font="italic">Hello Again!</text>
-                </box>
-                <box border="single">
                     <text>GoodBye World!</text>
                 </box>
             </row>
             <row>
                 <box border="single">
                     <text foreground="gold">Hello World!</text>
-                </box>
-                <box border="single">
-                    <text font="italic">Hello Again!</text>
                 </box>
                 <box border="single">
                     <text>GoodBye World!</text>

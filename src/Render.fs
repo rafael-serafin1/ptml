@@ -104,6 +104,11 @@ module Render =
             let baseY = offsetY + metrics.y
             children |> List.collect (renderWidget baseX baseY)
 
+        | PositionedCellWidget(metrics, children) ->
+            let baseX = offsetX + metrics.x
+            let baseY = offsetY + metrics.y
+            children |> List.collect (renderWidget baseX baseY)
+
         | PositionedBoxWidget(_, _, border, borderColor, _, metrics, children) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
@@ -122,10 +127,84 @@ module Render =
             let childOps = children |> List.collect (renderWidget childBaseX childBaseY)
             borderOps @ childOps
 
-        | PositionedCellWidget(_, _, orientation, total, border, metrics, children) ->
+        | PositionedGridWidget(border, borderColor, metrics, children: List<GridLayout>) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
-            children |> List.collect (renderWidget baseX baseY)
+
+            let separatorOps =
+                children
+                |> List.collect (fun grid ->
+                    let top = baseY
+                    let left = baseX
+                    let bottom = baseY + metrics.h - 1
+                    let right = baseX + metrics.w - 1
+                    let leftCross, rightCross, topCross, bottomCross, middleCross = borderCharsContinuity border
+                    let horizontalLine = borderChars border |> fun (_, _, _, _, h, _) -> h
+                    let verticalLine = borderChars border |> fun (_, _, _, _, _, v) -> v
+
+                    let horizontalLines =
+                        grid.separators
+                        |> List.choose (function
+                            | HorizontalSeparator y -> Some (drawHorizontal left right (baseY + y) horizontalLine borderColor)
+                            | _ -> None)
+                        |> List.collect id
+
+                    let verticalLines =
+                        grid.separators
+                        |> List.choose (function
+                            | VerticalSeparator x -> Some (drawVertical (baseX + x) top bottom verticalLine borderColor)
+                            | _ -> None)
+                        |> List.collect id
+
+                    let crossPoints =
+                        [ for xSep in grid.separators do
+                            for ySep in grid.separators do
+                                match xSep, ySep with
+                                | VerticalSeparator vx, HorizontalSeparator hy ->
+                                    yield DrawChar(middleCross, baseX + vx, baseY + hy, borderColor, None, None)
+                                | _ -> () ]
+
+                    let borderTopIntersections =
+                        if border <> NoBorder then
+                            grid.separators
+                            |> List.choose (function
+                                | VerticalSeparator x -> Some (DrawChar(topCross, baseX + x, baseY - 1, borderColor, None, None))
+                                | _ -> None)
+                        else []
+
+                    let borderBottomIntersections =
+                        if border <> NoBorder then
+                            grid.separators
+                            |> List.choose (function
+                                | VerticalSeparator x -> Some (DrawChar(bottomCross, baseX + x, baseY + metrics.h, borderColor, None, None))
+                                | _ -> None)
+                        else []
+
+                    let borderLeftIntersections =
+                        if border <> NoBorder then
+                            grid.separators
+                            |> List.choose (function
+                                | HorizontalSeparator y -> Some (DrawChar(leftCross, baseX - 1, baseY + y, borderColor, None, None))
+                                | _ -> None)
+                        else []
+
+                    let borderRightIntersections =
+                        if border <> NoBorder then
+                            grid.separators
+                            |> List.choose (function
+                                | HorizontalSeparator y -> Some (DrawChar(rightCross, baseX + metrics.w, baseY + y, borderColor, None, None))
+                                | _ -> None)
+                        else []
+
+                    horizontalLines @ verticalLines @ crossPoints @ borderTopIntersections @ borderBottomIntersections @ borderLeftIntersections @ borderRightIntersections)
+
+            let childOps =
+                children
+                |> List.collect (fun grid ->
+                    grid.cells
+                    |> List.collect (fun cell -> renderWidget baseX baseY cell.widget))
+
+            separatorOps @ childOps
 
         | PositionedTerminalWidget(_, _, alignX, alignY, metrics, children) ->
             let baseX = offsetX + metrics.x

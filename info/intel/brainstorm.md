@@ -253,14 +253,18 @@ Faz juz a profundidade. Seus filhos são distribuídos por índice da 3º dimens
 Exemplo .1:
 - Input
 ```ptml
-<depth>
-    <box index="0">
+<depth index="0">
+    <box>
         <text>Hello World!</text>
     </box>
-    <box index="-1">
+</depth>
+<depth index="-1">
+    <box>
         <text>GoodBye World!</text>
     </box>
-    <box index="-2">
+</depth>
+<depth index="-2">
+    <box>
         <text>Hello Again!</text>
     </box>
 </depth>
@@ -281,11 +285,11 @@ Exemplo .1:
 Exemplo .(1.5):
 - Input
 ```ptml
-<depth>
-    <box index="0">
+<depth index="0">
+    <box>
         <text>Hello World!</text>
     </box>
-    <box index="0">
+    <box>
         <text>GoodBye World!</text>
     </box>
 </depth>
@@ -299,8 +303,8 @@ Erro: não pode haver dois filhos com índice de mesmo valor!
 Exemplo .2:
 - Input
 ```ptml
-<depth>
-    <column index="0">
+<depth index="0">
+    <column>
         <row>
             <box border="single">
                 <text foreground="gold">Hello World!</text>
@@ -318,7 +322,9 @@ Exemplo .2:
             </box>
         </row>
     </column>
-    <column index="-1">
+</depth>
+<depth index="-1">
+    <column>
         <row>
             <box border="single">
                 <text foreground="gold">Hello World!</text>
@@ -353,19 +359,21 @@ Exemplo .2:
 
 ### **Atributos**:
 
-***index*** (específico para os filhos e obrigatório):
+***index*** (obrigatório):
 Define o índice de profundidade do elemento-filho.
 
 Exemplo:
 - Input
 ```ptml
-<depth>
-    <column index="0">
+<depth index="0">
+    <column>
         <box>
             <text>Hello World!</text>
         </box>
     </column>
-    <column index="-1">
+</depth>
+<depth index="-1">
+    <column>
         <box>
             <text>GoodBye World!</text>
         </box>
@@ -381,6 +389,15 @@ Exemplo:
  └────────────┘
 ```
 
+***overflow***:
+Atributo que define o comportamento do container em caso de overflow de conteúdo. Caso não seja explicitado o resoluto em caso de overflow, o valor por padrão é o `break` (quebra o conteudo em uma nova linha). Valores possíveis:
+```
+break                               (quebra em qualquer caractere)
+wrap                                (quebra respeitando palavras)
+cut                                 (corta texto bruto)
+clip                                (recorta área renderizada final.)
+```
+
 ***z-align***:
 Atributo que alinha um conteúdo dimensionalmente pela profundidade disponível do container pai. Valores possíveis:
 ```
@@ -392,11 +409,13 @@ end         (valor default APENAS para o cenário descrito na observação N2)
 Exemplo
 - Input
 ```ptml
-<depth z-align="center">
-    <column index="0">
+<depth index="0" z-align="center">
+    <column>
         <text>Hello World!</text>
     </column>
-    <column index="-1">
+</depth>
+<depth index="-1" z-align="center">
+    <column>
         <text>Bye World!</text>
     </column>
 </depth>
@@ -417,11 +436,13 @@ Define o espaçamento entre um filho e outro no layout. O valor deve ser numéri
 Exemplo:
 - Input
 ```ptml
-<depth gap="1">
-    <column index="0">
+<depth index="0" gap="1">
+    <column>
         <text>Hello World!</text>
     </column>
-    <column index="-1">
+</depth>
+<depth index="-1" gap="1">
+    <column>
         <text>Bye World!</text>
     </column>
 </depth>
@@ -706,12 +727,16 @@ Exemplo .1 Com Cell:
 ```ptml
 <block title="Cardapio">
     <column>
-        <cell>
-            <text>Tilapia Cozida</text>
-        </cell>
-        <cell>
-            <text>Pao de Batata</text>
-        </cell>
+        <row>
+            <cell>
+                <text>Tilapia Cozida</text>
+            </cell>
+        </row>
+        <row>
+            <cell>
+                <text>Pao de Batata</text>
+            </cell>
+        </row>
     </column>
 </block>
 ```
@@ -831,7 +856,8 @@ Define o tipo do input. Valores possíveis:
 ```
 button
 scan
-...
+radio-button
+check-box
 ```
 
 ***event***:
@@ -847,7 +873,7 @@ hold-click
 Define a função que será executada ao detectar que o evento foi chamado. A função deve ser declarada dentro do escopo do PTML através do elemento `<f-sharp></f-sharp>`.
 
 ***placeholder***:
-Coloca um texto explícito em formatação DIM dentro do input.
+Coloca um texto explícito em formatação DIM dentro do input. Tem como valor default, um caractere escondido.
 
 ---
 ### IGNORE POR ENQUANTO!
@@ -855,6 +881,30 @@ Coloca um texto explícito em formatação DIM dentro do input.
 
 `<output></output>` ou `<output/>`
 É um campo específico onde o valor retornado do elemento `<input />` será mostrado.
+
+---
+## Elemento `<entity>`
+
+`<entity></entity>` ou `<entity />`
+Representa uma entidade no terminal.
+
+### **Atributos**:
+
+***name***:
+Define o nome da entidade.
+
+---
+## Elemento `<point>`
+
+`<point></point>` ou `<point />`
+
+### **Atributos**:
+
+***from***:
+Define de onde aponta.
+
+***to***:
+Define para onde aponta.
 
 ---
 ### IGNORE POR ENQUANTO!

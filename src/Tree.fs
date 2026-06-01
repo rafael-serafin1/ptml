@@ -61,7 +61,7 @@ module Tree =
         | DepthWidget of zAlign: Align option * gap: int * children: Widget list
         | BoxWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * align:Align option * children:Widget list
         | BlockWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * name:string option * align:Align option * children:Widget list
-        | CellWidget of width: Dimension * height: Dimension * direction: CellOrientation * hasNextSibling: bool * border: Border * children: Widget list
+        | CellWidget of children: Widget list
         | TerminalWidget of width: Dimension * height: Dimension * alignX: Align option * alignY: Align option * children: Widget list
 
     ///
@@ -204,11 +204,7 @@ module Tree =
                 let align = tryGetAttr "align" attrs |> Option.map parseAlign
                 BlockWidget(width, height, border, borderColor, name, align, childrenWidgets)
             | "cell" -> 
-                let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
-                let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
-                let direction = CellOrientation.Vertical
-                let border = tryGetAttr "border" attrs |> Option.map parseBorder |> Option.defaultValue Single
-                CellWidget(width, height, direction, false, border, childrenWidgets)
+                CellWidget(childrenWidgets)
             | "terminal" ->
                 let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
                 let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
