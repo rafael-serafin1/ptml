@@ -12,6 +12,7 @@ open PTML.Render
 open PTML.Runner
 open PTML.Watch
 open PTML.Debug
+open PTML.Messager
 
 module Program =
     let help: string = """Comandos:
@@ -73,18 +74,23 @@ Flags:
                     | Help h -> printfn "%s" help
                     | Version v -> printfn "%s" version
             else 
-                printfn "No command provided. Use --help for usage information."
-                Environment.Exit(defineStatus(Status.Error))
+                PTMLMessage("No command provided. Use --help for usage information.", MessageStatus.Error)
+                Environment.Exit(defineStatus(MessageStatus.Error))
 
         | Some _ -> ()
         
         match config.filePath with
         | None -> 
-            printfn "No file path provided. Use --help for usage information."
-            Environment.Exit(defineStatus(Status.Error))
-        | Some _ -> ()
+            PTMLMessage("No file path provided. Use --help for usage information.", MessageStatus.Error)
+            Environment.Exit(defineStatus(MessageStatus.Error))
+        | Some _ -> 
+            let file = System.IO.File.Exists(config.filePath.Value)
+            if file = false then
+                PTMLMessage(sprintf "File not found: %s" config.filePath.Value, MessageStatus.Error)
+                Environment.Exit(defineStatus(MessageStatus.Error))
+            else ()
 
-        let mutable S: Status option = None
+        let mutable S: Token.Status option = None
         match config.command with
         | Some Run -> 
             match config.filePath with
@@ -110,5 +116,5 @@ Flags:
             
 
         match S with
-        | Some s -> defineStatus(s)
+        | Some s -> Token.defineStatus(s)
         | None -> 404

@@ -4,12 +4,14 @@
 *.tmp
 *.temp
 *.fake
+*.vsix
 
 # dirs
 /logs
 /hazard
 /prompt
-/node_modules
+*/out
+*/node_modules
 */bin
 */obj
 */testing

@@ -1,0 +1,89 @@
+{
+    "name": "ptml-language",
+    "displayName": "PTML Language Support",
+    "description": "Language support for PTML",
+    "version": "1.9.94",
+    "publisher": "Skrom",
+    "license": "MIT",
+
+    "engines": {
+        "vscode": "^1.80.0"
+    },
+
+    "categories": [
+        "Programming Languages"
+    ],
+
+    "activationEvents": [
+        "onLanguage:ptml",
+        "onCommand:ptml.run",
+        "onCommand:ptml.watch"
+    ],
+
+    "main": "./out/extension.js",
+
+    "contributes": {
+        "languages": [
+            {
+                "id": "ptml",
+                "aliases": [
+                    "PTML",
+                    "ptml"
+                ],
+                "extensions": [
+                    "*.ptml",
+                    ".ptml"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "commands": [
+            {
+                "command": "ptml.run",
+                "title": "Run PTML file"
+            }, 
+            {
+                "command": "ptml.watch",
+                "title": "Watch PTML file"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "ptml.run",
+                "key": "ctrl+alt+r"
+            },
+            {
+                "command": "ptml.watch",
+                "key": "ctrl+alt+w"
+            }
+        ],
+        "snippets": [
+            {
+                "language": "ptml",
+                "path": "./snippets/ptml.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "ptml",
+                "scopeName": "source.ptml",
+                "path": "./syntaxes/ptml.tmLanguage.json"
+            }
+        ]
+    },
+
+    "scripts": {
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./"
+    },
+
+    "dependencies": {
+        "vscode-languageclient": "^9.0.1"
+    },
+
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "@types/vscode": "^1.80.0",
+        "typescript": "^5.0.0"
+    }
+}

@@ -14,6 +14,32 @@ static
 São ignorados pelo parser. Servem para comentar código.
 
 ---
+### Categorização de Elementos PTML
+Os elementos PTML são categorizados em dois tipos, concreto e abstrato. Elementos concretos são aqueles que desenham/escrevem alguma no terminal. Já os elementos abstratos são aqueles que não desenham, mas definem o fluxo e direção do conteúdo de forma expressiva.
+
+Sendo assim, atualmente os concretos são:
+```ptml
+<text>
+<box>
+<block>
+<input>
+<output>
+<entity>
+<bind>
+<graphs>
+```
+
+Agora, os abstratos são:
+```ptml
+<row>
+<column>
+<depth>
+<terminal>
+<cell>
+<script>
+```
+
+---
 ### Elemento `<text>`
 
 `<text></text>`
@@ -75,11 +101,11 @@ lightgray -- [1;37m
 2 -- dim
 3 -- italic
 4 -- underline
-5 -- slow blink
-6 -- rapid blink
+5 -- slow-blink
+6 -- rapid-blink
 7 -- reverse                 (marked)
 8 -- conceal                 (hidden)
-9 -- strikethrough
+9 -- strike-through
 ```
 
 ### OBS:
@@ -109,7 +135,7 @@ RedJohn
 
 ***overflow***:
 Atributo que define o comportamento do container em caso de overflow de conteúdo. Caso não seja explicitado o resoluto em caso de overflow, o valor por padrão é o `break` (quebra o conteudo em uma nova linha). Valores possíveis:
-```
+``` 
 break                               (quebra em qualquer caractere)
 wrap                                (quebra respeitando palavras)
 cut                                 (corta texto bruto)
@@ -522,7 +548,6 @@ clip                                (recorta área renderizada final.)
 ```
 single              (┌ ┐ └ ┘ ─ │)
 double              (╔ ╗ ╚ ╝ ═ ║)
-semi-bold           (┍ ┑ ┕ ┙ ─ │)
 bold                (┏ ┓ ┗ ┛ ━ ┃)
 strange             ("╒", "╕", "╘", "╛", "═", "│" ) 
 rounded             (╭ ╮ ╰ ╯)
@@ -556,13 +581,27 @@ center
 end
 ```
 
-***index***:
-Atributo que define o índice da dimensão Z em que o elemento ficará.
+***padding***:
+Atributo que define o espaço entre a borda e o conteúdo, sendo seu valor padrão 0.
+
+- Input 
 ```ptml
-<box index="1">
+<box padding="1">
     <text>Olá</text>
 </box>
 ```
+
+- Output
+```cmd
+┌─────┐
+│     │
+│ Olá │
+│     │
+└─────┘
+```
+
+> Como é possível ver, a distância do conteúdo para as bordas laterais são de "1", assim como foi referenciado no atributo padding.
+
 
 ### OBS:
 Textos crus existem, mas eles não causam inutilização do elemento `<text>` pelo fato de eles não possuírem outra forma de serem estilizados, mas no fim eles acabam virando nó padrão de `<text>`.
@@ -571,7 +610,7 @@ Textos crus existem, mas eles não causam inutilização do elemento `<text>` pe
 ## Elemento `<block>`
 
 `<block></block>`
-Define um bloco nomeado através de um atributo obrigatório chamado `title`.
+Define um bloco nomeado através de um atributo obrigatório chamado `title`. A diferença chave entre `<box>` e `<block>` é que o conteúdo de `<block>` é tratado como dele, assim poderá no futuro colocar várias seções de botões rádio que não vão conflitarem entre si.
 
 Exemplo:
 - Input
@@ -618,10 +657,8 @@ clip                                (recorta área renderizada final.)
 ```
 single              (┌ ┐ └ ┘ ─ │)
 double              (╔ ╗ ╚ ╝ ═ ║)
-semi-bold           (┍ ┑ ┕ ┙ ─ │)
 bold                (┏ ┓ ┗ ┛ ━ ┃)
-strange             (╒ ╕ ╘ ╛ ═ │) 
-classic             (┍ ┑ ┕ ┙ ─ │)
+strange             ("╒", "╕", "╘", "╛", "═", "│" ) 
 rounded             (╭ ╮ ╰ ╯)
 ascii               (+ - |)
 none
@@ -669,13 +706,26 @@ Exemplo:
 └─────────┘
 ```
 
-***index***:
-Atributo que define o índice da dimensão Z em que o elemento ficará.
+***padding***:
+Atributo que define o espaço entre a borda e o conteúdo, sendo seu valor padrão 0.
+
+- Input 
 ```ptml
-<block title="PopUp" index="1">
+<block title="" padding="1">
     <text>Olá</text>
 </block>
 ```
+
+- Output
+```cmd
+┌─────┐
+│     │
+│ Olá │
+│     │
+└─────┘
+```
+
+> Como é possível ver, a distância do conteúdo para as bordas laterais são de "1", assim como foi referenciado no atributo padding.
 
 --- 
 ## Elemento `<terminal>`
@@ -831,6 +881,39 @@ Exemplo .3:
 ```
 
 ---
+## Elemento `<table>`
+
+`<table></table>`, `<table-row></table-row>` e `<table-column></table-column>`
+Elemento usado para criar tabelas.
+
+- Input 
+```ptml
+<table name="">
+    <table-row>
+        <table-column name="vogais">
+            <text>A</text>
+            <text>E</text>
+            <text>I</text>
+            <text>O</text>
+            <text>U</text>
+        </table-column>
+        <table-column name="consoantes">
+            <text>B</text>
+            <text>C</text>
+            <text>D</text>
+        </table-column>
+    </table-row>
+</table>
+```
+
+> Lógica: Uma tabela que contém uma linha com duas colunas.
+
+- Output
+```cmd
+
+```
+
+---
 ## Elemento `<f-sharp>`
 
 `<f-sharp></f-sharp>`
@@ -876,11 +959,13 @@ button
 scan
 radio-button
 check-box
+...
 ```
 
 ***event***:
 Define o tipo de evento que o input vai ser ativado por. Valores possíveis:
 ```
+clicks                          (aceita qualquer tipo de clique, podendo ser tratado durante o `handler`)
 single-click
 double-click
 hold-click
@@ -923,6 +1008,14 @@ Define de onde aponta.
 
 ***to***:
 Define para onde aponta.
+
+***linkage***:
+Define o tipo de ligação que as entidades terão. Valores possíveis:
+```
+arrow                   (e1 ----> e2)
+mutual-arrow            (e1 <---> e2)
+relationship            (e1 --<relation>-- e2)
+```
 
 ---
 ### IGNORE POR ENQUANTO!
@@ -982,7 +1075,7 @@ ln(x)
 Exemplo: 
 - Input
 ```ptml
-<graphs x-coordinates="15" function="log(10, x)"/>
+<graphs scale="auto" x-coordinates="15" function="log(10, x)"/>
 ```
 
 - Output

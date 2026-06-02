@@ -13,13 +13,11 @@ build_fs:
 pub:
 	dotnet publish -c Release -r win-x64 --self-contained true -o ./build
 
-all: build_fs pub
-
-testr_rapid: pub run
+qtestr: pub run
 testr: build_fs pub run
-testw_rapid: pub watch
+qtestw: pub watch
 testw: build_fs pub watch
-testd_rapid: pub debug
+qtestd: pub debug
 testd: build_fs pub debug
 
 run:
@@ -27,4 +25,4 @@ run:
 watch:
 	ptml watch "index.ptml"
 debug:
-	ptml debug "cell_test.ptml"
+	ptml debug "index.ptml"

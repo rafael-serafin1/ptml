@@ -1,0 +1,12 @@
+{
+    "PTML Header": {
+        "prefix": "??",
+        "body": [
+            "<?ptml encoding=\"UTF-6\" terminal-resize=\"static\"?>",
+            "<terminal x-align=\"start\">",
+            "$0",
+            "</terminal>"
+        ],
+        "description": "Insert PTML document header"
+    }
+}
