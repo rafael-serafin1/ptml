@@ -109,7 +109,7 @@ module Render =
             let baseY = offsetY + metrics.y
             children |> List.collect (renderWidget baseX baseY)
 
-        | PositionedBoxWidget(_, _, border, borderColor, _, metrics, children) ->
+        | PositionedBoxWidget(_, _, border, borderColor, _, _, _, metrics, children) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
             let borderOps = drawBorder baseX baseY metrics.w metrics.h border borderColor
@@ -118,7 +118,7 @@ module Render =
             let childOps = children |> List.collect (renderWidget childBaseX childBaseY)
             borderOps @ childOps
 
-        | PositionedBlockWidget(_, _, border, borderColor, name, align, metrics, children) ->
+        | PositionedBlockWidget(_, _, border, borderColor, name, align, _, _, metrics, children) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
             let borderOps = drawBorderWithTitle baseX baseY metrics.w metrics.h border borderColor name

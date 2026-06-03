@@ -39,6 +39,7 @@ module Parser =
             "height", Set.empty
             "border-color", colorValues
             "align", alignValues
+            "padding", Set.empty
         ]
         "block", Map.ofList [
             "title", Set.empty
@@ -48,6 +49,7 @@ module Parser =
             "height", Set.empty
             "border-color", colorValues
             "align", alignValues
+            "padding", Set.empty
         ]
         "terminal", Map.ofList [
             "x-align", alignValues
@@ -106,6 +108,16 @@ module Parser =
                                 if value <> "auto" && not (value.EndsWith "%") then
                                     let mutable i = 0
                                     if not (System.Int32.TryParse(value, &i)) then failwith $"Invalid {name}: {value}"
+                            | "padding" ->
+                                let parts : string[] = value.Split([| 'x' |])
+                                let parsePaddingPart (part: string) =
+                                    let mutable i = 0
+                                    if System.Int32.TryParse(part, &i) && i >= 0 then i
+                                    else failwith $"Invalid padding value: {value}"
+                                match parts with
+                                | [| part |] -> ignore (parsePaddingPart part)
+                                | [| vertical; horizontal |] -> ignore (parsePaddingPart vertical); ignore (parsePaddingPart horizontal)
+                                | _ -> failwith $"Invalid padding format: {value}"
                             | _ -> ()
                     | None -> failwith $"Invalid attribute for {tag}: {name}"
                 if tag = "block" && not (List.exists (fun (name, _) -> name = "title") attrs) then

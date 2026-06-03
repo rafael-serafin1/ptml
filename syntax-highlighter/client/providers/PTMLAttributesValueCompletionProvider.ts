@@ -91,11 +91,12 @@ export class PTMLAttributeValueCompletionProvider
         "x-align": align,
         "y-align": align,
         "z-align": align,
-
+        
         overflow: overflow,
-
+        
         width: NaNValuesInNumericAttrs,
         height: NaNValuesInNumericAttrs,
+        padding: NaNValuesInNumericAttrs,
         index: nums && NaNValuesInNumericAttrs
     };
 

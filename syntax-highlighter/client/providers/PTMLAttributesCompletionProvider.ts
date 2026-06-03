@@ -51,6 +51,10 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         {
             name: "align",
             values: align
+        },
+        {
+            name: "padding",
+            values: NaNValuesInNumericAttrs
         }
     ],
 
@@ -79,6 +83,10 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         {
             name: "align",
             values: align
+        },
+        {
+            name: "padding",
+            values: NaNValuesInNumericAttrs
         }
     ],
 

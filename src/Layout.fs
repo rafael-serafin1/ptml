@@ -16,8 +16,8 @@ module Layout =
         | PositionedRowWidget of width:Dimension * border:Border * gap:int * align:Align option * metrics:Metrics * children:PositionedWidget list
         | PositionedColumnWidget of width:Dimension * border:Border * gap:int * yAlign:Align option * metrics:Metrics * children:PositionedWidget list
         | PositionedCellWidget of metrics:Metrics * children:PositionedWidget list
-        | PositionedBoxWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * align:Align option * metrics:Metrics * children:PositionedWidget list
-        | PositionedBlockWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * name:string option * align:Align option * metrics:Metrics * children:PositionedWidget list
+        | PositionedBoxWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * align:Align option * padding:int * int * metrics:Metrics * children:PositionedWidget list
+        | PositionedBlockWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * name:string option * align:Align option * padding:int * int * metrics:Metrics * children:PositionedWidget list
         | PositionedGridWidget of border:Border * borderColor:string option * metrics: Metrics * children: GridLayout list
         | PositionedTerminalWidget of width:Dimension * height:Dimension * xAlign:Align option * yAlign:Align option * metrics:Metrics * children:PositionedWidget list
 
@@ -48,8 +48,8 @@ module Layout =
             | RowWidget(_, _, _, _, children)
             | ColumnWidget(_, _, _, _, children)
             | DepthWidget(_, _, children)
-            | BoxWidget(_, _, _, _, _, children)
-            | BlockWidget(_, _, _, _, _, _, children)
+            | BoxWidget(_, _, _, _, _, _, _, children)
+            | BlockWidget(_, _, _, _, _, _, _, _, children)
             | TerminalWidget(_, _, _, _, children) -> containsCell children
             | _ -> false)
 
@@ -88,10 +88,10 @@ module Layout =
                                         widget = shiftWidget dx dy cell.widget
                                 }) })
                 PositionedGridWidget(border, borderColor, shiftMetrics metrics, shiftedChildren)
-            | PositionedBoxWidget(width, height, border, borderColor, align, metrics, children) ->
-                PositionedBoxWidget(width, height, border, borderColor, align, shiftMetrics metrics, children)
-            | PositionedBlockWidget(width, height, border, borderColor, name, align, metrics, children) ->
-                PositionedBlockWidget(width, height, border, borderColor, name, align, shiftMetrics metrics, children)
+            | PositionedBoxWidget(width, height, border, borderColor, align, paddingV, paddingH, metrics, children) ->
+                PositionedBoxWidget(width, height, border, borderColor, align, paddingV, paddingH, shiftMetrics metrics, children)
+            | PositionedBlockWidget(width, height, border, borderColor, name, align, paddingV, paddingH, metrics, children) ->
+                PositionedBlockWidget(width, height, border, borderColor, name, align, paddingV, paddingH, shiftMetrics metrics, children)
             | PositionedTerminalWidget(width, height, xAlign, yAlign, metrics, children) ->
                 PositionedTerminalWidget(width, height, xAlign, yAlign, shiftMetrics metrics, children)
 
@@ -120,8 +120,8 @@ module Layout =
             |> List.filter (fun row -> not (List.isEmpty row))
         | ColumnWidget(_, _, _, _, children)
         | DepthWidget(_, _, children)
-        | BoxWidget(_, _, _, _, _, children)
-        | BlockWidget(_, _, _, _, _, _, children)
+        | BoxWidget(_, _, _, _, _, _, _, children)
+        | BlockWidget(_, _, _, _, _, _, _, _, children)
         | TerminalWidget(_, _, _, _, children) ->
             children |> List.collect collectCellRows
         | _ -> []
@@ -147,26 +147,26 @@ module Layout =
         | PositionedColumnWidget(_, _, _, _, m, _)
         | PositionedCellWidget(m, _)
         | PositionedGridWidget(_, _, m, _)
-        | PositionedBoxWidget(_, _, _, _, _, m, _)
-        | PositionedBlockWidget(_, _, _, _, _, _, m, _)
+        | PositionedBoxWidget(_, _, _, _, _, _, _, m, _)
+        | PositionedBlockWidget(_, _, _, _, _, _, _, _, m, _)
         | PositionedTerminalWidget(_, _, _, _, m, _) -> m
 
     let private totalWidth widget =
         let metrics = metricsOf widget
         match widget with
-        | PositionedBoxWidget(_, _, border, _, _, _, _) when border <> NoBorder ->
-            metrics.w + 2
-        | PositionedBlockWidget(_, _, border, _, _, _, _, _) when border <> NoBorder ->
-            metrics.w + 2
+        | PositionedBoxWidget(_, _, border, _, _, _, _, m, _) when border <> NoBorder ->
+            m.w + 2
+        | PositionedBlockWidget(_, _, border, _, _, _, _, _, m, _) when border <> NoBorder ->
+            m.w + 2
         | _ -> metrics.w
 
     let private totalHeight widget =
         let metrics = metricsOf widget
         match widget with
-        | PositionedBoxWidget(_, _, border, _, _, _, _) when border <> NoBorder ->
-            metrics.h + 2
-        | PositionedBlockWidget(_, _, border, _, _, _, _, _) when border <> NoBorder ->
-            metrics.h + 2
+        | PositionedBoxWidget(_, _, border, _, _, _, _, m, _) when border <> NoBorder ->
+            m.h + 2
+        | PositionedBlockWidget(_, _, border, _, _, _, _, _, m, _) when border <> NoBorder ->
+            m.h + 2
         | _ -> metrics.h
 
     let rec private layoutWidget widget parentWidth parentHeight =
@@ -262,56 +262,62 @@ module Layout =
                     shiftWidget xOffset yOffset child)
             PositionedCellWidget({ x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
 
-        | BoxWidget(width, height, border, borderColor, align, children) ->
+        | BoxWidget(width, height, border, borderColor, align, paddingV, paddingH, children) ->
             match layoutCellGrid children width parentWidth height parentHeight border borderColor with
             | Some grid ->
-                let gridWidth =
+                let gridContentWidth =
                     match grid with
                     | PositionedGridWidget(_, _, m, _) -> m.w
                     | _ -> 0
-                let gridHeight =
+                let gridContentHeight =
                     match grid with
                     | PositionedGridWidget(_, _, m, _) -> m.h
                     | _ -> 0
-                PositionedBoxWidget(width, height, border, borderColor, align, { x = 0; y = 0; w = gridWidth; h = gridHeight }, [ grid ])
+                let resolvedContentWidth = resolveDimension width parentWidth gridContentWidth
+                let resolvedContentHeight = resolveDimension height parentHeight gridContentHeight
+                let positionedGrid = shiftWidget paddingH paddingV grid
+                PositionedBoxWidget(width, height, border, borderColor, align, paddingV, paddingH, { x = 0; y = 0; w = resolvedContentWidth + paddingH * 2; h = resolvedContentHeight + paddingV * 2 }, [ positionedGrid ])
             | None ->
                 let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
                 let childWidths = positionedChildren |> List.map totalWidth
                 let childHeights = positionedChildren |> List.map totalHeight
                 let maxChildWidth = if List.isEmpty childWidths then 0 else List.max childWidths
                 let totalChildHeight = if List.isEmpty childHeights then 0 else List.max childHeights
-                let resolvedWidth = resolveDimension width parentWidth maxChildWidth
-                let resolvedHeight = resolveDimension height parentHeight totalChildHeight
+                let resolvedContentWidth = resolveDimension width parentWidth maxChildWidth
+                let resolvedContentHeight = resolveDimension height parentHeight totalChildHeight
+                let availableWidth = max 0 (resolvedContentWidth - paddingH * 2)
                 let positionedChildren =
                     positionedChildren
                     |> List.map (fun child ->
                         let childTotalWidth = totalWidth child
-                        let xOffset = alignOffset resolvedWidth childTotalWidth align
-                        shiftWidget xOffset 0 child)
-                PositionedBoxWidget(width, height, border, borderColor, align, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
+                        let xOffset = paddingH + alignOffset availableWidth childTotalWidth align
+                        shiftWidget xOffset paddingV child)
+                PositionedBoxWidget(width, height, border, borderColor, align, paddingV, paddingH, { x = 0; y = 0; w = resolvedContentWidth + paddingH * 2; h = resolvedContentHeight + paddingV * 2 }, positionedChildren)
 
-        | BlockWidget(width, height, border, borderColor, name, align, children) ->
+        | BlockWidget(width, height, border, borderColor, name, align, paddingV, paddingH, children) ->
             let titleWidth =
                 match name with
                 | Some t -> t.Length
                 | None -> 0
             match layoutCellGrid children width parentWidth height parentHeight border borderColor with
             | Some grid ->
-                let gridWidth =
+                let gridContentWidth =
                     match grid with
                     | PositionedGridWidget(_, _, m, _) -> m.w
                     | _ -> 0
-                let resolvedWidth = max (resolveDimension width parentWidth (max gridWidth titleWidth)) titleWidth
-                let resolvedHeight =
+                let gridContentHeight =
                     match grid with
                     | PositionedGridWidget(_, _, m, _) -> m.h
                     | _ -> 0
+                let contentWidth = max gridContentWidth titleWidth
+                let resolvedContentWidth = resolveDimension width parentWidth contentWidth
+                let resolvedContentHeight = resolveDimension height parentHeight gridContentHeight
                 let positionedGrid =
                     match grid with
-                    | PositionedGridWidget(border, borderColor, m, children) -> PositionedGridWidget(border, borderColor, m, children)
+                    | PositionedGridWidget(_, _, _, _) as g -> g
                     | _ -> grid
-                let gridChild = shiftWidget (alignOffset resolvedWidth gridWidth align) 0 positionedGrid
-                PositionedBlockWidget(width, height, border, borderColor, name, align, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, [ gridChild ])
+                let gridChild = shiftWidget (paddingH + alignOffset resolvedContentWidth gridContentWidth align) paddingV positionedGrid
+                PositionedBlockWidget(width, height, border, borderColor, name, align, paddingV, paddingH, { x = 0; y = 0; w = resolvedContentWidth + paddingH * 2; h = resolvedContentHeight + paddingV * 2 }, [ gridChild ])
             | None ->
                 let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
                 let childWidths = positionedChildren |> List.map totalWidth
@@ -319,15 +325,16 @@ module Layout =
                 let maxChildWidth = if List.isEmpty childWidths then 0 else List.max childWidths
                 let contentWidth = max maxChildWidth titleWidth
                 let totalChildHeight = if List.isEmpty childHeights then 0 else List.max childHeights
-                let resolvedWidth = resolveDimension width parentWidth contentWidth
-                let resolvedHeight = resolveDimension height parentHeight totalChildHeight
+                let resolvedContentWidth = resolveDimension width parentWidth contentWidth
+                let resolvedContentHeight = resolveDimension height parentHeight totalChildHeight
+                let availableWidth = max 0 (resolvedContentWidth - paddingH * 2)
                 let positionedChildren =
                     positionedChildren
                     |> List.map (fun child ->
                         let childTotalWidth = totalWidth child
-                        let xOffset = alignOffset resolvedWidth childTotalWidth align
-                        shiftWidget xOffset 0 child)
-                PositionedBlockWidget(width, height, border, borderColor, name, align, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
+                        let xOffset = paddingH + alignOffset availableWidth childTotalWidth align
+                        shiftWidget xOffset paddingV child)
+                PositionedBlockWidget(width, height, border, borderColor, name, align, paddingV, paddingH, { x = 0; y = 0; w = resolvedContentWidth + paddingH * 2; h = resolvedContentHeight + paddingV * 2 }, positionedChildren)
         (*| CellWidget(children) ->
             let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
 

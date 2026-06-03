@@ -96,3 +96,23 @@ module DiffRenderer =
             else 
                 ()
         | None, None -> ()
+
+    let renderBufferDiffs (oldBuffer: Buffer.Cell[,]) (newBuffer: Buffer.Cell[,]) =
+        diffBuffers oldBuffer newBuffer
+        |> List.iter renderDiffs
+
+    let renderBuffer (buffer: Buffer.Cell[,]) =
+        let height = Array2D.length1 buffer
+        let width = Array2D.length2 buffer
+        for y in 0 .. height - 1 do
+            for x in 0 .. width - 1 do
+                let cell = buffer.[y, x]
+                Console.SetCursorPosition(x, y)
+                if cell = emptyCell then
+                    Console.Write(reset)
+                    Console.Write(' ')
+                else
+                    Console.Write(ansiStyle cell)
+                    Console.Write(cell.char)
+                    Console.Write(reset)
+        Console.SetCursorPosition(0, 0)

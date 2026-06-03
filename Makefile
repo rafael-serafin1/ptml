@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 debug_script:
 	dotnet fsi ./playground/debug/debug.fsx
 

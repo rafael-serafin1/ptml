@@ -23,6 +23,7 @@ module Program =
 Flags:
 "--help" ou "-h" -> Printar esse comando.
 "--version" ou "-v" -> Printa a versão do projeto.
+"--window" ou "-w" -> Força o programa a rodar em um terminal em janela ao vez do terminal do VSCode
                     """
     let version: string = "Versão do projeto :: 0.1.1"
 
@@ -34,6 +35,7 @@ Flags:
     type Flag =
         | Help of bool
         | Version of bool
+        | Window of bool
 
     type Config = {
         command: Command option
@@ -58,6 +60,7 @@ Flags:
             //flags
             | "--help" | "-h" -> config <- { config with flags = Help true :: config.flags }
             | "--version" | "-v" -> config <- { config with flags = Version true :: config.flags }
+            | "--window" | "-w" -> config <- { config with flags = Window true :: config.flags }
             //commands
             | "run" -> config <- { config with command = Some Run }
             | "watch" -> config <- { config with command = Some Watch }

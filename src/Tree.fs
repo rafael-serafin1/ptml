@@ -59,8 +59,8 @@ module Tree =
         | RowWidget of width:Dimension * border:Border * gap:int * align:Align option * children:Widget list
         | ColumnWidget of width:Dimension * border:Border * gap:int * yAlign:Align option * children:Widget list
         | DepthWidget of zAlign: Align option * gap: int * children: Widget list
-        | BoxWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * align:Align option * children:Widget list
-        | BlockWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * name:string option * align:Align option * children:Widget list
+        | BoxWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * align:Align option * padding:int * int * children:Widget list
+        | BlockWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * name:string option * align:Align option * padding:int * int * children:Widget list
         | CellWidget of children: Widget list
         | TerminalWidget of width: Dimension * height: Dimension * alignX: Align option * alignY: Align option * children: Widget list
 
@@ -135,6 +135,17 @@ module Tree =
         | "end" -> End
         | value -> failwith $"Invalid align value: {value}"
 
+    let private parsePadding (value: string) =
+        let parsePart (part: string) =
+            let mutable i : int = 0
+            if System.Int32.TryParse(part, &i) && i >= 0 then i
+            else failwith $"Invalid padding value: {value}"
+        let parts : string[] = value.Split([| 'x' |])
+        match parts with
+        | [| part |] -> let p = parsePart part in (p, p)
+        | [| vertical; horizontal |] -> (parsePart vertical, parsePart horizontal)
+        | _ -> failwith $"Invalid padding format: {value}"
+
     let private parseBorder = function
         | "single" -> Single
         | "double" -> Double
@@ -194,7 +205,8 @@ module Tree =
                 let border = tryGetAttr "border" attrs |> Option.map parseBorder |> Option.defaultValue Single
                 let borderColor = tryGetAttr "border-color" attrs
                 let align = tryGetAttr "align" attrs |> Option.map parseAlign
-                BoxWidget(width, height, border, borderColor, align, childrenWidgets)
+                let paddingV, paddingH = tryGetAttr "padding" attrs |> Option.map parsePadding |> Option.defaultValue (0, 0)
+                BoxWidget(width, height, border, borderColor, align, paddingV, paddingH, childrenWidgets)
             | "block" ->
                 let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
                 let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
@@ -202,7 +214,8 @@ module Tree =
                 let borderColor = tryGetAttr "border-color" attrs
                 let name = tryGetAttr "title" attrs
                 let align = tryGetAttr "align" attrs |> Option.map parseAlign
-                BlockWidget(width, height, border, borderColor, name, align, childrenWidgets)
+                let paddingV, paddingH = tryGetAttr "padding" attrs |> Option.map parsePadding |> Option.defaultValue (0, 0)
+                BlockWidget(width, height, border, borderColor, name, align, paddingV, paddingH, childrenWidgets)
             | "cell" -> 
                 CellWidget(childrenWidgets)
             | "terminal" ->

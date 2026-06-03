@@ -1,3 +1,22 @@
 <?ptml encoding="UTF-6" terminal-resize="static"?>
-<terminal x-align="center">
+<terminal x-align="start">
+<box align="center">
+    <column>
+        <row>
+            <cell>ID</cell>
+            <cell>Nome</cell>
+            <cell>Telefone</cell>
+        </row>
+        <row>
+            <cell>1</cell>
+            <cell>Rafael</cell>
+            <cell>193013013</cell>
+        </row>
+        <row>
+            <cell>2</cell>
+            <cell>Daniel</cell>
+            <cell>193011233</cell>
+        </row>
+    </column>
+</box>
 </terminal>
