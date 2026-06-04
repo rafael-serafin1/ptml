@@ -1,5 +1,5 @@
 <!-- XML like definition -->
-<?ptml encoding="UTF-8" terminal-resize="reflow"?>
+<?ptml encoding="UTF-8" terminal-resize="static"?>
 
 <!-- Terminal Window Reference -->
 <terminal x-align="start">
