@@ -15,6 +15,7 @@ module Layout =
         | PositionedTextWidget of text:string * foreground:string option * background:string option * font:string option * metrics:Metrics
         | PositionedRowWidget of width:Dimension * border:Border * gap:int * align:Align option * metrics:Metrics * children:PositionedWidget list
         | PositionedColumnWidget of width:Dimension * border:Border * gap:int * yAlign:Align option * metrics:Metrics * children:PositionedWidget list
+        | PositionedDepthWidget of index:int * zAlign:Align option * gap:int * metrics:Metrics * children:PositionedWidget list
         | PositionedCellWidget of metrics:Metrics * children:PositionedWidget list
         | PositionedBoxWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * align:Align option * padding:int * int * metrics:Metrics * children:PositionedWidget list
         | PositionedBlockWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * name:string option * align:Align option * padding:int * int * metrics:Metrics * children:PositionedWidget list
@@ -47,7 +48,7 @@ module Layout =
             | CellWidget _ -> true
             | RowWidget(_, _, _, _, children)
             | ColumnWidget(_, _, _, _, children)
-            | DepthWidget(_, _, children)
+            | DepthWidget(_, _, _, children)
             | BoxWidget(_, _, _, _, _, _, _, children)
             | BlockWidget(_, _, _, _, _, _, _, _, children)
             | TerminalWidget(_, _, _, _, children) -> containsCell children
@@ -88,6 +89,8 @@ module Layout =
                                         widget = shiftWidget dx dy cell.widget
                                 }) })
                 PositionedGridWidget(border, borderColor, shiftMetrics metrics, shiftedChildren)
+            | PositionedDepthWidget(index, zAlign, gap, metrics, children) ->
+                PositionedDepthWidget(index, zAlign, gap, shiftMetrics metrics, children)
             | PositionedBoxWidget(width, height, border, borderColor, align, paddingV, paddingH, metrics, children) ->
                 PositionedBoxWidget(width, height, border, borderColor, align, paddingV, paddingH, shiftMetrics metrics, children)
             | PositionedBlockWidget(width, height, border, borderColor, name, align, paddingV, paddingH, metrics, children) ->
@@ -119,7 +122,7 @@ module Layout =
             |> joinRowsHorizontally
             |> List.filter (fun row -> not (List.isEmpty row))
         | ColumnWidget(_, _, _, _, children)
-        | DepthWidget(_, _, children)
+        | DepthWidget(_, _, _, children)
         | BoxWidget(_, _, _, _, _, _, _, children)
         | BlockWidget(_, _, _, _, _, _, _, _, children)
         | TerminalWidget(_, _, _, _, children) ->
@@ -149,8 +152,8 @@ module Layout =
         | PositionedGridWidget(_, _, m, _)
         | PositionedBoxWidget(_, _, _, _, _, _, _, m, _)
         | PositionedBlockWidget(_, _, _, _, _, _, _, _, m, _)
-        | PositionedTerminalWidget(_, _, _, _, m, _) -> m
-
+        | PositionedTerminalWidget(_, _, _, _, m, _)
+        | PositionedDepthWidget(_, _, _, m, _) -> m
     let private totalWidth widget =
         let metrics = metricsOf widget
         match widget with
@@ -158,6 +161,7 @@ module Layout =
             m.w + 2
         | PositionedBlockWidget(_, _, border, _, _, _, _, _, m, _) when border <> NoBorder ->
             m.w + 2
+        | PositionedDepthWidget(_, _, _, m, _) -> m.w
         | _ -> metrics.w
 
     let private totalHeight widget =
@@ -167,6 +171,7 @@ module Layout =
             m.h + 2
         | PositionedBlockWidget(_, _, border, _, _, _, _, _, m, _) when border <> NoBorder ->
             m.h + 2
+        | PositionedDepthWidget(_, _, _, m, _) -> m.h
         | _ -> metrics.h
 
     let rec private layoutWidget widget parentWidth parentHeight =
@@ -226,25 +231,13 @@ module Layout =
                 place positionedChildren 0 []
             PositionedColumnWidget(width, border, gap, yAlign, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
 
-        | DepthWidget(zAlign, gap, children) ->
+        | DepthWidget(index, zAlign, gap, children) ->
             let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
             let childWidths = positionedChildren |> List.map totalWidth
             let childHeights = positionedChildren |> List.map totalHeight
-            let maxChildWidth = if List.isEmpty childWidths then 0 else List.max childWidths
-            let totalChildHeight = if List.isEmpty childHeights then 0 else List.sum childHeights + gap * (List.length childHeights - 1)
-            let positionedChildren =
-                let rec place children yOffset acc =
-                    match children with
-                    | [] -> List.rev acc
-                    | child :: rest ->
-                        let childTotalWidth = totalWidth child
-                        let childTotalHeight = totalHeight child
-                        let xOffset = alignOffset maxChildWidth childTotalWidth zAlign
-                        let positioned = shiftWidget xOffset yOffset child
-                        let nextY = yOffset + childTotalHeight + gap
-                        place rest nextY (positioned :: acc)
-                place positionedChildren 0 []
-            PositionedColumnWidget(Auto, NoBorder, gap, zAlign, { x = 0; y = 0; w = maxChildWidth; h = totalChildHeight }, positionedChildren)
+            let resolvedWidth = if List.isEmpty childWidths then 0 else List.max childWidths
+            let resolvedHeight = if List.isEmpty childHeights then 0 else List.max childHeights
+            PositionedDepthWidget(index, zAlign, gap, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
 
         | CellWidget(children) ->
             let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)

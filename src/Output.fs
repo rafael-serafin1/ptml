@@ -82,6 +82,8 @@ module Output =
                     sb.Append(cursorTo x y) |> ignore
                     match ansiStyle cell with
                     | Some style when style <> currentStyle ->
+                        if currentStyle <> "" then
+                            sb.Append(resetCode) |> ignore
                         sb.Append(style) |> ignore
                         currentStyle <- style
                     | None when currentStyle <> "" ->

@@ -6,6 +6,15 @@ interface AttributeDefinition {
     values?: string[];
 }
 
+const globalAttributes = {
+        name: "id",
+        values: []
+    }
+
+const globalAttributes2 = {
+        name: "snippet",
+        values: []
+    }
 const widgetAttributes: Record<string, AttributeDefinition[]> = {
     "?ptml?": [
         {
@@ -25,7 +34,7 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         {
             name: "encoding",
             values: encoding
-        }
+        },
     ],
 
     terminal: [
@@ -36,7 +45,9 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         {
             name: "y-align",
             values: align
-        }
+        },
+        globalAttributes,   
+        globalAttributes2
     ],
 
     box: [
@@ -65,7 +76,9 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         {
             name: "padding",
             values: NaNValuesInNumericAttrs
-        }
+        },
+        globalAttributes,   
+        globalAttributes2
     ],
 
     block: [
@@ -97,7 +110,9 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         {
             name: "padding",
             values: NaNValuesInNumericAttrs
-        }
+        },
+        globalAttributes,   
+        globalAttributes2
     ],
 
     column: [
@@ -112,7 +127,9 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         {
             name: "y-align",
             values: align
-        }
+        },
+        globalAttributes,   
+        globalAttributes2
     ],
 
     row: [
@@ -127,7 +144,9 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         {
             name: "align",
             values: align
-        }
+        },
+        globalAttributes,   
+        globalAttributes2
     ],
 
     depth: [
@@ -146,7 +165,9 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         {
             name: "z-align",
             values: align
-        }
+        },
+        globalAttributes,   
+        globalAttributes2
     ],
 
     text: [
@@ -161,7 +182,18 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         {
             name: "font",
             values: fonts
-        }
+        },
+        globalAttributes,   
+        globalAttributes2
+    ],
+
+    snippet: [
+        {
+            name: "extends",
+            values: []
+        },
+        globalAttributes,   
+        globalAttributes2
     ]
 };
 

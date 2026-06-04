@@ -9,6 +9,7 @@ open PTML.Tree
 open PTML.Layout
 open PTML.Buffer
 open PTML.Render
+open PTML.Depth
 
 module Runner =
     let run(path: string): Status =
@@ -25,8 +26,10 @@ module Runner =
         let ast: AstNode list = buildAst(tokens)
         let semantic: Widget list = buildSemanticTree(ast)
         let layout = layoutTree semantic
-        let renderOps = renderTree layout
-        let buffer = processRenderTree renderOps (terminal.ViewWidth) (terminal.ViewHeight)
+        let filteredLayout, depthLayers = Depth.extractDepthLayers layout
+        let renderOps = renderTree filteredLayout
+        let baseBuffer = processRenderTree renderOps (terminal.ViewWidth) (terminal.ViewHeight)
+        let buffer = Depth.composeDepthLayers baseBuffer depthLayers
 
         Console.Write("\x1b[2J\x1b[H")
         Output.printAnsiBuffer(buffer)

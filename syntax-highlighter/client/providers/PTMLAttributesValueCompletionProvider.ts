@@ -99,7 +99,10 @@ export class PTMLAttributeValueCompletionProvider
         width: NaNValuesInNumericAttrs,
         height: NaNValuesInNumericAttrs,
         padding: NaNValuesInNumericAttrs,
-        index: nums && NaNValuesInNumericAttrs
+        index: nums && NaNValuesInNumericAttrs,
+        id: [],
+        snippet: [],
+        extends: [],
     };
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {
