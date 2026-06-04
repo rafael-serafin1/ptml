@@ -1,4 +1,4 @@
-### PTML
+## Procedural Instruction
 
 `<?ptml encoding="UTF-8" terminal-resize="calculate"?>` <br />
 Serve como Instrução Procedural, além de garantir que ao terminal resize o retained-mode rendering vai ser corretamente aplicado. <br />
@@ -9,12 +9,14 @@ clip
 static
 ```
 
+>> Elementos com título `IGNORE POR ENQUANTO` significa que sua lógica ainda estão sendo desenvolvida corretamente.
+
 ---
-### Elemento Comentário `<!-- -->`
+## Elemento Comentário `<!-- -->`
 São ignorados pelo parser. Servem para comentar código.
 
 ---
-### Categorização de Elementos PTML
+## Categorização de Elementos PTML
 Os elementos PTML são categorizados em dois tipos, concreto e abstrato. Elementos concretos são aqueles que desenham/escrevem alguma no terminal. Já os elementos abstratos são aqueles que não desenham, mas definem o fluxo e direção do conteúdo de forma expressiva.
 
 Sendo assim, atualmente os concretos são:
@@ -36,8 +38,22 @@ Agora, os abstratos são:
 <depth>
 <terminal>
 <cell>
-<script>
+<code>
 ```
+
+---
+## Atributos Globais
+São aqueles que qualquer elemento tem disponível para usar. Sendo eles:
+
+***id***:
+Atributo que aplica um identificador único ao elemento.
+
+***snippet***:
+*LEIA `<snippet>` PARA MELHOR CONTEXTO* 
+Atributo que todos os elementos possuem e que faz a adição dos atributos resumidos no elemento `<snippet>`.
+> OBS.1: Se o `<snippet>` tiver atributos que o elemento não possui, exemplo `padding` para `<text>`, a execução não será interrompida, mas um aviso será gerado no terminal para deixar claro que aquele atributo não existe para tal elemento.
+
+
 
 ---
 ### Elemento `<text>`
@@ -916,47 +932,86 @@ Exemplo .3:
 │ Pao de Batata  │ Pao, Batata.   │
 └────────────────┴────────────────┘
 ```
-
 ---
 ### IGNORE POR ENQUANTO!
-## Elemento `<table>`
+## Elemento `<spinner>`
 
-`<table></table>`
-Elemento usado para criar tabelas.
+`<spinner></spinner>` ou `<spinner />`
+Elemento que cria um spinner no terminal.
 
-Exemplo:
+## **Atributos**:
 
-- Input 
-```ptml
-<table name="">
-    <row>
-        <column name="vogais">
-            <text>A</text>
-            <text>E</text>
-            <text>I</text>
-            <text>O</text>
-            <text>U</text>
-        </column>
-        <column name="consoantes">
-            <text>B</text>
-            <text>C</text>
-            <text>D</text>
-        </column>
-    </row>
-</table>
-```
-
-> Lógica: Uma tabela que contém uma linha com duas colunas.
-
-- Output
-```cmd
-
-```
+***time***:
+Define por quanto tempo o `<spinner>` vai ficar girando (em ms).
 
 ---
-## Elemento `<f-sharp>`
+## Elemento `<snippet>`
 
-`<f-sharp></f-sharp>`
+`<snippet></snippet>`
+É um elemento usado para salvar configurações de atributos para serem usados depois, evitando repetições. O atributo `id` é indispensável para criar um `<snippet>`.
+
+Exemplo:
+- Declaration
+```pmtl
+<snippet id="warning-text">
+    foreground="black"
+    background="red"
+    font="bold"
+</snippet>
+```
+
+- Usage
+```ptml
+<text snippet="warning-text">!! Erro !!</text>
+```
+
+Exemplo .2:
+- Declaration
+```pmtl
+<snippet id="warning-text">
+    foreground="black"
+    background="red"
+    font="bold"
+</snippet>
+```
+
+- Usage
+```ptml
+<box snippet="warning-text">
+    <text>!! ERRO !!</text>
+</box>
+```
+
+> Esse exemplo gera um aviso no terminal, sobre os atributos não pertencerem ao box, mas isso não impede a geração do UI, apenas impede a estilização através do `<snippet>`.
+
+### **Atributos**:
+
+***id***:
+Atributo que define um crachá especial para o snippet. Atributo obrigatório de ter.
+
+***extend***: 
+Atributo que herda atribuições de outras tags `<snippet>` através de seus Id's.
+
+Exemplo:
+- Declaration
+```ptml
+<snippet id="danger">
+    foreground="red"
+</snippet>
+
+<snippet id="fatal" extends="danger">
+    font="bold"
+</snippet>
+```
+
+***snippet***:
+Atributo que todos os elementos possuem e que faz a adição dos atributos resumidos no elemento `<snippet>`.
+> OBS.1: Se o `<snippet>` tiver atributos que o elemento não possui, exemplo `padding` para `<text>`, a execução não será interrompida, mas um aviso será gerado no terminal para deixar claro que aquele atributo não existe para tal elemento.
+
+---
+## Elemento `<code>`
+
+`<code></code>`
 Elemento usado para inferir ou referenciar scripts executáveis.
 
 ### **Atributos**:
@@ -1022,7 +1077,7 @@ hold-click
 ```
 
 ***handler***:
-Define a função que será executada ao detectar que o evento foi chamado. A função deve ser declarada dentro do escopo do PTML através do elemento `<f-sharp></f-sharp>`.
+Define a função que será executada ao detectar que o evento foi chamado. A função deve ser declarada dentro do escopo do PTML através do elemento `<code></code>`.
 
 ***placeholder***:
 Coloca um texto explícito em formatação DIM dentro do input. Tem como valor default, um caractere escondido.
@@ -1063,15 +1118,25 @@ Define o tipo de ligação que as entidades terão. Valores possíveis:
 ```
 arrow                   (e1 ----> e2)
 mutual-arrow            (e1 <---> e2)
-relationship            (e1 --<relation>-- e2)
+relationship            (e1 --<...>-- e2)
 ```
+
+***relation***:
+Descreve a relação entre as duas entidades.
+
+---
+### IGNORE POR ENQUANTO!
+## Elemento `<tree>`
+
+`<tree></tree>`
+
 
 ---
 ### IGNORE POR ENQUANTO!
 ## Elemento `<graphs>`
 
 `<graphs></graphs>` ou `<graphs />`
-Representa um plano cartesiano de coordenadas no terminal.
+Representa um plano cartesiano de coordenadas.
 
 ### **Atributos**:
 
