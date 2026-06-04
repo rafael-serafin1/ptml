@@ -11,6 +11,7 @@ open PTML.Layout
 open PTML.Buffer
 open PTML.Render
 open PTML.Buffer
+open PTML.Depth
 open PTML.DiffRenderer
 open PTML.ErrorHandle
 
@@ -39,9 +40,11 @@ module Watch =
             let ast: AstNode list = buildAst(tokens)
             let semantic: Widget list = buildSemanticTree(ast)
             let layout = layoutTree semantic
-            let renderOps = renderTree layout
+            let filteredLayout, depthLayers = Depth.extractDepthLayers layout
+            let renderOps = renderTree filteredLayout
 
-            let buffer = processRenderTree renderOps terminal.SafeWidth terminal.SafeHeight
+            let baseBuffer = processRenderTree renderOps terminal.SafeWidth terminal.SafeHeight
+            let buffer = Depth.composeDepthLayers baseBuffer depthLayers
 
             if firstRender then
                 Console.Clear()

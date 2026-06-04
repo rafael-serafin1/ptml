@@ -12,12 +12,14 @@ build_fs:
 pub:
 	dotnet publish -c Release -r win-x64 --self-contained true -o ./build
 
+dobuild: build_fs pub
+
 qtestr: pub run
-testr: build_fs pub run
+testr: dobuild run
 qtestw: pub watch
-testw: build_fs pub watch
+testw: dobuild watch
 qtestd: pub debug
-testd: build_fs pub debug
+testd: dobuild debug
 
 run:
 	ptml run "index.ptml"
@@ -29,4 +31,16 @@ debug:
 wd:
 	ptml run "index.ptml" --window
 
-window: build_fs pub wd
+window: dobuild wd
+
+test_depth: dobuild
+	ptml run "examples/depth.ptml"
+
+depth: 
+	ptml run "examples/depth.ptml"
+
+test_snippet: dobuild
+	ptml run "examples/snippet.ptml"
+
+snippet:
+	ptml run "examples/snippet.ptml"

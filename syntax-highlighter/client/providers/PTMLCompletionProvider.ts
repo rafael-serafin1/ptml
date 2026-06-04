@@ -60,6 +60,11 @@ export class PTMLCompletionProvider
                 name: "depth",
                 snippet: 'depth index="$1">$0</depth',
                 documentation: '<depth index="...">|</depth>'
+            },
+            {
+                name: "snippet",
+                snippet: 'snippet id="$1">$0</snippet',
+                documentation: '<snippet id="...">|</snippet>'
             }
         ];
 

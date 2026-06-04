@@ -210,7 +210,8 @@ module Render =
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
             children |> List.collect (renderWidget baseX baseY)
-            
+
+        | PositionedDepthWidget(_, _, _, _, _) -> []
 
     let renderTree widgets =
         widgets |> List.collect (renderWidget 0 0)

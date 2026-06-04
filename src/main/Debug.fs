@@ -9,6 +9,7 @@ open PTML.Tree
 open PTML.Layout
 open PTML.Buffer
 open PTML.Render
+open PTML.Depth
 
 module Debug =
     let debug(path: string): Status = 
@@ -32,10 +33,15 @@ module Debug =
         let layout = layoutTree semantic
         printfn "Layout Pass: %A" layout
 
-        let renderOps = renderTree layout
+        let filteredLayout, depthLayers = Depth.extractDepthLayers layout
+        printfn "Filtered Layout Pass: %A" filteredLayout
+        printfn "Depth Layers: %A" depthLayers
+
+        let renderOps = renderTree filteredLayout
         printfn "Render Tree: %A" renderOps
 
-        let buffer = processRenderTree renderOps (terminal.ViewWidth) (terminal.ViewHeight)
+        let baseBuffer = processRenderTree renderOps (terminal.ViewWidth) (terminal.ViewHeight)
+        let buffer = Depth.composeDepthLayers baseBuffer depthLayers
 
         Console.Write("\x1b[2J\x1b[H")
         Output.printAnsiBuffer(buffer)

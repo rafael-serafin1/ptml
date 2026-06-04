@@ -53,8 +53,6 @@ Atributo que aplica um identificador único ao elemento.
 Atributo que todos os elementos possuem e que faz a adição dos atributos resumidos no elemento `<snippet>`.
 > OBS.1: Se o `<snippet>` tiver atributos que o elemento não possui, exemplo `padding` para `<text>`, a execução não será interrompida, mas um aviso será gerado no terminal para deixar claro que aquele atributo não existe para tal elemento.
 
-
-
 ---
 ### Elemento `<text>`
 

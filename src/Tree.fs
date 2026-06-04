@@ -1,9 +1,36 @@
 namespace PTML
 open PTML.Token
+open PTML.Parser
 
 module Tree =
+    type GlobalAttributes =
+        {
+            Id : string option
+            Snippet : string option
+        }
+
+    type SnippetDefinition =
+        {
+            Id : string
+            Extends : string option
+            GlobalAttributes : GlobalAttributes
+            Attributes : list<string * string>
+        }
+
+    type SnippetRegistry = Map<string, SnippetDefinition>
+
+    type ValidationWarning =
+        {
+            Message : string
+        }
+
+    type ValidationError =
+        {
+            Message : string
+        }
+
     type AstNode =
-        | Element of string * list<string * string> * AstNode list
+        | Element of string * GlobalAttributes * list<string * string> * AstNode list
         | TextNode of string
 
     type Dimension =
@@ -58,7 +85,7 @@ module Tree =
         | TextWidget of text:string * foreground:string option * background:string option * font:string option
         | RowWidget of width:Dimension * border:Border * gap:int * align:Align option * children:Widget list
         | ColumnWidget of width:Dimension * border:Border * gap:int * yAlign:Align option * children:Widget list
-        | DepthWidget of zAlign: Align option * gap: int * children: Widget list
+        | DepthWidget of index:int * zAlign: Align option * gap: int * children: Widget list
         | BoxWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * align:Align option * padding:int * int * children:Widget list
         | BlockWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * name:string option * align:Align option * padding:int * int * children:Widget list
         | CellWidget of children: Widget list
@@ -70,6 +97,14 @@ module Tree =
     let private normalizeText (text: string) =
         let trimmed = text.Trim()
         if trimmed = "" then None else Some trimmed
+
+    let private emptyGlobalAttributes = { Id = None; Snippet = None }
+
+    let private splitGlobalAttrs attrs =
+        let id = attrs |> List.tryFind (fun (name, _) -> name = "id") |> Option.map snd
+        let snippet = attrs |> List.tryFind (fun (name, _) -> name = "snippet") |> Option.map snd
+        let filtered = attrs |> List.filter (fun (name, _) -> name <> "id" && name <> "snippet")
+        ({ Id = id; Snippet = snippet }, filtered)
 
     let private parseNodes(tokens) =
         let rec loop tokens acc =
@@ -83,23 +118,177 @@ module Tree =
                 | Some content -> loop rest (TextNode content :: acc)
                 | None -> loop rest acc
             | StartTag (tag, selfClosing, attrs) :: rest ->
+                let globalAttrs, localAttrs = splitGlobalAttrs attrs
                 if selfClosing then
-                    loop rest (Element(tag, attrs, []) :: acc)
+                    loop rest (Element(tag, globalAttrs, localAttrs, []) :: acc)
                 else
                     let children, remaining = loop rest []
                     match remaining with
                     | EndTag endTag :: restAfter when endTag = tag ->
-                        loop restAfter (Element(tag, attrs, children) :: acc)
+                        loop restAfter (Element(tag, globalAttrs, localAttrs, children) :: acc)
                     | EndTag endTag :: _ ->
                         failwith $"Mismatched end tag: expected </{tag}>, found </{endTag}>"
                     | _ ->
                         failwith $"Unclosed tag: {tag}"
         loop tokens []
 
+    let private emitWarning (warning: ValidationWarning) =
+        System.Console.Error.WriteLine($"[warning] {warning.Message}")
+
+    let private emitWarnings warnings =
+        warnings |> List.rev |> List.iter emitWarning
+
+    let private parseSnippetBodyAttrs children : list<string * string> =
+        let rawText =
+            children
+            |> List.choose (function
+                | TextNode text -> Some text
+                | _ -> None)
+            |> String.concat " "
+
+        let tokens : string[] = rawText.Split([| ' '; '\n'; '\r'; '\t' |], System.StringSplitOptions.RemoveEmptyEntries)
+        let tryParseToken (token: string) : (string * string) option =
+            let eqIdx = token.IndexOf('=')
+            if eqIdx > 0 && token.Length > eqIdx + 2 && token.[eqIdx + 1] = '"' && token.[token.Length - 1] = '"' then
+                let name = token.[0..eqIdx - 1]
+                let value = token.[eqIdx + 2..token.Length - 2]
+                Some(name, value)
+            else
+                None
+        tokens |> Array.choose tryParseToken |> Array.toList
+
+    let private dedupeAttrsKeepLast attrs : list<string * string> =
+        let folder (seen, result) (name, value) =
+            if Set.contains name seen then
+                (seen, result)
+            else
+                (Set.add name seen, (name, value) :: result)
+
+        attrs
+        |> List.rev
+        |> List.fold folder (Set.empty, [])
+        |> snd
+
+    let private mergeAttributeLists baseAttrs overrides : list<string * string> =
+        let overrideNames = overrides |> List.map fst |> Set.ofList
+        let filteredAttrs =
+            baseAttrs
+            |> List.filter (fun (name, _) -> not (Set.contains name overrideNames))
+        filteredAttrs @ overrides
+
+    let private collectSnippetDefinitions ast : SnippetRegistry * ValidationError list =
+        let rec loop nodes (registry: SnippetRegistry) (errors: ValidationError list) : SnippetRegistry * ValidationError list =
+            match nodes with
+            | [] -> registry, errors
+            | TextNode _ :: rest -> loop rest registry errors
+            | Element("snippet", globalAttrs, attrs, children) :: rest ->
+                let bodyAttrs = parseSnippetBodyAttrs children
+                let extends = attrs |> List.tryFind (fun (name, _) -> name = "extends") |> Option.map snd
+                let localAttrs = attrs |> List.filter (fun (name, _) -> name <> "extends")
+                let definitionAttrs = dedupeAttrsKeepLast (localAttrs @ bodyAttrs)
+                match globalAttrs.Id with
+                | Some id when id <> "" ->
+                    if Map.containsKey id registry then
+                        let duplicateSnippetError: ValidationError = { Message = $"Duplicate snippet id '{id}'" }
+                        loop rest registry (duplicateSnippetError :: errors)
+                    else
+                        let definition = { Id = id; Extends = extends; GlobalAttributes = globalAttrs; Attributes = definitionAttrs }
+                        loop rest (Map.add id definition registry) errors
+                | _ ->
+                    let missingSnippetIdError: ValidationError = { Message = "Snippet declaration must have a valid id." }
+                    loop rest registry (missingSnippetIdError :: errors)
+            | Element(_, _, _, children) :: rest ->
+                let registry, errors = loop children registry errors
+                loop rest registry errors
+        loop ast Map.empty []
+
+    let private mergeSnippetAttributes tag snippetAttrs explicitAttrs : list<string * string> * ValidationWarning list =
+        let explicitNames = explicitAttrs |> List.map fst |> Set.ofList
+        let folder (mergedAttrs, warnings) (name, value) =
+            if Set.contains name explicitNames then
+                mergedAttrs, warnings
+            else
+                match validateAttribute tag name value with
+                | Valid -> (name, value) :: mergedAttrs, warnings
+                | InvalidValue message -> failwith message
+                | UnknownAttribute _ ->
+                    let warning: ValidationWarning = { Message = $"O atributo '{name}' não existe para o elemento {tag}." }
+                    mergedAttrs, warning :: warnings
+        let initialState: list<string * string> * ValidationWarning list = ([], [])
+        let merged, warnings = List.fold folder initialState snippetAttrs
+        (List.rev merged) @ explicitAttrs, warnings
+
+    let private resolveSnippets ast =
+        let snippetRegistry, registryErrors = collectSnippetDefinitions ast
+        if registryErrors <> [] then
+            let messages = registryErrors |> List.rev |> List.map (fun e -> e.Message) |> String.concat "; "
+            failwith messages
+
+        let rec resolveSnippetAttributes snippetId visited : list<string * string> =
+            if Set.contains snippetId visited then
+                failwith $"Circular snippet inheritance detected for '{snippetId}'."
+            else
+                match Map.tryFind snippetId snippetRegistry with
+                | None -> failwith $"Snippet '{snippetId}' não encontrado."
+                | Some snippetDefinition ->
+                    let parentAttrs =
+                        match snippetDefinition.Extends with
+                        | Some parentId -> resolveSnippetAttributes parentId (Set.add snippetId visited)
+                        | None -> []
+                    dedupeAttrsKeepLast (mergeAttributeLists parentAttrs snippetDefinition.Attributes)
+
+        let rec resolveNode node =
+            match node with
+            | TextNode _ as textNode -> Some textNode
+            | Element("snippet", _, _, _) ->
+                // Snippet declarations are only a parser-time construct and do not survive into the final AST.
+                None
+            | Element(tag, globalAttrs, attrs, children) ->
+                let resolvedChildren = children |> List.choose resolveNode
+                match globalAttrs.Snippet with
+                | Some snippetId ->
+                    let resolvedSnippetAttrs = resolveSnippetAttributes snippetId Set.empty
+                    let mergedAttrs, warnings = mergeSnippetAttributes tag resolvedSnippetAttrs attrs
+                    emitWarnings warnings
+                    let mergedGlobals = {
+                        Id = globalAttrs.Id
+                        Snippet = None
+                    }
+                    Some(Element(tag, mergedGlobals, mergedAttrs, resolvedChildren))
+                | None -> Some(Element(tag, globalAttrs, attrs, resolvedChildren))
+
+        ast
+        |> List.choose resolveNode
+
+    let private collectDuplicateIdWarnings ast : ValidationWarning list =
+        let rec loop nodes (seen: Set<string>) (warnings: ValidationWarning list) : ValidationWarning list =
+            match nodes with
+            | [] -> warnings
+            | TextNode _ :: rest -> loop rest seen warnings
+            | Element("snippet", _, _, children) :: rest ->
+                loop (children @ rest) seen warnings
+            | Element(_, globalAttrs, _, children) :: rest ->
+                let warnings =
+                    match globalAttrs.Id with
+                    | Some id when id <> "" && Set.contains id seen ->
+                        let duplicateWarning: ValidationWarning = { Message = $"ID duplicado '{id}' encontrado." }
+                        duplicateWarning :: warnings
+                    | _ -> warnings
+                let seen =
+                    match globalAttrs.Id with
+                    | Some id when id <> "" -> Set.add id seen
+                    | _ -> seen
+                loop (children @ rest) seen warnings
+        loop ast Set.empty []
+
     let buildAst(tokens) =
         let ast, remaining = parseNodes(tokens)
         match remaining with
-        | [] -> ast
+        | [] ->
+            let resolvedAst = resolveSnippets ast
+            let duplicateWarnings = collectDuplicateIdWarnings resolvedAst
+            emitWarnings duplicateWarnings
+            resolvedAst
         | EndTag tag :: _ -> failwith $"Unexpected closing tag: {tag}"
         | _ -> failwith "Unable to parse tokens to AST"
 
@@ -173,7 +362,7 @@ module Tree =
     and buildWidget node =
         match node with
         | TextNode text -> TextWidget(text, None, None, None)
-        | Element(tag, attrs, children) ->
+        | Element(tag, _, attrs, children) ->
             let childrenWidgets = buildSemanticTree children
             match tag with
             | "text" ->
@@ -196,9 +385,16 @@ module Tree =
                 let yAlign = tryGetAttr "y-align" attrs |> Option.map parseAlign
                 ColumnWidget(width, border, gap, yAlign, childrenWidgets)
             | "depth" ->
+                let index =
+                    match tryGetAttr "index" attrs with
+                    | Some value ->
+                        let mutable i = 0
+                        if System.Int32.TryParse(value, &i) then i
+                        else failwith $"Invalid integer value for index: {value}"
+                    | None -> failwith "Missing required attribute for depth: index"
                 let gap = parseIntAttr "gap" 0 attrs
                 let zAlign = tryGetAttr "z-align" attrs |> Option.map parseAlign
-                DepthWidget(zAlign, gap, childrenWidgets)
+                DepthWidget(index, zAlign, gap, childrenWidgets)
             | "box" ->
                 let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
                 let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
