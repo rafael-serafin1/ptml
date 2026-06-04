@@ -25,3 +25,8 @@ watch:
 	ptml watch "index.ptml"
 debug:
 	ptml debug "index.ptml"
+
+wd:
+	ptml run "index.ptml" --window
+
+window: build_fs pub wd

@@ -28,7 +28,7 @@ module Watch =
 
     // antigo buffer
     let mutable previousBuffer = 
-        createBuffer (getViewport().SafeWidth) (getViewport().SafeHeight)
+        createBuffer (getOutputViewport().SafeWidth) (getOutputViewport().SafeHeight)
     let mutable firstRender = true
     let asyncSetting(terminal: Terminal, path) = 
         async {
@@ -56,7 +56,7 @@ module Watch =
     // previous error message
     let mutable msn: string = ""
     let setWatcher(path: string) =
-        let mutable terminal: Terminal = getViewport()
+        let mutable terminal: Terminal = getOutputViewport()
         let mutable fullPath = Path.GetFullPath(path) 
         if fullPath = "" then                           // this is inconsistent, but works ¯\_(ツ)_/¯
             fullPath <- "../" + path
@@ -75,7 +75,7 @@ module Watch =
         // do smthng when file is changed
         watcher.Changed.Add(fun _ ->
             try
-                terminal <- getViewport()       // update terminal size
+                terminal <- getOutputViewport()       // update terminal size
                 asyncSetting(terminal, path) |> Async.RunSynchronously
                 ErrorHandle.clearError msn      // clear previous error message from 'with'
             with ex ->

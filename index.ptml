@@ -29,7 +29,7 @@
                </box>
             </cell>
             <cell>
-               <box border-color="green" padding="0">
+               <box border-color="gray" padding="0">
                    <text>GoodBye World!</text>
                </box>
             </cell>

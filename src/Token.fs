@@ -1,6 +1,7 @@
 ﻿namespace PTML
 open System
 open System.Text
+open PTML.PiAttrs
 
 module Token =
     [<Struct>]
@@ -40,6 +41,28 @@ module Token =
         SafeWidth = Console.WindowWidth - 1
         SafeHeight = Console.WindowHeight - 1
     }
+
+    let getLayoutViewport() =
+        let width = Console.WindowWidth
+        let height = Console.WindowHeight
+        let layoutWidth, layoutHeight = getLayoutSize width height
+        {
+            ViewWidth = layoutWidth
+            ViewHeight = layoutHeight
+            SafeWidth = max 0 (layoutWidth - 1)
+            SafeHeight = max 0 (layoutHeight - 1)
+        }
+
+    let getOutputViewport() =
+        let width = Console.WindowWidth
+        let height = Console.WindowHeight
+        let outputWidth, outputHeight = getOutputSize width height
+        {
+            ViewWidth = outputWidth
+            ViewHeight = outputHeight
+            SafeWidth = max 0 (outputWidth - 1)
+            SafeHeight = max 0 (outputHeight - 1)
+        }
 
     type Status =
         | Success = 0

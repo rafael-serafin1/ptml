@@ -17,6 +17,16 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
             values: encoding
         }
     ],
+    "ptml": [
+        {
+            name: "terminal-resize",
+            values: ["reflow", "static", "clip"]
+        },
+        {
+            name: "encoding",
+            values: encoding
+        }
+    ],
 
     terminal: [
         {
@@ -166,7 +176,7 @@ export class PTMLAttributeCompletionProvider
         const line = document.lineAt(position.line).text;
         const beforeCursor = line.substring(0, position.character);
 
-        const tagMatch = beforeCursor.match(/<(\w+)[^>]*$/);
+        const tagMatch = beforeCursor.match(/<\??([a-zA-Z][\w-]*)[^>]*$/);
 
         if (!tagMatch) {
             return [];

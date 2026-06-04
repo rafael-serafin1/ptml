@@ -2,6 +2,8 @@
 open System
 open System.Text
 open System.IO
+open System.Diagnostics
+open System.Runtime.InteropServices
 open PTML.Token
 open PTML.Lexer
 open PTML.Parser
@@ -23,7 +25,7 @@ module Program =
 Flags:
 "--help" ou "-h" -> Printar esse comando.
 "--version" ou "-v" -> Printa a versão do projeto.
-"--window" ou "-w" -> Força o programa a rodar em um terminal em janela ao vez do terminal do VSCode
+"--window" ou "-w" -> Força o programa a rodar em um terminal em janela do sistema com tamanho 460x200
                     """
     let version: string = "Versão do projeto :: 0.1.1"
 
@@ -42,6 +44,39 @@ Flags:
         filePath: string option
         flags: Flag list
     }
+
+    let quoteCmdArg (arg: string) =
+        if arg.Contains(" ") || arg.Contains("\t") || arg.Contains("\"") then
+            "\"" + arg.Replace("\"", "\\\"") + "\""
+        else arg
+
+    let buildCmdLine (args: string[]) =
+        args
+        |> Array.map quoteCmdArg
+        |> String.concat " "
+
+    let isWindowChild() = Environment.GetEnvironmentVariable("PTML_WINDOW_CHILD") = "1"
+
+    let openInSystemWindow argv =
+        let exePath =
+            let entry = System.Reflection.Assembly.GetEntryAssembly().Location
+            if String.IsNullOrWhiteSpace(entry) then
+                match Environment.ProcessPath with
+                | null | "" -> "ptml"
+                | path -> path
+            else entry
+
+        let quotedExe = quoteCmdArg exePath
+        let quotedArgs = buildCmdLine argv
+        let childCommand = sprintf "%s %s" quotedExe quotedArgs
+
+        let psi = ProcessStartInfo()
+        psi.FileName <- "cmd.exe"
+        psi.Arguments <- sprintf "/c start \"PTML\" cmd /k \"mode con: cols=460 lines=200 && %s\"" childCommand
+        psi.UseShellExecute <- false
+        psi.Environment.["PTML_WINDOW_CHILD"] <- "1"
+        Process.Start(psi) |> ignore
+        0
 
     [<EntryPoint>]
     let main(argv): int =
@@ -66,7 +101,7 @@ Flags:
             | "watch" -> config <- { config with command = Some Watch }
             | "debug" -> config <- { config with command = Some Debug }
             //file path
-            | _ when arg.EndsWith(".ptml") -> config <- { config with filePath = Some arg }
+            | _ when arg.ToLower().EndsWith(".ptml") -> config <- { config with filePath = Some arg }
             | _ -> printfn "Unknown argument: %s" arg
 
         match config.command with
@@ -76,6 +111,7 @@ Flags:
                     match flag with
                     | Help h -> printfn "%s" help
                     | Version v -> printfn "%s" version
+                    | Window w -> () // a flag de window é processada mais tarde, quando o programa for rodar
             else 
                 PTMLMessage("No command provided. Use --help for usage information.", MessageStatus.Error)
                 Environment.Exit(defineStatus(MessageStatus.Error))
@@ -92,6 +128,17 @@ Flags:
                 PTMLMessage(sprintf "File not found: %s" config.filePath.Value, MessageStatus.Error)
                 Environment.Exit(defineStatus(MessageStatus.Error))
             else ()
+
+        let shouldOpenWindow =
+            config.flags
+            |> List.exists (fun flag -> match flag with Window true -> true | _ -> false)
+            && not (isWindowChild())
+
+        if shouldOpenWindow then
+            if RuntimeInformation.IsOSPlatform(OSPlatform.Windows) then
+                Environment.Exit(openInSystemWindow argv)
+            else
+                PTMLMessage("The --window flag is currently supported only on Windows. Continuing in the current terminal.", MessageStatus.Warning)
 
         let mutable S: Token.Status option = None
         match config.command with
@@ -116,6 +163,7 @@ Flags:
             match flag with
             | Help h -> printfn "%s" help
             | Version v -> printfn "%s" version
+            | Window w -> ()                                // a flag de window é processada mais tarde, quando o programa for rodar
             
 
         match S with

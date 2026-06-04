@@ -2,7 +2,7 @@
     "PTML Header": {
         "prefix": "??",
         "body": [
-            "<?ptml encoding=\"UTF-6\" terminal-resize=\"static\"?>",
+            "<?ptml encoding=\"UTF-8\" terminal-resize=\"static\"?>",
             "<terminal x-align=\"start\">",
             "$0",
             "</terminal>"

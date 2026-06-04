@@ -79,11 +79,7 @@ module Parser =
         | [] -> if stack <> [] then failwith "Unclosed tags" else ()
         | ProcInst pi :: rest ->
             let piAttrs = parsePiAttrs pi
-            for (name, value) in piAttrs do
-                match name with
-                | "encoding" -> ()
-                | "terminal-resize" -> if not (Set.contains value terminalResizeValues) then failwith $"Invalid terminal-resize: {value}"
-                | _ -> failwith $"Invalid pi attribute: {name}"
+            PiAttrs.parseAndApplyPiAttrs piAttrs
             parser(rest, stack)
         | Comment _ :: rest -> parser(rest, stack)
         | Text _ :: rest -> parser(rest, stack)

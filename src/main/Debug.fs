@@ -12,7 +12,7 @@ open PTML.Render
 
 module Debug =
     let debug(path: string): Status = 
-        let terminal: Terminal = getViewport()
+        let terminal: Terminal = getOutputViewport()
         let input: string = File.ReadAllText(path)
         if input = "" then  
             printfn "\x1b[31mError\x1b[0m -- PTML File is empty."

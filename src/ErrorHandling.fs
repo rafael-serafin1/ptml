@@ -11,7 +11,7 @@ module ErrorHandle =
         match cursorPos with
         | (x, y) -> Console.SetCursorPosition(x, y + 1)
 
-        let clean = msg.PadRight(getViewport().SafeWidth)
+        let clean = msg.PadRight(getOutputViewport().SafeWidth)
 
         Console.Write($"\x1b[31m{clean}\x1b[0m")
         match cursorPos with

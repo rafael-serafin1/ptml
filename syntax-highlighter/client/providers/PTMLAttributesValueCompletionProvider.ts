@@ -69,7 +69,8 @@ export const nums = [
 export const encoding = [
     "UTF-8",
     "UTF-16",
-    "UTF-32"
+    "UTF-32",
+    "ASCII"
 ]
 
 export class PTMLAttributeValueCompletionProvider
@@ -81,6 +82,7 @@ export class PTMLAttributeValueCompletionProvider
             "static",
             "clip"
         ],
+        encoding: encoding,
         border: borders,
         font: fonts,
         foreground: colors,

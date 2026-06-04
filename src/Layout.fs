@@ -358,7 +358,7 @@ module Layout =
             PositionedGridWidget({ x = 0; y = 0; w = resolvedWidth; h = resolvedHeight}, positionedChildren)
         *)
         | TerminalWidget(width, height, alignX, alignY, children) -> 
-            let cmd = getViewport()
+            let cmd = getLayoutViewport()
 
             let positionedChildren = children |> List.map (fun child -> layoutWidget child (Some cmd.SafeWidth) (Some cmd.SafeHeight))
 

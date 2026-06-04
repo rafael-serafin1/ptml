@@ -23,10 +23,10 @@ export class PTMLHeaderCompletionProvider
         item.detail = "Insert PTML document header";
 
         item.documentation =
-            '<?ptml encoding="UTF-6" terminal-resize="static"?>';
+            '<?ptml encoding="UTF-8" terminal-resize="static"?>';
 
         item.insertText = new vscode.SnippetString(
-            '<?ptml encoding="UTF-6" terminal-resize="static"?>'
+            '<?ptml encoding="UTF-8" terminal-resize="static"?>'
         );
 
         item.range = new vscode.Range(
