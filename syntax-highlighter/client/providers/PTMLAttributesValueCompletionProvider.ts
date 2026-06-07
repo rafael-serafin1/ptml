@@ -14,6 +14,7 @@ export const borders = [
     "classic",
     "rounded",
     "ascii",
+    "borderless",
     "none"
 ]
 
@@ -103,6 +104,11 @@ export class PTMLAttributeValueCompletionProvider
         id: [],
         snippet: [],
         extends: [],
+
+        type: ["braille", "dots", "waiting", "beam", "ascii", "circle", "square", "arrow", "moon"],
+        interval: [],
+        duration: [],
+        completed: ["check"]
     };
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {

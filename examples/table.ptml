@@ -1,22 +1,35 @@
 <?ptml encoding="UTF-8" terminal-resize="static"?>
 <terminal x-align="start">
-<box align="center">
-    <column>
-        <row>
-            <cell>ID</cell>
-            <cell>Nome</cell>
-            <cell>Telefone</cell>
-        </row>
-        <row>
-            <cell>1</cell>
-            <cell>Rafael</cell>
-            <cell>193013013</cell>
-        </row>
-        <row>
-            <cell>2</cell>
-            <cell>Daniel</cell>
-            <cell>193011233</cell>
-        </row>
-    </column>
-</box>
+<snippet id="shine">
+    foreground="gold"
+    font="bold"
+</snippet>
+
+<column y-align="center">
+    <text font="italic" foreground="red">Tabela de Exemplo</text>
+    <box align="center" border="rounded">
+        <column>
+            <row>
+                <cell><text snippet="shine">ID</text></cell>
+                <cell><text snippet="shine">Nome</text></cell>
+            </row>
+            <row>
+                <cell>1</cell>
+                <cell>Tiago</cell>
+            </row>
+            <row>
+                <cell>2</cell>
+                <cell>Rafael</cell>
+            </row>
+            <row>
+                <cell>3</cell>
+                <cell>Davi</cell>
+            </row>
+            <row>
+                <cell>4</cell>
+                <cell>Yuri</cell>
+            </row>
+        </column>
+    </box>
+</column>
 </terminal>

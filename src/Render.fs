@@ -1,10 +1,12 @@
 namespace PTML
 open PTML.Tree
 open PTML.Layout
+open PTML.Spinner
 
 module Render =
     type RenderOperation =
         | DrawChar of string * int * int * string option * string option * string option
+        | DrawSpinner of Types * int * int * string * string * string * string option * string option
 
     let private borderChars(border: Border) =
         match border with
@@ -14,7 +16,8 @@ module Render =
         | Bold -> ("┏", "┓", "┗", "┛", "━", "┃")
         | Strange -> ("╒", "╕", "╘", "╛", "═", "│")
         | Rounded -> ("╭", "╮", "╰", "╯", "─", "│")
-        | Ascii -> ("+", "+", "+", "+", "-", "|")
+        | Border.Ascii -> ("+", "+", "+", "+", "-", "|")
+        | Borderless -> ("", "", "", "", "", "")
         | NoBorder -> ("", "", "", "", "", "")
 
     let private borderCharsContinuity(border: Border) =
@@ -25,7 +28,8 @@ module Render =
         | Bold -> ("┝", "┥", "┯", "┷", "┿")
         | Strange -> ("╞", "╡", "╤", "╧", "╪")
         | Rounded -> ("├", "┤", "┬", "┴", "┼")
-        | Ascii -> ("+", "+", "+", "+", "+")
+        | Border.Ascii -> ("+", "+", "+", "+", "+")
+        | Borderless -> ("", "", "", "", "")
         | NoBorder -> ("", "", "", "", "")
 
     let private drawHorizontal xStart xEnd y char fore =
@@ -36,7 +40,8 @@ module Render =
 
     let private drawBorder x y width height border borderColor =
         match border with
-        | NoBorder -> []
+        | NoBorder
+        | Borderless -> []
         | _ ->
             let topLeft, topRight, bottomLeft, bottomRight, horizontal, vertical = borderChars border
             let left = x
@@ -57,7 +62,8 @@ module Render =
 
     let private drawBorderWithTitle x y width height border borderColor title =
         match border with
-        | NoBorder -> []
+        | NoBorder
+        | Borderless -> []
         | _ ->
             let topLeft, topRight, bottomLeft, bottomRight, horizontal, vertical = borderChars border
             let left = x
@@ -97,6 +103,9 @@ module Render =
         match widget with
         | PositionedTextWidget(text, fg, bg, font, metrics) ->
             [ DrawChar(text, offsetX + metrics.x, offsetY + metrics.y, fg, bg, font) ]
+
+        | PositionedSpinnerWidget(tp, inter, dur, comp, fg, bg, metrics) ->
+            [ DrawSpinner(tp, offsetX + metrics.x, offsetY + metrics.y, inter, dur, comp, fg, bg) ]
 
         | PositionedRowWidget(_, _, _, _, metrics, children)
         | PositionedColumnWidget(_, _, _, _, metrics, children) ->
@@ -213,5 +222,5 @@ module Render =
 
         | PositionedDepthWidget(_, _, _, _, _) -> []
 
-    let renderTree widgets =
+    let renderTree(widgets: PositionedWidget list): RenderOperation list =
         widgets |> List.collect (renderWidget 0 0)

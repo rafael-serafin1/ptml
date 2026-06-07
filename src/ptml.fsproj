@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="utils/Utils.fs"          />
     <Compile Include="utils/Messager.fs"       />
+    <Compile Include="components/Spinner.fs"   />
     <Compile Include="PiAttrs.fs"              />
     <Compile Include="Token.fs"                />
     <Compile Include="Lexer.fs"                />

@@ -112,10 +112,10 @@ Flags:
                     | Help h -> printfn "%s" help
                     | Version v -> printfn "%s" version
                     | Window w -> () // a flag de window é processada mais tarde, quando o programa for rodar
+                ()
             else 
                 PTMLMessage("No command provided. Use --help for usage information.", MessageStatus.Error)
                 Environment.Exit(defineStatus(MessageStatus.Error))
-
         | Some _ -> ()
         
         match config.filePath with
@@ -136,7 +136,7 @@ Flags:
 
         if shouldOpenWindow then
             if RuntimeInformation.IsOSPlatform(OSPlatform.Windows) then
-                Environment.Exit(openInSystemWindow argv)
+                ()
             else
                 PTMLMessage("The --window flag is currently supported only on Windows. Continuing in the current terminal.", MessageStatus.Warning)
 
@@ -145,17 +145,29 @@ Flags:
         | Some Run -> 
             match config.filePath with
             | Some file -> 
-                S <- Some (run(file))
+                if shouldOpenWindow then
+                    openInSystemWindow [| "run"; file |] |> ignore
+                    Environment.Exit(0)
+                else
+                    S <- Some (run(file))
             | None -> ()
         | Some Watch -> 
             match config.filePath with
             | Some file -> 
-                S <- Some (watch(file))
+                if shouldOpenWindow then
+                    openInSystemWindow [| "watch"; file |] |> ignore
+                    S <- Some Status.Success
+                else
+                    S <- Some (watch(file))
             | None -> ()
         | Some Debug ->
             match config.filePath with 
             | Some file -> 
-                S <- Some (debug(file))
+                if shouldOpenWindow then
+                    openInSystemWindow [| "debug"; file |] |> ignore
+                    Environment.Exit(0)
+                else
+                    S <- Some (debug(file))
             | None -> ()
         | None -> ()
 

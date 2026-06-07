@@ -1,10 +1,18 @@
 namespace PTML
 open PTML.Render
+open PTML.Spinner
 
 module Buffer =
     (* BUFFER *)
+    type Spinner = {
+        tp: Types
+        interval: string
+        dur: string
+        complete: string
+    }
     type Cell = {
         char: char
+        spinner: Spinner option
         foreground: string option
         background: string option
         font: string option
@@ -13,6 +21,7 @@ module Buffer =
     (* EMPTY CELL *)
     let emptyCell: Cell = {
         char = ' '
+        spinner = None
         foreground = None
         background = None
         font = None
@@ -27,9 +36,26 @@ module Buffer =
         if x >= 0 && x < Array2D.length2 buffer && y >= 0 && y < Array2D.length1 buffer then
             buffer.[y, x] <- {
                 char = char
+                spinner = None
                 foreground = foreground
                 background = background
                 font = font
+            }
+    
+    let setSpinnerCell(buffer, typ, x, y, inter, dur, complete, fg, bg)=
+        if x >= 0 && x < Array2D.length2 buffer && y >= 0 && y < Array2D.length1 buffer then
+            let char = (char)(firstFrame typ)
+            buffer.[y, x] <- {
+                char = char
+                spinner = Some {
+                    tp = typ
+                    interval = inter
+                    dur = dur
+                    complete = complete
+                }
+                foreground = fg
+                background = bg
+                font = None
             }
 
     (* STEP 1: CLEAR BUFFER *)
@@ -50,8 +76,13 @@ module Buffer =
             match op with
             | Render.DrawChar(text, x, y, fg, bg, font) ->
                 text
-                    |> Seq.iteri (fun offset ch ->
-                        setCell buffer (x + offset) y (char ch) fg bg font)
+                |> Seq.iteri (fun offset ch ->
+                    setCell buffer (x + offset) y (char ch) fg bg font)
+            | Render.DrawSpinner(tp, x, y, inter, dur, complete, fg, bg) -> 
+                tp 
+                |> firstFrame
+                |> Seq.iteri (fun offset ch -> 
+                    setSpinnerCell(buffer, tp, (x + offset), y, inter, dur, complete, fg, bg))
         )
         buffer
 

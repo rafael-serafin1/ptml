@@ -1,0 +1,15 @@
+<?ptml encoding="UTF-8" terminal-resize="static"?>
+<terminal x-align="start">
+    <column>
+        <row>
+            <text>Príons são </text>
+            <text foreground="gray" font="bold">
+                proteínas infecciosas
+            </text>
+            <text>.</text>
+        </row>
+        <row>
+            <text>Príons são <frag foreground="gray" font="bold">proteínas infecciosas</frag>.</text>
+        </row>
+    </column>
+</terminal>
