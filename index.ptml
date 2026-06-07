@@ -1,40 +1,52 @@
 <!-- XML like definition -->
 <?ptml encoding="UTF-8" terminal-resize="static"?>
 
-<!-- Terminal Window Reference -->
+<!-- Terminal Window Reference (not mandatory) -->
 <terminal x-align="start">
-<!-- Simple Box with a Title -->
-<block title="PTML" border="rounded">
-    <!-- Children are distributed in column pattern -->
-    <column>
-        <!-- Children are distributed in row pattern -->
-        <row>
-            <!-- Divide first concret parent by the number of cells -->
-            <cell>
-               <box border-color="gray">
-                   <!-- Prints out a text -->
-                   <text foreground="gold">Hello World!</text>
-               </box>
-            </cell>
-            <cell>
-               <box border-color="gray">
-                   <text>GoodBye World!</text>
-               </box>
-            </cell>
-        </row>
-        <row>
-            <cell>
-               <box border-color="gray">
-                   <text foreground="gold">Hello World!</text>
-               </box>
-            </cell>
-            <cell>
-               <box border-color="gray" padding="0">
-                   <text>GoodBye World!</text>
-               </box>
-            </cell>
-        </row>
-    </column>
-</block>
+    < id="important">
+        foreground="gold"
+    </>
+
+    <!-- Simple Box with a Title -->
+    <block title="PTML" border="rounded">
+        <!-- Children are distributed in column pattern -->
+        <column>
+            <!-- Children are distributed in row pattern -->
+            <row>
+                <!-- Divide first concret parent by the number of cells -->
+                <cell>
+                <box border-color="gray">
+                    <!-- Prints out a text -->
+                    <row>
+                        <text ="important">Hello <frag font="italic">World</frag>!</text>
+                    </row>
+                </box>
+                </cell>
+                <cell>
+                <box border-color="gray">
+                    <row>
+                        <text>GoodBye <frag font="italic">World</frag>!</text>
+                    </row>
+                </box>
+                </cell>
+            </row>
+            <row>
+                <cell>
+                <box border-color="gray">
+                    <row>
+                        <text ="important">Hello <frag font="italic">World</frag>!</text>
+                    </row>
+                </box>
+                </cell>
+                <cell>
+                <box border-color="gray" padding="0">
+                    <row>
+                        <text>GoodBye <frag font="italic">World</frag>!</text>
+                    </row>
+                </box>
+                </cell>
+            </row>
+        </column>
+    </block>
 </terminal>
 <!-- THIS IS A PTML TEST FILE -->

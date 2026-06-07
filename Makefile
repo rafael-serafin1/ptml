@@ -34,13 +34,10 @@ wd:
 window: dobuild wd
 
 test_depth: dobuild
-	ptml run "examples/depth.ptml"
-
-depth: 
-	ptml run "examples/depth.ptml"
+	ptml run "tests/depth.ptml"
 
 test_snippet: dobuild
-	ptml run "examples/snippet.ptml"
+	ptml run "tests/snippet.ptml"
 
-snippet:
-	ptml run "examples/snippet.ptml"
+test_spinner: dobuild
+	ptml run "tests/spinner.ptml"

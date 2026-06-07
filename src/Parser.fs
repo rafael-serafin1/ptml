@@ -3,15 +3,20 @@ open PTML.Lexer
 open PTML.Token
 
 module Parser =
-    let validTags = Set.ofList ["text"; "row"; "column"; "depth"; "box"; "block"; "terminal"; "cell"; "snippet"]
+    let validTags = Set.ofList ["frag"; "text"; "row"; "column"; "depth"; "box"; "block"; "terminal"; "cell"; "snippet"; "spinner"]
     let colorValues = Set.ofList ["none"; "black"; "red"; "green"; "gold"; "blue"; "purple"; "cyan"; "fire"; "limegreen"; "yellow"; "lightblue"; "lilac"; "crystal"; "gray"; "lightgray"; "white"]
     let fontValues = Set.ofList ["none"; "bold"; "dim"; "italic"; "underline"; "slow-blink"; "rapid-blink"; "reverse"; "conceal"; "strike-through"]
     let overflowValues = Set.ofList ["break"; "wrap"; "cut"; "clip"]
     let alignValues = Set.ofList ["start"; "center"; "end"]
-    let borderValues = Set.ofList ["single"; "double"; "classic"; "bold"; "strange"; "rounded"; "ascii"; "none"]
+    let borderValues = Set.ofList ["single"; "double"; "classic"; "bold"; "strange"; "rounded"; "ascii"; "none"; "borderless"]
     let terminalResizeValues = Set.ofList ["reflow"; "clip"; "static"]
 
     let validAttributes = Map.ofList [
+        "frag", Map.ofList [
+            "foreground", colorValues
+            "background", colorValues
+            "font", fontValues
+        ]   
         "text", Map.ofList [
             "foreground", colorValues
             "background", colorValues
@@ -56,7 +61,15 @@ module Parser =
             "x-align", alignValues
             "y-align", alignValues
         ]
-        "cell", Map.ofList []       // no attrs for now
+        "cell", Map.ofList [];      // no attrs for now
+        "spinner", Map.ofList [
+            "type", Set.ofList ["braille"; "dots"; "waiting"; "beam"; "ascii"; "circle"; "square"; "moon"; "arrow"; "bounce"]
+            "interval", Set.empty
+            "duration", Set.empty
+            "completed", Set.empty
+            "foreground", colorValues
+            "background", colorValues
+        ]
     ]
 
     let globalAttributes = Set.ofList ["id"; "snippet"]
@@ -136,6 +149,18 @@ module Parser =
         if number <= 0 then true
         else false 
 
+    let private isInsideTag tag stack =
+        List.contains tag stack
+
+    let private validateFragContext tag stack =
+        if tag = "frag" then
+            if not (isInsideTag "text" stack) then
+                failwith "Elemento <frag> só pode existir dentro de <text>."
+            if isInsideTag "frag" stack then
+                failwith "Elemento <frag> não pode conter outro <frag>."
+        elif isInsideTag "text" stack && tag <> "frag" then
+            failwith $"Elemento <{tag}> não é permitido dentro de <text>."
+
     let rec parser(tokens, stack ) =
         match tokens with
         | [] -> if stack <> [] then failwith "Unclosed tags" else ()
@@ -147,6 +172,7 @@ module Parser =
         | Text _ :: rest -> parser(rest, stack)
         | StartTag (tag, selfClosing, attrs) :: rest ->
             if not (Set.contains tag validTags) then failwith $"Invalid tag: {tag}"
+            validateFragContext tag stack
             if tag <> "snippet" then
                 for (name, value) in attrs do
                     match validateAttribute tag name value with

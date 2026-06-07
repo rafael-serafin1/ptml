@@ -187,12 +187,60 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         globalAttributes2
     ],
 
+    frag: [
+        {
+            name: "foreground",
+            values: colors
+        },
+        {
+            name: "background",
+            values: colors
+        },
+        {
+            name: "font",
+            values: fonts
+        },
+        globalAttributes,   
+        globalAttributes2
+    ],
+
     snippet: [
         {
             name: "extends",
             values: []
         },
         globalAttributes,   
+        globalAttributes2
+    ],
+
+    spinner: [
+        {
+            name: "type",
+            values: [
+                "braille",
+                "dots",
+                "waiting",
+                "beam",
+                "ascii",
+                "circle",
+                "square",
+                "arrow",
+                "moon"
+            ]
+        },
+        {
+            name: "interval",
+            values: []
+        },
+        {
+            name: "duration",
+            values: []
+        },
+        {
+            name: "completed",
+            values: ["check"]
+        },
+        globalAttributes,
         globalAttributes2
     ]
 };

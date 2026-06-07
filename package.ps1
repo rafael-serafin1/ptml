@@ -1,7 +1,26 @@
 #!/usr/bin/env pwsh
 
+param([string]$Command)
+
 Set-Location ./syntax-highlighter
-npm run compile
-vsce package
+
+if ($Command -eq "publish") {
+    Write-Host "Executando publish..."
+    Remove-Item "*.vsix"
+    npm run compile
+    vsce package
+    vsce publish
+}
+elseif ($Command -eq "package") {
+    Write-Host "Executando package..."
+    Remove-Item "*.vsix"
+    npm run compile
+    vsce package
+}
+else {
+    Write-Host "Uso: .\package.ps1 [publish|package]"
+    exit 1
+}
+
 Set-Location ../
-# Só estou com preguiça de ficar escrevendo o caminho completo dessa pasta kkkkkkkkkk
+exit 0

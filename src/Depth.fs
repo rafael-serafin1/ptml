@@ -139,6 +139,9 @@ module Depth =
             let nestedLayers = childResults |> List.collect snd
             (Some (PositionedTerminalWidget(width, height, alignX, alignY, metrics, filteredChildren)), nestedLayers)
 
+        | PositionedSpinnerWidget(tp, interval, duration, completed, foreground, background, metrics) ->
+            (Some (PositionedSpinnerWidget(tp, interval, duration, completed, foreground, background, metrics)), [])
+
         | PositionedTextWidget(text, foreground, background, font, metrics) ->
             (Some (PositionedTextWidget(text, foreground, background, font, metrics)), [])
 

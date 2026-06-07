@@ -1,6 +1,8 @@
 namespace PTML
+open System
 open PTML.Token
 open PTML.Parser
+open PTML.Spinner
 
 module Tree =
     type GlobalAttributes =
@@ -29,9 +31,20 @@ module Tree =
             Message : string
         }
 
+    type FragmentNode = {
+            Foreground : string option
+            Background : string option
+            Font : string option
+            Content : string
+        }
+
+    type TextContent =
+        | RawText of string
+        | Fragment of FragmentNode
+
     type AstNode =
         | Element of string * GlobalAttributes * list<string * string> * AstNode list
-        | TextNode of string
+        | TextNode of TextContent list
 
     type Dimension =
         | Auto
@@ -55,6 +68,7 @@ module Tree =
         | Strange
         | Rounded
         | Ascii
+        | Borderless
         | NoBorder
 
     type Colors =
@@ -82,6 +96,7 @@ module Tree =
 
     // discriminated union for semantic tree
     type Widget =
+        | SpinnerWidget of text:Types * interval: string * duration: string * completed: string * foreground:string option * background:string option
         | TextWidget of text:string * foreground:string option * background:string option * font:string option
         | RowWidget of width:Dimension * border:Border * gap:int * align:Align option * children:Widget list
         | ColumnWidget of width:Dimension * border:Border * gap:int * yAlign:Align option * children:Widget list
@@ -95,8 +110,24 @@ module Tree =
     /// AST BUILDING
     /// 
     let private normalizeText (text: string) =
-        let trimmed = text.Trim()
-        if trimmed = "" then None else Some trimmed
+        if text = "" then
+            None
+        else
+            let allWhitespace = text |> Seq.forall Char.IsWhiteSpace
+            if allWhitespace then
+                if text.Contains("\n") || text.Contains("\r") then
+                    None
+                else
+                    Some text
+            else
+                if text.Contains("\n") || text.Contains("\r") || text.Contains("\t") then
+                    let normalized =
+                        text.Split([| ' '; '\n'; '\r'; '\t' |], System.StringSplitOptions.RemoveEmptyEntries)
+                        |> String.concat " "
+                    let trimmed = normalized.Trim()
+                    if trimmed = "" then None else Some trimmed
+                else
+                    Some text
 
     let private emptyGlobalAttributes = { Id = None; Snippet = None }
 
@@ -107,6 +138,29 @@ module Tree =
         ({ Id = id; Snippet = snippet }, filtered)
 
     let private parseNodes(tokens) =
+        let tryGetAttrLocal name attrs =
+            attrs |> List.tryFind (fun (k, _) -> k = name) |> Option.map snd
+
+        let fragFromChildren children =
+            children
+            |> List.collect (function
+                | TextNode contents -> contents
+                | _ -> failwith "Invalid content inside <frag>."
+            )
+            |> List.map (function
+                | RawText text -> text
+                | Fragment _ -> failwith "Nested <frag> is not allowed."
+            )
+            |> String.concat ""
+
+        let buildFragmentNode attrs children =
+            {
+                Foreground = tryGetAttrLocal "foreground" attrs
+                Background = tryGetAttrLocal "background" attrs
+                Font = tryGetAttrLocal "font" attrs
+                Content = fragFromChildren children
+            }
+
         let rec loop tokens acc =
             match tokens with
             | [] -> List.rev acc, []
@@ -115,21 +169,36 @@ module Tree =
             | ProcInst _ :: rest -> loop rest acc
             | Text text :: rest ->
                 match normalizeText text with
-                | Some content -> loop rest (TextNode content :: acc)
+                | Some content -> loop rest (TextNode [RawText content] :: acc)
                 | None -> loop rest acc
             | StartTag (tag, selfClosing, attrs) :: rest ->
                 let globalAttrs, localAttrs = splitGlobalAttrs attrs
-                if selfClosing then
-                    loop rest (Element(tag, globalAttrs, localAttrs, []) :: acc)
+                if tag = "frag" then
+                    if selfClosing then
+                        let fragmentNode = buildFragmentNode localAttrs []
+                        loop rest (TextNode [Fragment fragmentNode] :: acc)
+                    else
+                        let children, remaining = loop rest []
+                        match remaining with
+                        | EndTag endTag :: restAfter when endTag = tag ->
+                            let fragmentNode = buildFragmentNode localAttrs children
+                            loop restAfter (TextNode [Fragment fragmentNode] :: acc)
+                        | EndTag endTag :: _ ->
+                            failwith $"Mismatched end tag: expected </{tag}>, found </{endTag}>"
+                        | _ ->
+                            failwith $"Unclosed tag: {tag}"
                 else
-                    let children, remaining = loop rest []
-                    match remaining with
-                    | EndTag endTag :: restAfter when endTag = tag ->
-                        loop restAfter (Element(tag, globalAttrs, localAttrs, children) :: acc)
-                    | EndTag endTag :: _ ->
-                        failwith $"Mismatched end tag: expected </{tag}>, found </{endTag}>"
-                    | _ ->
-                        failwith $"Unclosed tag: {tag}"
+                    if selfClosing then
+                        loop rest (Element(tag, globalAttrs, localAttrs, []) :: acc)
+                    else
+                        let children, remaining = loop rest []
+                        match remaining with
+                        | EndTag endTag :: restAfter when endTag = tag ->
+                            loop restAfter (Element(tag, globalAttrs, localAttrs, children) :: acc)
+                        | EndTag endTag :: _ ->
+                            failwith $"Mismatched end tag: expected </{tag}>, found </{endTag}>"
+                        | _ ->
+                            failwith $"Unclosed tag: {tag}"
         loop tokens []
 
     let private emitWarning (warning: ValidationWarning) =
@@ -142,7 +211,14 @@ module Tree =
         let rawText =
             children
             |> List.choose (function
-                | TextNode text -> Some text
+                | TextNode contents ->
+                    let text =
+                        contents
+                        |> List.choose (function
+                            | RawText text -> Some text
+                            | Fragment _ -> None)
+                        |> String.concat ""
+                    Some text
                 | _ -> None)
             |> String.concat " "
 
@@ -342,48 +418,80 @@ module Tree =
         | "bold" -> Bold
         | "strange" -> Strange
         | "rounded" -> Rounded
-        | "ascii" -> Ascii
+        | "ascii" -> Border.Ascii
         | "none" -> NoBorder
+        | "borderless" -> Borderless
         | value -> failwith $"Invalid border value: {value}"
 
-    let private buildTextContent children =
-        children
-        |> List.choose (function
-            | TextWidget(text, _, _, _) -> Some text
-            | _ -> None)
-        |> String.concat ""
+    let private parseSpinnerType = function
+        | "braille" -> Braille
+        | "dots" -> Dots
+        | "waiting" -> Waiting
+        | "beam" -> Beam
+        | "ascii" -> Spinner.Ascii
+        | "circle" -> Circle
+        | "square" -> Square
+        | "moon" -> Moon
+        | "arrow" -> Arrow
+        | "bounce" -> Bounce
+        | value -> failwith $"Invalid spinner type: {value}"
+
+    let private normalizeSpinnerCompleted value =
+        if String.IsNullOrWhiteSpace(value) then
+            "✓"
+        elif value = "check" then
+            "✓"
+        else
+            value
 
     let mutable previousTag: AstNode option = None
-    /// builder
+
+    let private buildTextNodeWidgets contents =
+        contents
+        |> List.collect (function
+            | RawText text -> [ TextWidget(text, None, None, None) ]
+            | Fragment fragment -> [ TextWidget(fragment.Content, fragment.Foreground, fragment.Background, fragment.Font) ]
+        )
+
+    let private applyTextStyle widget parentFg parentBg parentFont =
+        match widget with
+        | TextWidget(text, fg, bg, font) ->
+            let finalFg = if fg.IsSome then fg else parentFg
+            let finalBg = if bg.IsSome then bg else parentBg
+            let finalFont = if font.IsSome then font else parentFont
+            TextWidget(text, finalFg, finalBg, finalFont)
+        | _ -> failwith "Invalid child inside <text>."
+
     let rec buildSemanticTree ast =
-        ast |> List.map buildWidget
+        ast |> List.collect buildWidget
 
     /// Builds a Widget tree from a list of AST nodes
     and buildWidget node =
         match node with
-        | TextNode text -> TextWidget(text, None, None, None)
+        | TextNode contents -> buildTextNodeWidgets contents
         | Element(tag, _, attrs, children) ->
-            let childrenWidgets = buildSemanticTree children
             match tag with
             | "text" ->
-                let fg = tryGetAttr "foreground" attrs
-                let bg = tryGetAttr "background" attrs
-                let font = tryGetAttr "font" attrs
-                match childrenWidgets with
-                | [TextWidget(text, _, _, _)] -> TextWidget(text, fg, bg, font)
-                | _ -> TextWidget(buildTextContent childrenWidgets, fg, bg, font)
+                let parentFg = tryGetAttr "foreground" attrs
+                let parentBg = tryGetAttr "background" attrs
+                let parentFont = tryGetAttr "font" attrs
+                let childrenWidgets = children |> List.collect buildWidget
+                childrenWidgets
+                |> List.map (fun widget -> applyTextStyle widget parentFg parentBg parentFont)
             | "row" ->
                 let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
                 let border = tryGetAttr "border" attrs |> Option.map parseBorder |> Option.defaultValue NoBorder
                 let gap = parseIntAttr "gap" 0 attrs
                 let align = tryGetAttr "align" attrs |> Option.map parseAlign
-                RowWidget(width, border, gap, align, childrenWidgets)
+                let childrenWidgets = children |> List.collect buildWidget
+                [ RowWidget(width, border, gap, align, childrenWidgets) ]
             | "column" ->
                 let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
                 let border = tryGetAttr "border" attrs |> Option.map parseBorder |> Option.defaultValue NoBorder
                 let gap = parseIntAttr "gap" 0 attrs
                 let yAlign = tryGetAttr "y-align" attrs |> Option.map parseAlign
-                ColumnWidget(width, border, gap, yAlign, childrenWidgets)
+                let childrenWidgets = children |> List.collect buildWidget
+                [ ColumnWidget(width, border, gap, yAlign, childrenWidgets) ]
             | "depth" ->
                 let index =
                     match tryGetAttr "index" attrs with
@@ -394,7 +502,8 @@ module Tree =
                     | None -> failwith "Missing required attribute for depth: index"
                 let gap = parseIntAttr "gap" 0 attrs
                 let zAlign = tryGetAttr "z-align" attrs |> Option.map parseAlign
-                DepthWidget(index, zAlign, gap, childrenWidgets)
+                let childrenWidgets = children |> List.collect buildWidget
+                [ DepthWidget(index, zAlign, gap, childrenWidgets) ]
             | "box" ->
                 let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
                 let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
@@ -402,7 +511,8 @@ module Tree =
                 let borderColor = tryGetAttr "border-color" attrs
                 let align = tryGetAttr "align" attrs |> Option.map parseAlign
                 let paddingV, paddingH = tryGetAttr "padding" attrs |> Option.map parsePadding |> Option.defaultValue (0, 0)
-                BoxWidget(width, height, border, borderColor, align, paddingV, paddingH, childrenWidgets)
+                let childrenWidgets = children |> List.collect buildWidget
+                [ BoxWidget(width, height, border, borderColor, align, paddingV, paddingH, childrenWidgets) ]
             | "block" ->
                 let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
                 let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
@@ -411,15 +521,26 @@ module Tree =
                 let name = tryGetAttr "title" attrs
                 let align = tryGetAttr "align" attrs |> Option.map parseAlign
                 let paddingV, paddingH = tryGetAttr "padding" attrs |> Option.map parsePadding |> Option.defaultValue (0, 0)
-                BlockWidget(width, height, border, borderColor, name, align, paddingV, paddingH, childrenWidgets)
-            | "cell" -> 
-                CellWidget(childrenWidgets)
+                let childrenWidgets = children |> List.collect buildWidget
+                [ BlockWidget(width, height, border, borderColor, name, align, paddingV, paddingH, childrenWidgets) ]
+            | "cell" ->
+                let childrenWidgets = children |> List.collect buildWidget
+                [ CellWidget(childrenWidgets) ]
             | "terminal" ->
                 let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
                 let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
                 let xAlign = tryGetAttr "x-align" attrs |> Option.map parseAlign
                 let yAlign = tryGetAttr "y-align" attrs |> Option.map parseAlign
-                TerminalWidget(width, height, xAlign, yAlign, childrenWidgets)
+                let childrenWidgets = children |> List.collect buildWidget
+                [ TerminalWidget(width, height, xAlign, yAlign, childrenWidgets) ]
+            | "spinner" ->
+                let spinnerType = tryGetAttr "type" attrs |> Option.map parseSpinnerType |> Option.defaultValue Braille
+                let interval = tryGetAttr "interval" attrs |> Option.defaultValue "250ms"
+                let duration = tryGetAttr "duration" attrs |> Option.defaultValue "3000ms"
+                let completed = tryGetAttr "completed" attrs |> Option.map normalizeSpinnerCompleted |> Option.defaultValue "✓"
+                let foreground = tryGetAttr "foreground" attrs
+                let background = tryGetAttr "background" attrs
+                [ SpinnerWidget(spinnerType, interval, duration, completed, foreground, background) ]
             | _ ->
                 failwith $"Unsupported semantic tag: {tag}"
 

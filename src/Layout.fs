@@ -2,6 +2,7 @@ namespace PTML
 open PTML.Tree
 open PTML.Token
 open System
+open PTML.Spinner
 
 module Layout = 
     type Metrics = {
@@ -12,6 +13,7 @@ module Layout =
     }
 
     type PositionedWidget =
+        | PositionedSpinnerWidget of text:Types * interval:string * duration:string * completed:string * foreground:string option * background:string option * metrics:Metrics
         | PositionedTextWidget of text:string * foreground:string option * background:string option * font:string option * metrics:Metrics
         | PositionedRowWidget of width:Dimension * border:Border * gap:int * align:Align option * metrics:Metrics * children:PositionedWidget list
         | PositionedColumnWidget of width:Dimension * border:Border * gap:int * yAlign:Align option * metrics:Metrics * children:PositionedWidget list
@@ -69,6 +71,8 @@ module Layout =
     let rec private shiftWidget dx dy widget =
         let shiftMetrics metrics = { metrics with x = metrics.x + dx; y = metrics.y + dy }
         match widget with
+            | PositionedSpinnerWidget(tp, interval, duration, completed, fg, bg, metrics) -> 
+                PositionedSpinnerWidget(tp, interval, duration, completed, fg, bg, shiftMetrics metrics)
             | PositionedTextWidget(text, fg, bg, font, metrics) -> PositionedTextWidget(text, fg, bg, font, shiftMetrics metrics)
             | PositionedRowWidget(width, border, gap, align, metrics, children) ->
                 PositionedRowWidget(width, border, gap, align, shiftMetrics metrics, children)
@@ -145,6 +149,7 @@ module Layout =
 
     let private metricsOf widget =
         match widget with
+        | PositionedSpinnerWidget(_,_,_,_,_,_,m)
         | PositionedTextWidget(_, _, _, _, m)
         | PositionedRowWidget(_, _, _, _, m, _)
         | PositionedColumnWidget(_, _, _, _, m, _)
@@ -178,6 +183,10 @@ module Layout =
         match widget with
         (* Layout logic for each widget type *)
         (* Entra em loop até chegar aqui     *)
+        | SpinnerWidget(types, interval, duration, completed, fg, bg ) ->
+            let w = Spinner.maxFrameWidth types
+            let h = lineHeight 
+            PositionedSpinnerWidget(types, interval, duration, completed, fg, bg, { x = 0; y = 0; w = w; h = h })
         | TextWidget(text, fg, bg, font) ->
             let w = text.Length * charWidth
             let h = lineHeight
@@ -328,28 +337,6 @@ module Layout =
                         let xOffset = paddingH + alignOffset availableWidth childTotalWidth align
                         shiftWidget xOffset paddingV child)
                 PositionedBlockWidget(width, height, border, borderColor, name, align, paddingV, paddingH, { x = 0; y = 0; w = resolvedContentWidth + paddingH * 2; h = resolvedContentHeight + paddingV * 2 }, positionedChildren)
-        (*| CellWidget(children) ->
-            let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
-
-            let childWidths = positionedChildren |> List.map totalWidth
-            let childHeights = positionedChildren |> List.map totalHeight
-
-            let totalChildWidth = if List.isEmpty childWidths then 0 else List.max childWidths
-            let totalChildHeight = if List.isEmpty childHeights then 0 else List.max childHeights
-
-            let resolvedWidth = match parentWidth with | Some number -> number | none -> 0
-            let resolvedHeight = match parentHeight with | Some number -> number | none -> 0
-
-            let positionedChildren =
-                positionedChildren
-                |> List.map (fun child ->
-                    let childTotalWidth = totalWidth child
-                    let childTotalHeight = totalHeight child
-                    let xOffset = alignOffset resolvedWidth childTotalWidth None
-                    let yOffset = alignOffset resolvedHeight childTotalHeight None
-                    shiftWidget xOffset yOffset child)
-            PositionedGridWidget({ x = 0; y = 0; w = resolvedWidth; h = resolvedHeight}, positionedChildren)
-        *)
         | TerminalWidget(width, height, alignX, alignY, children) -> 
             let cmd = getLayoutViewport()
 

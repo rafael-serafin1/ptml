@@ -2,6 +2,8 @@ namespace PTML
 open System
 open System.Text
 open PTML.Buffer
+open System.Threading
+open PTML.Spinner
 
 module Output =
     let private escape = "\x1b"
@@ -69,6 +71,12 @@ module Output =
         || Option.isSome (backgroundCode cell.background)
         || Option.isSome (fontCode cell.font)
 
+    let private shouldRenderSpinner(cell: Cell) =
+        cell.char <> ' '
+        && Option.isSome (cell.spinner)
+        || Option.isSome (foregroundCode cell.foreground)
+        || Option.isSome (backgroundCode cell.background)
+        || Option.isSome (fontCode cell.font)
     let bufferToAnsi (buffer: Cell[,]) =
         let height = Array2D.length1 buffer
         let width = Array2D.length2 buffer
@@ -78,23 +86,39 @@ module Output =
         for y in 0 .. height - 1 do
             for x in 0 .. width - 1 do
                 let cell = buffer.[y, x]
-                if shouldRenderCell cell then
-                    sb.Append(cursorTo x y) |> ignore
-                    match ansiStyle cell with
-                    | Some style when style <> currentStyle ->
-                        if currentStyle <> "" then
+                match cell.spinner with
+                | Some c -> 
+                    if shouldRenderSpinner cell then
+                        sb.Append(cursorTo x y) |> ignore
+                        let T = Thread(ThreadStart(fun () -> Spinner.drawSpinner(c.tp, x, y, c.interval, c.dur, c.complete)))
+                        T.Start()
+                        match ansiStyle cell with
+                        | Some style when style <> currentStyle ->
+                            if currentStyle <> "" then
+                                sb.Append(resetCode) |> ignore
+                            sb.Append(style) |> ignore
+                            currentStyle <- style
+                        | None when currentStyle <> "" ->
                             sb.Append(resetCode) |> ignore
-                        sb.Append(style) |> ignore
-                        currentStyle <- style
-                    | None when currentStyle <> "" ->
-                        sb.Append(resetCode) |> ignore
-                        currentStyle <- ""
-                    | _ -> ()
-                    sb.Append(cell.char) |> ignore
+                            currentStyle <- ""
+                        | _ -> ()
+                | None ->
+                    if shouldRenderCell cell then
+                        sb.Append(cursorTo x y) |> ignore
+                        match ansiStyle cell with
+                        | Some style when style <> currentStyle ->
+                            if currentStyle <> "" then
+                                sb.Append(resetCode) |> ignore
+                            sb.Append(style) |> ignore
+                            currentStyle <- style
+                        | None when currentStyle <> "" ->
+                            sb.Append(resetCode) |> ignore
+                            currentStyle <- ""
+                        | _ -> ()
+                        sb.Append(cell.char) |> ignore
 
         if currentStyle <> "" then
             sb.Append(resetCode) |> ignore
-
         sb.ToString()
 
     let printAnsiBuffer (buffer: Cell[,]) =
