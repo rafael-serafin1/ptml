@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { align, borders, colors, encoding, fonts, NaNValuesInNumericAttrs, nums, overflow } from "./PTMLAttributesValueCompletionProvider";
+import { align, borders, colors, completed, encoding, fonts, NaNValuesInNumericAttrs, nums, ori, overflow, spinners } from "./PTMLAttributesValueCompletionProvider";
 
 interface AttributeDefinition {
     name: string;
@@ -216,17 +216,7 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
     spinner: [
         {
             name: "type",
-            values: [
-                "braille",
-                "dots",
-                "waiting",
-                "beam",
-                "ascii",
-                "circle",
-                "square",
-                "arrow",
-                "moon"
-            ]
+            values: spinners
         },
         {
             name: "interval",
@@ -238,10 +228,22 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         },
         {
             name: "completed",
-            values: ["check"]
+            values: completed
         },
         globalAttributes,
         globalAttributes2
+    ],
+    hr: [
+        {
+            name: "orientation",
+            values: ori
+        },
+        {
+            name: "width",
+        },
+        {
+            name: "height"
+        }
     ]
 };
 

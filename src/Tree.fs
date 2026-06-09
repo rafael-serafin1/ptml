@@ -5,31 +5,27 @@ open PTML.Parser
 open PTML.Spinner
 
 module Tree =
-    type GlobalAttributes =
-        {
-            Id : string option
-            Snippet : string option
-        }
+    type GlobalAttributes = {
+        Id : string option
+        Snippet : string option
+    }
 
-    type SnippetDefinition =
-        {
-            Id : string
-            Extends : string option
-            GlobalAttributes : GlobalAttributes
-            Attributes : list<string * string>
-        }
+    type SnippetDefinition = {
+        Id : string
+        Extends : string option
+        GlobalAttributes : GlobalAttributes
+        Attributes : list<string * string>
+    }
 
     type SnippetRegistry = Map<string, SnippetDefinition>
 
-    type ValidationWarning =
-        {
-            Message : string
-        }
+    type ValidationWarning ={
+        Message : string
+    }
 
-    type ValidationError =
-        {
-            Message : string
-        }
+    type ValidationError = {
+        Message : string
+    }
 
     type FragmentNode = {
             Foreground : string option
@@ -94,8 +90,13 @@ module Tree =
         | Conceal = 8
         | StrikeThrough = 9
 
+    type Orientation =
+    | Vertical
+    | Horizontal
+
     // discriminated union for semantic tree
     type Widget =
+        | HrWidget of orientation: Orientation * width: Dimension * height: Dimension
         | SpinnerWidget of text:Types * interval: string * duration: string * completed: string * foreground:string option * background:string option
         | TextWidget of text:string * foreground:string option * background:string option * font:string option
         | RowWidget of width:Dimension * border:Border * gap:int * align:Align option * children:Widget list
@@ -153,13 +154,12 @@ module Tree =
             )
             |> String.concat ""
 
-        let buildFragmentNode attrs children =
-            {
-                Foreground = tryGetAttrLocal "foreground" attrs
-                Background = tryGetAttrLocal "background" attrs
-                Font = tryGetAttrLocal "font" attrs
-                Content = fragFromChildren children
-            }
+        let buildFragmentNode attrs children = {
+            Foreground = tryGetAttrLocal "foreground" attrs
+            Background = tryGetAttrLocal "background" attrs
+            Font = tryGetAttrLocal "font" attrs
+            Content = fragFromChildren children
+        }
 
         let rec loop tokens acc =
             match tokens with
@@ -411,6 +411,11 @@ module Tree =
         | [| vertical; horizontal |] -> (parsePart vertical, parsePart horizontal)
         | _ -> failwith $"Invalid padding format: {value}"
 
+    let private parseHr = function
+        | "vertical" -> Vertical
+        | "horizontal" -> Horizontal
+        | value -> failwith $"Invalid orientation value: {value}"
+
     let private parseBorder = function
         | "single" -> Single
         | "double" -> Double
@@ -427,6 +432,7 @@ module Tree =
         | "braille" -> Braille
         | "dots" -> Dots
         | "waiting" -> Waiting
+        | "burger" -> Burger
         | "beam" -> Beam
         | "ascii" -> Spinner.Ascii
         | "circle" -> Circle
@@ -439,10 +445,15 @@ module Tree =
     let private normalizeSpinnerCompleted value =
         if String.IsNullOrWhiteSpace(value) then
             "✓"
-        elif value = "check" then
-            "✓"
         else
-            value
+        match value with
+        | "check" -> "✓"
+        | "error" -> "✖"
+        | "star" -> "✱"
+        | "cog" -> "⚙"
+        | "bright" -> "✦"
+        | _ -> value
+        
 
     let mutable previousTag: AstNode option = None
 
@@ -471,6 +482,11 @@ module Tree =
         | TextNode contents -> buildTextNodeWidgets contents
         | Element(tag, _, attrs, children) ->
             match tag with
+            | "hr" -> 
+                let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
+                let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
+                let orientation: Orientation = tryGetAttr "orientation" attrs |> Option.map parseHr |> Option.defaultValue Orientation.Horizontal
+                [ HrWidget(orientation, width, height) ]
             | "text" ->
                 let parentFg = tryGetAttr "foreground" attrs
                 let parentBg = tryGetAttr "background" attrs

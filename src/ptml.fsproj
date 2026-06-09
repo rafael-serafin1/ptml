@@ -9,26 +9,33 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="utils/Utils.fs"          />
-    <Compile Include="utils/Messager.fs"       />
-    <Compile Include="components/Spinner.fs"   />
-    <Compile Include="PiAttrs.fs"              />
-    <Compile Include="Token.fs"                />
-    <Compile Include="Lexer.fs"                />
-    <Compile Include="Parser.fs"               />
-    <Compile Include="Tree.fs"                 />
-    <Compile Include="Layout.fs"               />
-    <Compile Include="Render.fs"               />
-    <Compile Include="Buffer.fs"               />
-    <Compile Include="Diff.fs"                 />
-    <Compile Include="DiffRenderer.fs"         />
-    <Compile Include="Output.fs"               />
-    <Compile Include="Depth.fs"                />
-    <Compile Include="main/Runner.fs"          />
-    <Compile Include="ErrorHandling.fs"        />
-    <Compile Include="main/Watch.fs"           />
-    <Compile Include="main/Debug.fs"           />
-    <Compile Include="Program.fs"              />
+    <None Include=".env.example" />
+    <Compile Include="utils/Utils.fs" />
+    <Compile Include="utils/Messager.fs" />
+    <Compile Include="components/Spinner.fs" />
+    <Compile Include="PiAttrs.fs" />
+    <Compile Include="Token.fs" />
+    <Compile Include="Lexer.fs" />
+    <Compile Include="Parser.fs" />
+    <Compile Include="Tree.fs" />
+    <Compile Include="Layout.fs" />
+    <Compile Include="Render.fs" />
+    <Compile Include="Buffer.fs" />
+    <Compile Include="Diff.fs" />
+    <Compile Include="DiffRenderer.fs" />
+    <Compile Include="Output.fs" />
+    <Compile Include="Depth.fs" />
+    <Compile Include="main/Runner.fs" />
+    <Compile Include="ErrorHandling.fs" />
+    <Compile Include="main/Watch.fs" />
+    <Compile Include="main/Debug.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup />
+
+  <ItemGroup>
+    <None Include="application.json"></None>
   </ItemGroup>
 
 </Project>

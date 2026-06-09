@@ -32,6 +32,11 @@ module Render =
         | Borderless -> ("", "", "", "", "")
         | NoBorder -> ("", "", "", "", "")
 
+    let private hrChars(ori: Orientation) =
+        match ori with
+        | Vertical -> "│"
+        | Horizontal -> "─"
+
     let private drawHorizontal xStart xEnd y char fore =
         [ for x in xStart .. xEnd -> DrawChar(char, x, y, fore, None, None) ]
 
@@ -101,6 +106,14 @@ module Render =
 
     let rec private renderWidget offsetX offsetY widget =
         match widget with
+        | PositionedHrWidget(ori, _, _, metrics) ->
+            let baseX = offsetX + metrics.x
+            let baseY = offsetY + metrics.y
+            match ori with
+            | Horizontal ->
+                drawHorizontal baseX (baseX + metrics.w - 1) baseY (hrChars Horizontal) None
+            | Vertical ->
+                drawVertical baseX baseY (baseY + metrics.h - 1) (hrChars Vertical) None
         | PositionedTextWidget(text, fg, bg, font, metrics) ->
             [ DrawChar(text, offsetX + metrics.x, offsetY + metrics.y, fg, bg, font) ]
 

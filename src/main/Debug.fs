@@ -44,6 +44,6 @@ module Debug =
         let buffer = Depth.composeDepthLayers baseBuffer depthLayers
 
         Console.Write("\x1b[2J\x1b[H")
-        Output.printAnsiBuffer(buffer)
+        Output.writeAnsiBuffer(buffer)
         printfn ""
         Status.Success

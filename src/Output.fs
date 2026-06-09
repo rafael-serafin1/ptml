@@ -90,7 +90,7 @@ module Output =
                 | Some c -> 
                     if shouldRenderSpinner cell then
                         sb.Append(cursorTo x y) |> ignore
-                        let T = Thread(ThreadStart(fun () -> Spinner.drawSpinner(c.tp, x, y, c.interval, c.dur, c.complete)))
+                        let T = Thread(ThreadStart(fun () -> drawSpinner(c.tp, x, y, c.interval, c.dur, c.complete)))
                         T.Start()
                         match ansiStyle cell with
                         | Some style when style <> currentStyle ->
@@ -121,8 +121,96 @@ module Output =
             sb.Append(resetCode) |> ignore
         sb.ToString()
 
+    // escreve um por um normalmente
     let printAnsiBuffer (buffer: Cell[,]) =
         Console.Write(bufferToAnsi buffer)
 
+    // concatena tudo em uma string e escreve man
     let writeAnsiBuffer (buffer: Cell[,]) =
-        Console.Out.Write(bufferToAnsi buffer)
+        let height = Array2D.length1 buffer
+
+        let lines =
+            Array.Parallel.init height (fun y ->
+                let sb = StringBuilder()
+
+                let width = Array2D.length2 buffer
+                let mutable currentStyle = ""
+
+                for x in 0 .. width - 1 do
+                    let cell = buffer.[y, x]
+                    match cell.spinner with
+                    | Some c ->
+                        if shouldRenderSpinner cell then
+                            sb.Append(cursorTo x y) |> ignore
+                            let t =
+                                Thread(ThreadStart(fun () ->
+                                    Spinner.drawSpinner(
+                                        c.tp,
+                                        x,
+                                        y,
+                                        c.interval,
+                                        c.dur,
+                                        c.complete
+                                    )
+                                ))
+                            t.Start()
+                            match ansiStyle cell with
+                            | Some style when style <> currentStyle ->
+                                if currentStyle <> "" then
+                                    sb.Append(resetCode) |> ignore
+
+                                sb.Append(style) |> ignore
+                                currentStyle <- style
+
+                            | None when currentStyle <> "" ->
+                                sb.Append(resetCode) |> ignore
+                                currentStyle <- ""
+
+                            | _ -> ()
+                    | None ->
+                        if shouldRenderCell cell then
+                            sb.Append(cursorTo x y) |> ignore
+                            match ansiStyle cell with
+                            | Some style when style <> currentStyle ->
+                                if currentStyle <> "" then
+                                    sb.Append(resetCode) |> ignore
+                                sb.Append(style) |> ignore
+                                currentStyle <- style
+                            | None when currentStyle <> "" ->
+                                sb.Append(resetCode) |> ignore
+                                currentStyle <- ""
+                            | _ -> ()
+                            sb.Append(cell.char) |> ignore
+                if currentStyle <> "" then
+                    sb.Append(resetCode) |> ignore
+                sb.ToString()
+            )
+        Console.Out.Write(String.Concat(lines))
+
+    // usa threads para escrever cada linhas da matriz
+    let writeAll(buffer: Cell[,]) = 
+        let height = Array2D.length1 buffer
+
+        let threads =
+            [|
+                for y in 0 .. height - 1 ->
+                    Thread(ThreadStart(fun () ->
+                        let sb = StringBuilder()
+
+                        let width = Array2D.length2 buffer
+
+                        for x in 0 .. width - 1 do
+                            let cell = buffer.[y,x]
+
+                            if shouldRenderCell cell then
+                                sb.Append(cursorTo x y) |> ignore
+                                sb.Append(cell.char) |> ignore
+
+                        lock Console.Out (fun () ->
+                            Console.Out.Write(sb.ToString())
+                        )
+                    ))
+            |]
+
+        threads |> Array.iter (fun t -> t.Start())
+        threads |> Array.iter (fun t -> t.Join())

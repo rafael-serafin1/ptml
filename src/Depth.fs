@@ -144,6 +144,8 @@ module Depth =
 
         | PositionedTextWidget(text, foreground, background, font, metrics) ->
             (Some (PositionedTextWidget(text, foreground, background, font, metrics)), [])
+        | PositionedHrWidget(ori, width, height, metrics) -> 
+            (Some (PositionedHrWidget(ori, width, height, metrics)), [])
 
     let extractDepthLayers widgets =
         let results = widgets |> List.map (extractWidget 0 0)

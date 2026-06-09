@@ -8,6 +8,7 @@ module Spinner =
     | Braille
     | Dots
     | Waiting
+    | Burger
     | Beam
     | Ascii
     | Moon
@@ -45,6 +46,7 @@ module Spinner =
                 "⡿"; "⣟"; "⣯"; "⣷"
             |]
         | Waiting -> [| "."; ".."; "..."; "...." |]
+        | Burger -> [| "-"; "="; "≡" |]
         | Beam -> [| "[=  ]"; "[== ]"; "[===]"; "[ ==]"; "[  =]" |]
         | Ascii -> [| "|"; "/"; "-"; "\\" |]
         | Circle -> [| "◐"; "◓"; "◑"; "◒" |]
@@ -93,38 +95,90 @@ module Spinner =
         else
             failwith "Invalid duration format. Use 'ms', 's' or 'laps'."
 
+    let CleanSpinner(lenght: int, x: int, y: int) = 
+        let mutable index: int = x
+        let final = lenght + x
+        while index <> final do
+            Console.SetCursorPosition(index, y)
+            Console.Write(" ")
+            index <- index + 1
+            
+
     let drawSpinner(tp: Types, x, y, inter: string, dur: string, complete: string) =
         let frames = framesOfType tp
         let duration = ParseDuration(dur, inter, frames)
         let intervalMs = ParseInterval(inter)
+        let cursorPos = Console.GetCursorPosition()
 
         Console.SetCursorPosition(x, y)
         Console.CursorVisible <- false
         let stopwatch = Stopwatch.StartNew()
 
         let mutable frameIndex = 0
+        let mutable helpIndex = 0
         let mutable laps = 0
         let mutable running = true
-        while running do
-            Console.SetCursorPosition(x, y)
-            Console.Write(frames[frameIndex])
+        if tp = Types.Waiting then
+            while running do
+                Console.SetCursorPosition(x, y)
+                Console.Write(frames[frameIndex])
 
-            Thread.Sleep(intervalMs)
+                Thread.Sleep(intervalMs)
 
-            frameIndex <- frameIndex + 1
-            if frameIndex >= frames.Length then
-                frameIndex <- 0
-                laps <- laps + 1
-            match duration.tp with
-            | "ms" ->
-                if stopwatch.ElapsedMilliseconds >= int64 duration.value then
-                    running <- false
-            | "laps" ->
-                if laps >= duration.value then
-                    running <- false
-            | _ -> ()
+                frameIndex <- frameIndex + 1
+                helpIndex <- helpIndex + 1
+                if frameIndex >= frames.Length then
+                    let mutable helpX: int = x
+                    while helpIndex <> 0 do
+                        Console.SetCursorPosition(helpX, y)
+                        Console.Write(" ")
+                        helpIndex <- helpIndex - 1
+                        helpX <- helpX + 1
+                    frameIndex <- 0
+                    laps <- laps + 1
+                match duration.tp with
+                | "s" ->
+                    if stopwatch.ElapsedMilliseconds >= int64(duration.value * 1000) then
+                        CleanSpinner(frames.Length, x, y)
+                        running <- false
+                | "ms" ->
+                    if stopwatch.ElapsedMilliseconds >= int64 duration.value then
+                        CleanSpinner(frames.Length, x, y)
+                        running <- false
+                | "laps" ->
+                    if laps >= duration.value then
+                        CleanSpinner(frames.Length, x, y)
+                        running <- false
+                | _ -> 
+                    CleanSpinner(frames.Length, x, y)
+                    ()
+        else
+            while running do
+                Console.SetCursorPosition(x, y)
+                Console.Write(frames[frameIndex])
+
+                Thread.Sleep(intervalMs)
+
+                frameIndex <- frameIndex + 1
+                if frameIndex >= frames.Length then
+                    frameIndex <- 0
+                    laps <- laps + 1
+                match duration.tp with
+                | "s" ->
+                    if stopwatch.ElapsedMilliseconds >= int64(duration.value * 1000) then
+                        running <- false
+                | "ms" ->
+                    if stopwatch.ElapsedMilliseconds >= int64 duration.value then
+                        running <- false
+                | "laps" ->
+                    if laps >= duration.value then
+                        running <- false
+                | _ -> ()
         stopwatch.Stop()
 
         Console.SetCursorPosition(x, y)
         Console.Write(complete)
-        Console.CursorVisible <- true
+        match cursorPos with
+        | x, y -> 
+            Console.SetCursorPosition(x, y)
+            Console.CursorVisible <- true

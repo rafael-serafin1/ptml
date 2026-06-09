@@ -39,6 +39,24 @@ export function activate(context: vscode.ExtensionContext) {
         }
     );
 
+    const window = vscode.commands.registerCommand(
+        'ptml.window',
+        async () => {
+            const editor = vscode.window.activeTextEditor;
+            if (!editor) return;
+
+            await editor.document.save();
+            const file = editor.document.fileName;
+            const terminal = vscode.window.createTerminal(
+                "ptml window code"
+            )
+            terminal.show();
+            terminal.sendText(
+                `ptml run "${file}" --window`
+            );
+        }
+    );
+
     const watch = vscode.commands.registerCommand(
         'ptml.watch',
         async () => {
@@ -60,15 +78,14 @@ export function activate(context: vscode.ExtensionContext) {
     const provider = vscode.languages.registerCompletionItemProvider(
         "ptml",
         new PTMLCompletionProvider(),
-        "<",
-        "a","b","c","d","e","f","g","h","i","j",
-        "k","l","m","n","o","p","q","r","s","t",
-        "u","v","w","x","y","z"
+        "<","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"
     );
         
     context.subscriptions.push(provider);
+    context.subscriptions.push(window);
     context.subscriptions.push(disposable);
     context.subscriptions.push(watch);
+
     context.subscriptions.push(
         vscode.languages.registerCompletionItemProvider(
             "ptml",

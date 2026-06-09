@@ -26,6 +26,7 @@ Sendo assim, atualmente os concretos são:
 <box>
 <block>
 <spinner>
+<hr>
 <input>
 <output>
 <entity>
@@ -41,7 +42,9 @@ Agora, os abstratos são:
 <terminal>
 <cell>
 <snippet>
+<br>
 <code>
+<function>
 ```
 
 ---
@@ -185,6 +188,73 @@ reverse                 (marked)
 conceal                 (hidden)
 strike-through
 ```
+
+---
+## Elemento `<br>`
+
+`<br />`
+Elemento responsável por quebrar a frase para a próxima linha, respeitando as palavras.
+
+Exemplo:
+- Input
+```ptml
+<text>Olá!<br/>Tchau!</text>
+```
+
+- Output
+```cmd
+Olá!
+Tchau!
+```
+
+---
+## Elemento `<hr>`
+
+`<hr />`
+Elemento que com a função de separar elementos no terminal.
+
+Exemplo:
+- Input
+```ptml
+<column>
+    <text>Acima</text>
+    <hr orientation="horizontal" />
+    <text>Abaixo</text>
+</column>
+```
+
+- Output
+```cmd
+Acima
+──────────────
+Abaixo
+```
+
+### **Atributos**:
+
+***orientation***:
+Define a orientação da barreira. Valores possíveis:
+```
+vertical
+horizontal
+```
+
+***width/height***:
+Corresponde a largura e altura do componente. Seus valores são numéricos inteiros ou específicos. Em caso de não declaração, o valor padrão é `auto` (renderiza no tamanho necessário para confortar o texto). Valores não-numéricos específicos:
+```
+auto                                    (renderiza do tamanho necessário)
+Nº%                                     (valor associado ao elemento-pai substituindo Nº por número --> percentage. Exemplo: 40%)
+```
+
+---
+## `<hr>` VS `<cell>`
+
+```
+<hr>                | <cell>
++ leve              | - pesado
+- sem continuidade  | + continuidade de layout
+```
+> Legenda: '+' significa pro e '-' significa contra.
 
 ---
 ## Elemento `<row>`
@@ -995,6 +1065,7 @@ Exemplo .3:
 │ Pao de Batata  │ Pao, Batata.   │
 └────────────────┴────────────────┘
 ```
+
 ---
 ## Elemento `<spinner>`
 
@@ -1016,8 +1087,9 @@ Define o tipo de `<spinner>` a ser usado. Seu valor padrão é `braille`. Valore
 ```
 braille         (⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
 dots            (⣾ ⣽ ⣻ ⢿ ⡿ ⣟ ⣯ ⣷)
-waiting         (. .. ... ....)
-beam            (= == ===) -- ([=  ] [== ] [===] [ ==] [  =])
+waiting         (. .. ... ....)                                     ! AGORA FUNCIONA
+burger          (- = ≡)
+beam            (= == ===) -- ([=  ] [== ] [===] [ ==] [  =])       ! NÃO FUNCIONA PORQUE O PRIMEIRO FRAME POSSUI 5 CARACTERES
 ascii           (| / - \)
 circle          (◐ ◓ ◑ ◒)
 square          (◰ ◳ ◲ ◱)
@@ -1045,7 +1117,14 @@ Lap é calculado pela multiplicação da quantidade de frames pelo intervalo. En
 ```
 
 ***completed***:
-Define o que deve fazer ao ser completado. Por padrão, é colocado o caractere `✓` (alias para `check`).
+Define o que deve fazer ao ser completado. Por padrão, é colocado o caractere `✓` (alias para `check`). Alias possíveis:
+```
+check                           (✓)
+error                           (✖)
+star                            (✱)
+cog                             (⚙)
+bright                          (✦)
+```
 
 ***foreground/background***:
 Define a cor da fonte/fundo. Seu valores possíveis estão definidos no elemento `<text>`.
@@ -1099,7 +1178,7 @@ Exemplo .2:
 ***id***:
 Atributo que define um crachá especial para o snippet. Atributo obrigatório de ter.
 
-***extend***: 
+***extends***: 
 Atributo que herda atribuições de outras tags `<snippet>` através de seus Id's.
 
 Exemplo:
@@ -1117,6 +1196,27 @@ Exemplo:
 ***snippet***:
 Atributo que todos os elementos possuem e que faz a adição dos atributos resumidos no elemento `<snippet>`.
 > OBS.1: Se o `<snippet>` tiver atributos que o elemento não possui, exemplo `padding` para `<text>`, a execução não será interrompida, mas um aviso será gerado no terminal para deixar claro que aquele atributo não existe para tal elemento.
+
+---
+## Elemento `<list>`
+
+`<list></list>`
+Elemento usado para descrever listas.
+
+### **Atributos**:
+
+***oftype***:
+Define como a lista será escrita.
+```
+unorder             (não ordernada -, -, -)
+order               (ordenada ○, ○, ○)
+enum                (enumerada ex: 1,2,3)
+alphabet            (ex: a, b, c)
+Alphabet            (ex: A, B, C)
+```
+
+***before/after***:
+Descreve o que deve vir antes ou depois do caractere de lista.
 
 ---
 ## Elemento `<code>`

@@ -3,9 +3,9 @@
 
 <!-- Terminal Window Reference (not mandatory) -->
 <terminal x-align="start">
-    < id="important">
+    <snippet id="important">
         foreground="gold"
-    </>
+    </snippet>
 
     <!-- Simple Box with a Title -->
     <block title="PTML" border="rounded">
@@ -18,7 +18,7 @@
                 <box border-color="gray">
                     <!-- Prints out a text -->
                     <row>
-                        <text ="important">Hello <frag font="italic">World</frag>!</text>
+                        <text snippet="important">Hello <frag font="italic">World</frag>!</text>
                     </row>
                 </box>
                 </cell>
@@ -34,7 +34,7 @@
                 <cell>
                 <box border-color="gray">
                     <row>
-                        <text ="important">Hello <frag font="italic">World</frag>!</text>
+                        <text snippet="important">Hello <frag font="italic">World</frag>!</text>
                     </row>
                 </box>
                 </cell>

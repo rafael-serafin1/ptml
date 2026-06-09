@@ -75,7 +75,12 @@ export class PTMLCompletionProvider
                 name: "spinner",
                 snippet: 'spinner type="$1" interval="$2" duration="$3" completed="$4"/>',
                 documentation: '<spinner type="..." interval="..." duration="..." completed="..."/>'
-            }
+            },
+            {
+                name: "hr",
+                snippet: 'hr orientation="$1"/>',
+                documentation: '<hr orientation="..."/>'
+            },
         ];
 
         const filtered = tags.filter(t => t.name.startsWith(partial));
