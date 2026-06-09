@@ -12,22 +12,27 @@
             <row>
                 <cell><text snippet="shine">ID</text></cell>
                 <cell><text snippet="shine">Nome</text></cell>
+                <cell><text snippet="shine">Idade</text></cell>
             </row>
             <row>
                 <cell>1</cell>
                 <cell>Tiago</cell>
+                <cell>23</cell>
             </row>
             <row>
                 <cell>2</cell>
                 <cell>Rafael</cell>
+                <cell>19</cell>
             </row>
             <row>
                 <cell>3</cell>
                 <cell>Davi</cell>
+                <cell>19</cell>
             </row>
             <row>
                 <cell>4</cell>
                 <cell>Yuri</cell>
+                <cell>18</cell>
             </row>
         </column>
     </box>

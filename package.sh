@@ -9,7 +9,7 @@ if [ "$arg" = "publish" ]; then
     npm run compile
     vsce package
     vsce publish
-elif [ "$arg" = "package" ]; then
+elif [ "$arg" = "pack" ]; then
     echo "Executando package..."
     rm "*.vsix"
     npm run compile

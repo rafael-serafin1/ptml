@@ -11,7 +11,7 @@ if ($Command -eq "publish") {
     vsce package
     vsce publish
 }
-elseif ($Command -eq "package") {
+elseif ($Command -eq "pack") {
     Write-Host "Executando package..."
     Remove-Item "*.vsix"
     npm run compile

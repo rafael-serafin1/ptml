@@ -19,5 +19,7 @@
 extras/
 testing/
 .vscode/
+.vs/
+*/.vs
 
 .fake

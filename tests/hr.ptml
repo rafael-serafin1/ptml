@@ -1,0 +1,10 @@
+<?ptml encoding="UTF-8" terminal-resize="static"?>
+<terminal x-align="start">
+<box>
+    <row>
+        <text>Olá</text>
+        <hr orientation="vertical" width="1"/>
+        <text>Tchau</text>
+    </row>
+</box>
+</terminal>

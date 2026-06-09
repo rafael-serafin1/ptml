@@ -3,15 +3,21 @@ open PTML.Lexer
 open PTML.Token
 
 module Parser =
-    let validTags = Set.ofList ["frag"; "text"; "row"; "column"; "depth"; "box"; "block"; "terminal"; "cell"; "snippet"; "spinner"]
+    let validTags = Set.ofList ["frag"; "text"; "row"; "column"; "depth"; "box"; "block"; "terminal"; "cell"; "snippet"; "spinner"; "hr"]
     let colorValues = Set.ofList ["none"; "black"; "red"; "green"; "gold"; "blue"; "purple"; "cyan"; "fire"; "limegreen"; "yellow"; "lightblue"; "lilac"; "crystal"; "gray"; "lightgray"; "white"]
     let fontValues = Set.ofList ["none"; "bold"; "dim"; "italic"; "underline"; "slow-blink"; "rapid-blink"; "reverse"; "conceal"; "strike-through"]
     let overflowValues = Set.ofList ["break"; "wrap"; "cut"; "clip"]
     let alignValues = Set.ofList ["start"; "center"; "end"]
     let borderValues = Set.ofList ["single"; "double"; "classic"; "bold"; "strange"; "rounded"; "ascii"; "none"; "borderless"]
     let terminalResizeValues = Set.ofList ["reflow"; "clip"; "static"]
+    let orientation = Set.ofList ["vertical"; "horizontal"]
 
     let validAttributes = Map.ofList [
+        "hr", Map.ofList [
+            "orientation", orientation
+            "width", Set.empty
+            "height", Set.empty
+        ]
         "frag", Map.ofList [
             "foreground", colorValues
             "background", colorValues
@@ -63,7 +69,7 @@ module Parser =
         ]
         "cell", Map.ofList [];      // no attrs for now
         "spinner", Map.ofList [
-            "type", Set.ofList ["braille"; "dots"; "waiting"; "beam"; "ascii"; "circle"; "square"; "moon"; "arrow"; "bounce"]
+            "type", Set.ofList ["braille"; "dots"; "waiting"; "burger"; "beam"; "ascii"; "circle"; "square"; "moon"; "arrow"; "bounce"]
             "interval", Set.empty
             "duration", Set.empty
             "completed", Set.empty

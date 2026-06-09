@@ -19,6 +19,7 @@
         font="strike-through"
         foreground="blue"
     </snippet>
+    
     <column>
         <row>
             <text snippet="fatal">!ERRO!</text>

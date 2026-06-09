@@ -15,19 +15,25 @@ open PTML.Runner
 open PTML.Watch
 open PTML.Debug
 open PTML.Messager
+open System.Text.Json
+open System.Text.Json.Serialization
 
 module Program =
-    let help: string = """Comandos:
-- run <PATH>   :: Roda um arquivo PTML.
-- watch <PATH> :: Roda e observa mudanças e atualiza o terminal automaticamente.
-- debug <PATH> :: Ferramenta para debug do pipeline (uso para desenvolvedores). 
-----------------------------------------------------------------------------------
-Flags:
-"--help" ou "-h" -> Printar esse comando.
-"--version" ou "-v" -> Printa a versão do projeto.
-"--window" ou "-w" -> Força o programa a rodar em um terminal em janela do sistema com tamanho 460x200
-                    """
-    let version: string = "Versão do projeto :: 0.1.1"
+    type Settings = {
+        [<JsonPropertyName("version")>]
+        version: string
+        [<JsonPropertyName("help")>]
+        help: string
+    }
+
+    let json = File.ReadAllText("./src/application.json")
+    let options = JsonSerializerOptions(PropertyNameCaseInsensitive = true)
+    let settings = JsonSerializer.Deserialize<Settings>(json, options)
+
+    let bruh: string = "Não foi possível obter "
+
+    let help: string = $"""{settings.help}"""
+    let version: string = settings.version
 
     type Command = 
         | Run
@@ -109,8 +115,14 @@ Flags:
             if config.flags.IsEmpty = false then
                 for flag: Flag in config.flags do
                     match flag with
-                    | Help h -> printfn "%s" help
-                    | Version v -> printfn "%s" version
+                    | Help h -> 
+                        match help with
+                        | null -> printfn "%sos comandos para ajuda." bruh
+                        | value -> printfn "%s" help
+                    | Version v -> 
+                        match version with
+                        | null -> printfn "%sa versão do projeto." bruh
+                        | value -> printfn "%s" version
                     | Window w -> () // a flag de window é processada mais tarde, quando o programa for rodar
                 ()
             else 

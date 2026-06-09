@@ -74,6 +74,33 @@ export const encoding = [
     "ASCII"
 ]
 
+export const spinners = [
+    "braille",
+    "dots",
+    "waiting",
+    "burger",
+    "beam",
+    "ascii",
+    "circle",
+    "square",
+    "arrow",
+    "bounce",
+    "moon"
+]
+
+export const completed = [
+    "checked",
+    "error",
+    "cog",
+    "star",
+    "bright"
+]
+
+export const ori = [
+    "vertical",
+    "horizontal"
+]
+
 export class PTMLAttributeValueCompletionProvider
     implements vscode.CompletionItemProvider {
 
@@ -105,10 +132,11 @@ export class PTMLAttributeValueCompletionProvider
         snippet: [],
         extends: [],
 
-        type: ["braille", "dots", "waiting", "beam", "ascii", "circle", "square", "arrow", "moon"],
+        type: spinners,
         interval: [],
         duration: [],
-        completed: ["check"]
+        completed: completed,
+        orientation: ori,
     };
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {

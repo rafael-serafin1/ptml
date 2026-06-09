@@ -2,7 +2,7 @@
     "name": "ptml-language",
     "displayName": "PTML Language Support",
     "description": "Language support for PTML",
-    "version": "1.10.4",
+    "version": "1.10.9",
     "publisher": "Skrom",
     "repository": {
         "type": "git",
@@ -47,6 +47,10 @@
                 "title": "Run PTML file"
             }, 
             {
+                "command": "ptml.window",
+                "title": "Run PTMl on a Window"
+            },
+            {
                 "command": "ptml.watch",
                 "title": "Watch PTML file"
             }
@@ -55,6 +59,10 @@
             {
                 "command": "ptml.run",
                 "key": "ctrl+alt+r"
+            },
+            {
+                "command": "ptml.window",
+                "key": "crtl+alt+q"
             },
             {
                 "command": "ptml.watch",

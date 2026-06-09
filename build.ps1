@@ -7,4 +7,5 @@ Set-Location ../build
 Set-Variable path=%path%;
 Where-Object ptml
 Set-Location ../
-ptml --help
+ptml --help --version
+ptml run "index.ptml" --window
