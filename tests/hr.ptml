@@ -1,10 +1,19 @@
 <?ptml encoding="UTF-8" terminal-resize="static"?>
 <terminal x-align="start">
-<box>
-    <row>
-        <text>Olá</text>
-        <hr orientation="vertical" width="1"/>
-        <text>Tchau</text>
-    </row>
-</box>
+    <column>
+        <box>
+            <row>
+                <text>Olá</text>
+                <hr orientation="vertical" width="1"/>
+                <spinner type="braille" interval="50ms" duration="3s" completed="X"/>
+            </row>
+        </box>
+        <box>
+            <column y-align="center">
+                <text>Olá</text>
+                <hr orientation="horizontal" width="auto" />
+                <spinner type="braille" interval="50ms" duration="3000ms" completed="X"/>
+            </column>
+        </box>
+    </column>
 </terminal>

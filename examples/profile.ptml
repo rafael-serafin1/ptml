@@ -1,0 +1,110 @@
+<?ptml encoding="UTF-8" terminal-resize="reflow"?>
+
+<!-- RUN THIS ON A WINDOW -->
+<terminal x-align="center">
+    <snippet id="success">
+        foreground="limegreen"
+        font="bold"
+    </snippet>
+
+    <snippet id="warning">
+        foreground="yellow"
+        font="bold"
+    </snippet>
+
+    <snippet id="error">
+        foreground="fire"
+        font="bold"
+    </snippet>
+
+    <block title="Git Dashboard" border="rounded">
+        <column gap="1">
+            <row>
+                <cell>
+                    <block title="Repository">
+                        <column>
+                            <text>
+                                Projeto:
+                                <frag font="bold">PTML</frag>
+                            </text>
+
+                            <text>
+                                Branch:
+                                <frag foreground="cyan">
+                                    feature/parser-ptml
+                                </frag>
+                            </text>
+
+                            <text snippet="success">
+                                ✓ Working Tree Clean
+                            </text>
+                        </column>
+                    </block>
+                </cell>
+
+                <cell>
+                    <block title="CI/CD">
+                        <column>
+                            <text>
+                                Build:
+                                <frag foreground="limegreen">SUCCESS</frag>
+                            </text>
+
+                            <text>
+                                Tests:
+                                <frag foreground="limegreen">128/128</frag>
+                            </text>
+
+                            <text>
+                                Coverage:
+                                <frag foreground="yellow">82%</frag>
+                            </text>
+
+                        </column>
+                    </block>
+                </cell>
+            </row>
+
+            <row>
+                <cell>
+                    <block title="Open Pull Requests">
+                        <column>
+                            <text>
+                                #52 Refactor Renderer
+                            </text>
+
+                            <text>
+                                #53 Cell Layout Optimization
+                            </text>
+
+                            <text>
+                                #54 Spinner Event System
+                            </text>
+                        </column>
+                    </block>
+                </cell>
+            </row>
+
+            <row>
+                <cell>
+                    <block title="Recent Commits">
+                        <column>
+                            <text>
+                                4f7a1d2 Fix overflow clipping
+                            </text>
+                            <text>
+                                c8a9ff0 Add depth renderer
+                            </text>
+                            <text>
+                                a77de11 Optimize cell splitting
+                            </text>
+                            <text>
+                                b71fd34 Add spinner aliases
+                            </text>
+                        </column>
+                    </block>
+                </cell>
+            </row>
+        </column>
+    </block>
+</terminal>

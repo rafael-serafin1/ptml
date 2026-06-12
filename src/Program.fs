@@ -25,12 +25,11 @@ module Program =
         [<JsonPropertyName("help")>]
         help: string
     }
-
+    let bruh: string = "Não foi possível obter "
     let json = File.ReadAllText("./src/application.json")
     let options = JsonSerializerOptions(PropertyNameCaseInsensitive = true)
     let settings = JsonSerializer.Deserialize<Settings>(json, options)
 
-    let bruh: string = "Não foi possível obter "
 
     let help: string = $"""{settings.help}"""
     let version: string = settings.version
@@ -101,7 +100,9 @@ module Program =
             //flags
             | "--help" | "-h" -> config <- { config with flags = Help true :: config.flags }
             | "--version" | "-v" -> config <- { config with flags = Version true :: config.flags }
-            | "--window" | "-w" -> config <- { config with flags = Window true :: config.flags }
+            | "--window" | "-w" -> 
+                config <- { config with flags = Window true :: config.flags }
+                Utils.shouldWindow <- true
             //commands
             | "run" -> config <- { config with command = Some Run }
             | "watch" -> config <- { config with command = Some Watch }

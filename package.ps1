@@ -4,7 +4,7 @@ param([string]$Command)
 
 Set-Location ./syntax-highlighter
 
-if ($Command -eq "publish") {
+if ($Command -eq "pub") {
     Write-Host "Executando publish..."
     Remove-Item "*.vsix"
     npm run compile
@@ -18,7 +18,7 @@ elseif ($Command -eq "pack") {
     vsce package
 }
 else {
-    Write-Host "Uso: .\package.ps1 [publish|package]"
+    Write-Host "Uso: .\package.ps1 [pub|pack]"
     exit 1
 }
 

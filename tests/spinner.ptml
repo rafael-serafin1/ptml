@@ -1,9 +1,26 @@
 <?ptml encoding="UTF-8" terminal-resize="static"?>
 <terminal x-align="start">
+    <!-- 
     <box>
         <row>
             <text font="italic">Loading</text>
-            <spinner type="waiting" interval="200ms" duration="3s" completed="check" />
-        </row>
-    </box>
+            <spinner type="moon" interval="200ms" duration="3s" completed="check" />
+            </row>
+        </box>
+    -->
+<!-- O OutPut quebra em caso de ter mais de um spinner...-->
+    <column>
+        <box>
+            <row>
+                <text font="italic">Loading</text>
+                <spinner type="waiting" interval="200ms" duration="3s" completed="check" />
+            </row>
+        </box>
+        <box>
+            <row>
+                <text font="italic">Loading</text>
+                <spinner type="waiting" interval="200ms" duration="3s" completed="check" />
+            </row>
+        </box>
+    </column>
 </terminal>

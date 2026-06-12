@@ -27,6 +27,7 @@ Sendo assim, atualmente os concretos são:
 <block>
 <spinner>
 <hr>
+---> Em desenvolvimento
 <input>
 <output>
 <entity>
@@ -42,6 +43,7 @@ Agora, os abstratos são:
 <terminal>
 <cell>
 <snippet>
+---> Em desenvolvimento
 <br>
 <code>
 <function>
@@ -207,6 +209,40 @@ Olá!
 Tchau!
 ```
 
+### **Atributos**:
+
+***multiply***:
+Aplica a quebra de linha pelo número definido. Valores possíveis além do numérico:
+```
+auto                    (default value)
+```
+
+Exemplo:
+Sem::
+- Input
+```ptml
+<text>Olá!<br />Tchau!</text>
+```
+
+- Output
+```cmd
+Olá!
+Tchau!
+```
+
+Com::
+- Input
+```ptml
+<text>Olá!<br multiply="2" />Tchau!</text>
+```
+
+- Output
+```cmd
+Olá!
+
+Tchau!
+```
+
 ---
 ## Elemento `<hr>`
 
@@ -250,9 +286,9 @@ Nº%                                     (valor associado ao elemento-pai substi
 ## `<hr>` VS `<cell>`
 
 ```
-<hr>                | <cell>
-+ leve              | - pesado
-- sem continuidade  | + continuidade de layout
+<hr>                            | <cell>
++ calculo interno mais leve     | - calculo interno mais pesado
+- sem continuidade de bordas    | + continuidade de layout de bordas
 ```
 > Legenda: '+' significa pro e '-' significa contra.
 

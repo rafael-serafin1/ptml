@@ -89,7 +89,7 @@ export const spinners = [
 ]
 
 export const completed = [
-    "checked",
+    "check",
     "error",
     "cog",
     "star",

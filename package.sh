@@ -3,7 +3,7 @@
 cd ./syntax-highlighter
 arg="$1"
 
-if [ "$arg" = "publish" ]; then
+if [ "$arg" = "pub" ]; then
     echo "Executando publish..."
     rm "*.vsix"
     npm run compile
@@ -15,7 +15,7 @@ elif [ "$arg" = "pack" ]; then
     npm run compile
     vsce package
 else
-    echo "Uso: $0 [publish|package]"
+    echo "Uso: $0 [pub|pack]"
     exit 1
 fi
 
