@@ -2,6 +2,7 @@ namespace PTML
 open System
 open System.Threading
 open System.Diagnostics
+open System.Collections.Concurrent
 
 module Spinner = 
     type Types =
@@ -16,6 +17,20 @@ module Spinner =
     | Square
     | Arrow
     | Bounce
+
+    let private consoleLock = obj()
+
+    type SpinnerInstance = {
+        Tp: Types
+        X: int
+        Y: int
+        Interval: string
+        Duration: string
+        Complete: string
+        mutable FrameIndex: int
+        mutable Laps: int
+        Stopwatch: Stopwatch
+    }
 
     let ParseInterval(s: string) =
         let value =
@@ -176,9 +191,21 @@ module Spinner =
                 | _ -> ()
         stopwatch.Stop()
 
-        Console.SetCursorPosition(x, y)
+        if frames[frames.Length - 1].Length > 1 then
+            Console.SetCursorPosition(x + 1, y)
+        else    
+            Console.SetCursorPosition(x, y)
         Console.Write(complete)
         match cursorPos with
         | x, y -> 
             Console.SetCursorPosition(x, y)
             Console.CursorVisible <- true
+            Console.Write("\n")
+        ()                                                      // return
+
+    // Com um spinner até funciona, mas quando tem mais de um, da bosta.
+    // o problema ta no fato do código estar refém do Console.SetCursorPosition() 
+    // ele é o culpado e devo voltar com uma solução
+    let threadDraw(tp: Types, x, y, inter: string, dur: string, complete: string) =
+        let T = Thread(ThreadStart(fun () -> drawSpinner(tp, x, y, inter, dur, complete)))
+        T.Start()

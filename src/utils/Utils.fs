@@ -1,6 +1,8 @@
 namespace PTML
 
 module Utils =
+    let mutable shouldWindow: bool = false
+    
     type Classify = 
     | even = 0
     | odd = 1

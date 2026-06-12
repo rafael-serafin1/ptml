@@ -112,7 +112,6 @@
                         }
                     ]
                 },
-
                 {
                     "name": "meta.tag.block.begin",
 
@@ -128,10 +127,14 @@
                         }
                     },
 
-                    "end": "(>)",
+                    "end": "(/)?(>)",
 
                     "endCaptures": {
                         "1": {
+                            "name": "punctuation.definition.tag.end"
+                        },
+
+                        "2": {
                             "name": "punctuation.definition.tag.end"
                         }
                     },
@@ -142,7 +145,6 @@
                         }
                     ]
                 },
-
                 {
                     "name": "meta.tag.block.end",
 
@@ -158,43 +160,13 @@
                         }
                     },
 
-                    "end": "(>)",
+                    "end": "/?>",
 
                     "endCaptures": {
-                        "1": {
+                        "0": {
                             "name": "punctuation.definition.tag.end"
                         }
                     }
-                },
-
-                {
-                    "name": "meta.tag.self-closing",
-
-                    "begin": "(<)([a-zA-Z_][a-zA-Z0-9_-]*)",
-
-                    "beginCaptures": {
-                        "1": {
-                            "name": "punctuation.definition.tag.begin"
-                        },
-
-                        "2": {
-                            "name": "entity.name.tag"
-                        }
-                    },
-
-                    "end": "(/>)",
-
-                    "endCaptures": {
-                        "1": {
-                            "name": "punctuation.definition.tag.end"
-                        }
-                    },
-
-                    "patterns": [
-                        {
-                            "include": "#attributes"
-                        }
-                    ]
                 }
             ]
         },

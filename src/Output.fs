@@ -86,12 +86,11 @@ module Output =
         for y in 0 .. height - 1 do
             for x in 0 .. width - 1 do
                 let cell = buffer.[y, x]
-                match cell.spinner with
-                | Some c -> 
-                    if shouldRenderSpinner cell then
+                if shouldRenderCell cell then
+                    match cell.spinner with
+                    | Some c ->     
                         sb.Append(cursorTo x y) |> ignore
-                        let T = Thread(ThreadStart(fun () -> drawSpinner(c.tp, x, y, c.interval, c.dur, c.complete)))
-                        T.Start()
+                        threadDraw(c.tp, x, y, c.interval, c.dur, c.complete)
                         match ansiStyle cell with
                         | Some style when style <> currentStyle ->
                             if currentStyle <> "" then
@@ -102,8 +101,7 @@ module Output =
                             sb.Append(resetCode) |> ignore
                             currentStyle <- ""
                         | _ -> ()
-                | None ->
-                    if shouldRenderCell cell then
+                    | None ->
                         sb.Append(cursorTo x y) |> ignore
                         match ansiStyle cell with
                         | Some style when style <> currentStyle ->

@@ -24,7 +24,7 @@
     <Compile Include="Diff.fs" />
     <Compile Include="DiffRenderer.fs" />
     <Compile Include="Output.fs" />
-    <Compile Include="Depth.fs" />
+    <Compile Include="components/Depth.fs" />
     <Compile Include="main/Runner.fs" />
     <Compile Include="ErrorHandling.fs" />
     <Compile Include="main/Watch.fs" />

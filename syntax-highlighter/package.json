@@ -2,7 +2,7 @@
     "name": "ptml-language",
     "displayName": "PTML Language Support",
     "description": "Language support for PTML",
-    "version": "1.10.9",
+    "version": "1.11.7",
     "publisher": "Skrom",
     "repository": {
         "type": "git",
@@ -21,7 +21,8 @@
     "activationEvents": [
         "onLanguage:ptml",
         "onCommand:ptml.run",
-        "onCommand:ptml.watch"
+        "onCommand:ptml.watch",
+        "onCommand:ptml.window"
     ],
 
     "main": "./out/extension.js",

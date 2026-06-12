@@ -31,7 +31,14 @@ module Runner =
         let baseBuffer = processRenderTree renderOps (terminal.ViewWidth) (terminal.ViewHeight)
         let buffer = Depth.composeDepthLayers baseBuffer depthLayers
 
-        Console.Write("\x1b[2J\x1b[H")
-        Output.printAnsiBuffer(buffer)
-        printfn ""
+        if Utils.shouldWindow = false then
+            Console.WindowWidth <- 203
+            Console.WindowHeight <- 30
+            Console.Write("\x1b[2J\x1b[H")
+            Output.printAnsiBuffer(buffer)
+            printfn ""
+        else
+            Console.Write("\x1b[2J\x1b[H")
+            Output.printAnsiBuffer(buffer)
+            printfn ""
         Status.Success
