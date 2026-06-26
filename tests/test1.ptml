@@ -1,9 +1,13 @@
 <?ptml encoding="UTF-8" terminal-resize="static"?>
 <terminal x-align="start">
+    <snippet id="description">
+        foreground="gray"
+        font="bold"
+    </snippet>
     <column>
         <row>
             <text>Príons são </text>
-            <text foreground="gray" font="bold">
+            <text snippet="description">
                 proteínas infecciosas
             </text>
             <text>.</text>

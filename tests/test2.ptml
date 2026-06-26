@@ -2,6 +2,6 @@
 <terminal x-align="start">
     <row>
         <spinner type="dots" interval="500ms" duration="3000ms"/>
-        <text> Loading...</text>
+        <text> Loading</text>
     </row>
 </terminal>

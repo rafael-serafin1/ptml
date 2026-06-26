@@ -3,6 +3,7 @@ import * as vscode from "vscode"
 import { PTMLCompletionProvider } from "./providers/PTMLCompletionProvider";
 import { PTMLAttributeValueCompletionProvider } from "./providers/PTMLAttributesValueCompletionProvider";
 import { PTMLAttributeCompletionProvider } from "./providers/PTMLAttributesCompletionProvider";
+import { validateSyntax } from "./syntax/validator";
 
 import {
     LanguageClient,
@@ -106,6 +107,31 @@ export function activate(context: vscode.ExtensionContext) {
             "ptml",
             new PTMLHeaderCompletionProvider(),
             "?"
+        )
+    );
+
+    const collection = vscode.languages.createDiagnosticCollection("ptml");
+
+    const updateDiagnostics = (document: vscode.TextDocument) => {
+        if (document.languageId !== "ptml")
+            return;
+
+        const diagnostics =
+            validateSyntax(document);
+
+        collection.set(document.uri, diagnostics);
+    };
+
+    vscode.workspace.textDocuments.forEach(updateDiagnostics);
+    context.subscriptions.push(
+        vscode.workspace.onDidOpenTextDocument(
+            updateDiagnostics
+        ),
+        vscode.workspace.onDidChangeTextDocument(
+            e => updateDiagnostics(e.document)
+        ),
+        vscode.workspace.onDidCloseTextDocument(
+            doc => collection.delete(doc.uri)
         )
     );
 

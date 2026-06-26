@@ -88,19 +88,7 @@ module Output =
                 let cell = buffer.[y, x]
                 if shouldRenderCell cell then
                     match cell.spinner with
-                    | Some c ->     
-                        sb.Append(cursorTo x y) |> ignore
-                        threadDraw(c.tp, x, y, c.interval, c.dur, c.complete)
-                        match ansiStyle cell with
-                        | Some style when style <> currentStyle ->
-                            if currentStyle <> "" then
-                                sb.Append(resetCode) |> ignore
-                            sb.Append(style) |> ignore
-                            currentStyle <- style
-                        | None when currentStyle <> "" ->
-                            sb.Append(resetCode) |> ignore
-                            currentStyle <- ""
-                        | _ -> ()
+                    | Some c -> ()
                     | None ->
                         sb.Append(cursorTo x y) |> ignore
                         match ansiStyle cell with

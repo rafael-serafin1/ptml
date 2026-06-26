@@ -20,6 +20,18 @@ module Spinner =
 
     let private consoleLock = obj()
 
+    let private writeAt x y (text: string) =
+        lock consoleLock (fun () ->
+            Console.SetCursorPosition(x, y)
+            Console.Write(text)
+        )
+
+    let private clearAt x y =
+        lock consoleLock (fun () ->
+            Console.SetCursorPosition(x, y)
+            Console.Write(" ")
+        )
+
     type SpinnerInstance = {
         Tp: Types
         X: int
@@ -110,14 +122,13 @@ module Spinner =
         else
             failwith "Invalid duration format. Use 'ms', 's' or 'laps'."
 
-    let CleanSpinner(lenght: int, x: int, y: int) = 
-        let mutable index: int = x
-        let final = lenght + x
+    let CleanSpinner(length: int, x: int, y: int) =
+        let mutable index = x
+        let final = length + x
+
         while index <> final do
-            Console.SetCursorPosition(index, y)
-            Console.Write(" ")
+            clearAt index y
             index <- index + 1
-            
 
     let drawSpinner(tp: Types, x, y, inter: string, dur: string, complete: string) =
         let frames = framesOfType tp
@@ -125,8 +136,7 @@ module Spinner =
         let intervalMs = ParseInterval(inter)
         let cursorPos = Console.GetCursorPosition()
 
-        Console.SetCursorPosition(x, y)
-        Console.CursorVisible <- false
+        lock consoleLock (fun () -> Console.CursorVisible <- false)
         let stopwatch = Stopwatch.StartNew()
 
         let mutable frameIndex = 0
@@ -135,8 +145,7 @@ module Spinner =
         let mutable running = true
         if tp = Types.Waiting then
             while running do
-                Console.SetCursorPosition(x, y)
-                Console.Write(frames[frameIndex])
+                writeAt x y frames[frameIndex]
 
                 Thread.Sleep(intervalMs)
 
@@ -145,8 +154,7 @@ module Spinner =
                 if frameIndex >= frames.Length then
                     let mutable helpX: int = x
                     while helpIndex <> 0 do
-                        Console.SetCursorPosition(helpX, y)
-                        Console.Write(" ")
+                        clearAt helpX y
                         helpIndex <- helpIndex - 1
                         helpX <- helpX + 1
                     frameIndex <- 0
@@ -169,8 +177,7 @@ module Spinner =
                     ()
         else
             while running do
-                Console.SetCursorPosition(x, y)
-                Console.Write(frames[frameIndex])
+                writeAt x y frames[frameIndex]
 
                 Thread.Sleep(intervalMs)
 
@@ -192,20 +199,12 @@ module Spinner =
         stopwatch.Stop()
 
         if frames[frames.Length - 1].Length > 1 then
-            Console.SetCursorPosition(x + 1, y)
+            writeAt (x + 1) y complete
         else    
-            Console.SetCursorPosition(x, y)
-        Console.Write(complete)
-        match cursorPos with
-        | x, y -> 
-            Console.SetCursorPosition(x, y)
-            Console.CursorVisible <- true
-            Console.Write("\n")
+            writeAt x y complete
+        lock consoleLock (fun () -> Console.CursorVisible <- true)
         ()                                                      // return
 
-    // Com um spinner até funciona, mas quando tem mais de um, da bosta.
-    // o problema ta no fato do código estar refém do Console.SetCursorPosition() 
-    // ele é o culpado e devo voltar com uma solução
     let threadDraw(tp: Types, x, y, inter: string, dur: string, complete: string) =
         let T = Thread(ThreadStart(fun () -> drawSpinner(tp, x, y, inter, dur, complete)))
         T.Start()

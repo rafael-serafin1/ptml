@@ -18,7 +18,7 @@ elseif ($Command -eq "pack") {
     vsce package
 }
 else {
-    Write-Host "Uso: .\package.ps1 [pub|pack]"
+    Write-Host "Uso: '.\package.ps1 [pub|pack]'"
     exit 1
 }
 
