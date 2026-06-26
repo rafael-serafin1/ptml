@@ -116,6 +116,8 @@ module Render =
                 drawVertical baseX baseY (baseY + metrics.h - 1) (hrChars Vertical) None
         | PositionedTextWidget(text, fg, bg, font, metrics) ->
             [ DrawChar(text, offsetX + metrics.x, offsetY + metrics.y, fg, bg, font) ]
+        | PositionedFragWidget(text, fg, bg, font, metrics) ->
+            [ DrawChar(text, offsetX + metrics.x, offsetY + metrics.y, fg, bg, font) ]
 
         | PositionedSpinnerWidget(tp, inter, dur, comp, fg, bg, metrics) ->
             [ DrawSpinner(tp, offsetX + metrics.x, offsetY + metrics.y, inter, dur, comp, fg, bg) ]

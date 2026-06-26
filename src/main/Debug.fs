@@ -43,7 +43,18 @@ module Debug =
         let baseBuffer = processRenderTree renderOps (terminal.ViewWidth) (terminal.ViewHeight)
         let buffer = Depth.composeDepthLayers baseBuffer depthLayers
 
+        if Utils.shouldWindow = false then
+            Console.WindowWidth <- 203
+            Console.WindowHeight <- 30
+
         Console.Write("\x1b[2J\x1b[H")
         Output.writeAnsiBuffer(buffer)
+        for y = 0 to buffer.GetLength(0) - 1 do
+            for x = 0 to buffer.GetLength(0) - 1 do
+                let cell = buffer[y, x]
+                match cell.spinner with
+                | Some c -> 
+                    Spinner.threadDraw(c.tp, x, y, c.interval, c.dur, c.complete)
+                | None -> ()
         printfn ""
         Status.Success

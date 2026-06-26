@@ -99,6 +99,7 @@ module Tree =
         | HrWidget of orientation: Orientation * width: Dimension * height: Dimension
         | SpinnerWidget of text:Types * interval: string * duration: string * completed: string * foreground:string option * background:string option
         | TextWidget of text:string * foreground:string option * background:string option * font:string option
+        | FragWidget of text:string * foreground:string option * background:string option * font:string option
         | RowWidget of width:Dimension * border:Border * gap:int * align:Align option * children:Widget list
         | ColumnWidget of width:Dimension * border:Border * gap:int * yAlign:Align option * children:Widget list
         | DepthWidget of index:int * zAlign: Align option * gap: int * children: Widget list
@@ -473,6 +474,15 @@ module Tree =
             TextWidget(text, finalFg, finalBg, finalFont)
         | _ -> failwith "Invalid child inside <text>."
 
+    let private applyFragStyle widget parentFg parentBg parentFont =
+        match widget with
+        | FragWidget(text, fg, bg, font) ->
+            let finalFg = if fg.IsSome then fg else parentFg
+            let finalBg = if bg.IsSome then bg else parentBg
+            let finalFont = if font.IsSome then font else parentFont
+            FragWidget(text, finalFg, finalBg, finalFont)
+        | _ -> failwith "Invalid child inside <frag>."
+
     let rec buildSemanticTree ast =
         ast |> List.collect buildWidget
 
@@ -494,6 +504,13 @@ module Tree =
                 let childrenWidgets = children |> List.collect buildWidget
                 childrenWidgets
                 |> List.map (fun widget -> applyTextStyle widget parentFg parentBg parentFont)
+            | "frag" ->
+                let parentFg = tryGetAttr "foreground" attrs
+                let parentBg = tryGetAttr "background" attrs
+                let parentFont = tryGetAttr "font" attrs
+                let childrenWidgets = children |> List.collect buildWidget
+                childrenWidgets
+                |> List.map (fun widget -> applyFragStyle widget parentFg parentBg parentFont)
             | "row" ->
                 let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
                 let border = tryGetAttr "border" attrs |> Option.map parseBorder |> Option.defaultValue NoBorder

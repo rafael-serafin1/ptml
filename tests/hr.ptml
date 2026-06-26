@@ -5,14 +5,14 @@
             <row>
                 <text>Olá</text>
                 <hr orientation="vertical" width="1"/>
-                <spinner type="braille" interval="50ms" duration="3s" completed="X"/>
+                <spinner type="braille" interval="50ms" duration="3s" completed="check"/>
             </row>
         </box>
         <box>
             <column y-align="center">
                 <text>Olá</text>
-                <hr orientation="horizontal" width="auto" />
-                <spinner type="braille" interval="50ms" duration="3000ms" completed="X"/>
+                <hr orientation="horizontal" />
+                <spinner type="braille" interval="50ms" duration="3000ms" completed="check"/>
             </column>
         </box>
     </column>

@@ -29,16 +29,19 @@ module Runner =
         let filteredLayout, depthLayers = Depth.extractDepthLayers layout
         let renderOps = renderTree filteredLayout
         let baseBuffer = processRenderTree renderOps (terminal.ViewWidth) (terminal.ViewHeight)
-        let buffer = Depth.composeDepthLayers baseBuffer depthLayers
+        let buffer: Cell array2d = Depth.composeDepthLayers baseBuffer depthLayers
 
         if Utils.shouldWindow = false then
             Console.WindowWidth <- 203
             Console.WindowHeight <- 30
-            Console.Write("\x1b[2J\x1b[H")
-            Output.printAnsiBuffer(buffer)
-            printfn ""
-        else
-            Console.Write("\x1b[2J\x1b[H")
-            Output.printAnsiBuffer(buffer)
-            printfn ""
+        Console.Write("\x1b[2J\x1b[H")
+        Output.printAnsiBuffer(buffer)
+        for y = 0 to buffer.GetLength(0) - 1 do
+            for x = 0 to buffer.GetLength(0) - 1 do
+                let cell = buffer[y, x]
+                match cell.spinner with
+                | Some c -> 
+                    Spinner.threadDraw(c.tp, x, y, c.interval, c.dur, c.complete)
+                | None -> ()
+        printfn ""
         Status.Success

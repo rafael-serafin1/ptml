@@ -144,6 +144,8 @@ module Depth =
 
         | PositionedTextWidget(text, foreground, background, font, metrics) ->
             (Some (PositionedTextWidget(text, foreground, background, font, metrics)), [])
+        | PositionedFragWidget(text, foreground, background, font, metrics) ->
+            (Some (PositionedFragWidget(text, foreground, background, font, metrics)), [])
         | PositionedHrWidget(ori, width, height, metrics) -> 
             (Some (PositionedHrWidget(ori, width, height, metrics)), [])
 

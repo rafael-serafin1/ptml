@@ -2,31 +2,26 @@
     "name": "ptml-language",
     "displayName": "PTML Language Support",
     "description": "Language support for PTML",
-    "version": "1.11.7",
+    "version": "1.11.9",
     "publisher": "Skrom",
     "repository": {
         "type": "git",
         "url": "https://github.com/rafael-serafin1/ptml"
     },
     "license": "MIT",
-
     "engines": {
         "vscode": "^1.80.0"
     },
-
     "categories": [
         "Programming Languages"
     ],
-
     "activationEvents": [
         "onLanguage:ptml",
         "onCommand:ptml.run",
         "onCommand:ptml.watch",
         "onCommand:ptml.window"
     ],
-
     "main": "./out/extension.js",
-
     "contributes": {
         "languages": [
             {
@@ -46,7 +41,7 @@
             {
                 "command": "ptml.run",
                 "title": "Run PTML file"
-            }, 
+            },
             {
                 "command": "ptml.window",
                 "title": "Run PTMl on a Window"
@@ -84,18 +79,17 @@
             }
         ]
     },
-
     "scripts": {
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./"
     },
-
     "dependencies": {
+        "sax": "^1.6.0",
         "vscode-languageclient": "^9.0.1"
     },
-
     "devDependencies": {
         "@types/node": "^20.0.0",
+        "@types/sax": "^1.2.7",
         "@types/vscode": "^1.80.0",
         "typescript": "^5.0.0"
     }
