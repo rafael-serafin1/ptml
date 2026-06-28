@@ -44,7 +44,6 @@ Agora, os abstratos são:
 <cell>
 <snippet>
 ---> Em desenvolvimento
-<br>
 <code>
 <function>
 ```
@@ -189,58 +188,6 @@ rapid-blink
 reverse                 (marked)
 conceal                 (hidden)
 strike-through
-```
-
----
-## Elemento `<br>`
-
-`<br />`
-Elemento responsável por quebrar a frase para a próxima linha, respeitando as palavras.
-
-Exemplo:
-- Input
-```ptml
-<text>Olá!<br/>Tchau!</text>
-```
-
-- Output
-```cmd
-Olá!
-Tchau!
-```
-
-### **Atributos**:
-
-***multiply***:
-Aplica a quebra de linha pelo número definido. Valores possíveis além do numérico:
-```
-auto                    (default value)
-```
-
-Exemplo:
-Sem::
-- Input
-```ptml
-<text>Olá!<br />Tchau!</text>
-```
-
-- Output
-```cmd
-Olá!
-Tchau!
-```
-
-Com::
-- Input
-```ptml
-<text>Olá!<br multiply="2" />Tchau!</text>
-```
-
-- Output
-```cmd
-Olá!
-
-Tchau!
 ```
 
 ---
@@ -1234,6 +1181,7 @@ Atributo que todos os elementos possuem e que faz a adição dos atributos resum
 > OBS.1: Se o `<snippet>` tiver atributos que o elemento não possui, exemplo `padding` para `<text>`, a execução não será interrompida, mas um aviso será gerado no terminal para deixar claro que aquele atributo não existe para tal elemento.
 
 ---
+### IGNORE POR ENQUANTO!
 ## Elemento `<list>`
 
 `<list></list>`
@@ -1255,6 +1203,7 @@ Alphabet            (ex: A, B, C)
 Descreve o que deve vir antes ou depois do caractere de lista.
 
 ---
+### IGNORE POR ENQUANTO!
 ## Elemento `<code>`
 
 `<code></code>`
@@ -1273,6 +1222,7 @@ async               (de forma assíncrona)
 ```
 
 --- 
+### IGNORE POR ENQUANTO!
 ## Elemento `<input>`
 
 `<input></input>` ou `<input />`
@@ -1347,6 +1297,7 @@ Representa uma entidade no terminal.
 Define o nome da entidade.
 
 ---
+### IGNORE POR ENQUANTO!
 ## Elemento `<bind>`
 
 `<bind></bind>` ou `<bind />`
@@ -1440,6 +1391,7 @@ Nº%                                  (valor associado ao elemento-pai substitui
 ```
 
 ---
+### IGNORE POR ENQUANTO!
 ## Elemento `<function>`
 
 `<function></function>` ou `<function />`
@@ -1483,3 +1435,41 @@ Exemplo:
 ```
 
 > O gráfico é definido pelo elemento `<graphs>`, mas os pontos/curvas dentro dele são definidos pelo elemento `<function>`
+
+---
+### IGNORE POR ENQUANTO!
+## Elemento `<progress>`
+
+`<progress />`
+Elemento que cria uma barra de progresso no terminal.
+
+Exemplo:
+- Input
+```ptml
+<row gap="1">
+    <text>Progresso: </text>
+    <progress value="50" max="100"/>
+</row>
+```
+
+- Output
+```
+Progresso: █████░░░░░
+```
+
+### **Atributos:**
+
+***max***:
+Valor máximo do progresso. Valor padrão 100.
+
+***value***:
+Valor atual do progresso. Valor padrão 0.
+ 
+---
+## Elementos Banidos
+
+Elementos que foram cogitados sua adição, mas foram descartados.
+```
+<br>        -->         Não tem por quê adicionar, já que o objetivo é você formalizar o espaço através de <column> com gap.
+<>          -->         ...
+```
