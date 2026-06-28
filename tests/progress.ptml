@@ -1,0 +1,13 @@
+<?ptml encoding="UTF-8" terminal-resize="static"?>
+<terminal x-align="start">
+    <column>
+        <box>
+            <cell>
+                <row gap="1">
+                    <text>Progresso:</text>
+                    <progress style="rhombus" value="5" max="10" show-value="true" />
+                </row>
+            </cell>
+        </box>
+    </column>
+</terminal>

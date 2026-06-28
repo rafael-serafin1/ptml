@@ -1,0 +1,9 @@
+<?ptml encoding="UTF-8" terminal-resize="static"?>
+<terminal x-align="start">
+    <row gap="1">
+        <text>A</text>
+        <text>B</text>
+        <text>C</text>
+    </row>
+</terminal>
+

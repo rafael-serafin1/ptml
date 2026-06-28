@@ -106,6 +106,16 @@ module Render =
 
     let rec private renderWidget offsetX offsetY widget =
         match widget with
+        | PositionedProgressWidget(tp, value, max, width, height, show, metrics) ->
+            let mutable baseX = offsetX + metrics.x
+            let baseY = offsetY + metrics.y
+            let mutable charFrames: string = ""
+            match show with
+            | None -> 
+                charFrames <- Progress.framefy(metrics.w, metrics.h, tp, value, max, "false")
+            | Some str ->
+                charFrames <- Progress.framefy(metrics.w, metrics.h, tp, value, max, str)
+            [ DrawChar(charFrames, baseX, baseY, None, None, None) ]
         | PositionedHrWidget(ori, _, _, metrics) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y

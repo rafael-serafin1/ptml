@@ -3,7 +3,7 @@ open PTML.Lexer
 open PTML.Token
 
 module Parser =
-    let validTags = Set.ofList ["frag"; "text"; "row"; "column"; "depth"; "box"; "block"; "terminal"; "cell"; "snippet"; "spinner"; "hr"]
+    let validTags = Set.ofList ["frag"; "text"; "row"; "column"; "layer"; "box"; "block"; "terminal"; "cell"; "snippet"; "spinner"; "hr"; "progress"]
     let colorValues = Set.ofList ["none"; "black"; "red"; "green"; "gold"; "blue"; "purple"; "cyan"; "fire"; "limegreen"; "yellow"; "lightblue"; "lilac"; "crystal"; "gray"; "lightgray"; "white"]
     let fontValues = Set.ofList ["none"; "bold"; "dim"; "italic"; "underline"; "slow-blink"; "rapid-blink"; "reverse"; "conceal"; "strike-through"]
     let overflowValues = Set.ofList ["break"; "wrap"; "cut"; "clip"]
@@ -11,10 +11,21 @@ module Parser =
     let borderValues = Set.ofList ["single"; "double"; "classic"; "bold"; "strange"; "rounded"; "ascii"; "none"; "borderless"]
     let terminalResizeValues = Set.ofList ["reflow"; "clip"; "static"]
     let orientation = Set.ofList ["vertical"; "horizontal"]
+    let progresstype = Set.ofList ["blocks"; "square"; "dots"; "tiny-square"; "rhombus"]
+    let boolean = Set.ofList ["true"; "false"]
+
 
     let validAttributes = Map.ofList [
         "hr", Map.ofList [
             "orientation", orientation
+            "width", Set.empty
+            "height", Set.empty
+        ]
+        "progress", Map.ofList [
+            "style", progresstype
+            "max", Set.empty
+            "value", Set.empty
+            "show-value", boolean
             "width", Set.empty
             "height", Set.empty
         ]
@@ -39,7 +50,7 @@ module Parser =
             "gap", Set.empty
             "y-align", alignValues
         ]
-        "depth", Map.ofList [
+        "layer", Map.ofList [
             "index", Set.empty
             "z-align", alignValues
             "gap", Set.empty
@@ -110,6 +121,10 @@ module Parser =
                             let mutable i = 0
                             if System.Int32.TryParse(value, &i) then Valid
                             else InvalidValue $"Gap must be int: {value}"
+                        | "max" | "value" ->
+                            let mutable i = 0
+                            if System.Int32.TryParse(value, &i) then Valid
+                            else InvalidValue $"Invalid value for {name}: {value}"
                         | "width" | "height" ->
                             if value <> "auto" && not (value.EndsWith "%") then
                                 let mutable i = 0
@@ -184,7 +199,7 @@ module Parser =
                     match validateAttribute tag name value with
                     | Valid -> ()
                     | InvalidValue message -> failwith message
-                    | UnknownAttribute _ -> failwith $"Invalid attribute for {tag}: {name}"
+                    | UnknownAttribute _ -> failwith $"Invalid attribute for attribute '{tag}': {name}"
                 if tag = "block" && not (List.exists (fun (name, _) -> name = "title") attrs) then
                     failwith "Missing required attribute for block: title"
                 if tag = "depth" && not (List.exists (fun (name, _) -> name = "index") attrs) then

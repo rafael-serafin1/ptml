@@ -25,14 +25,13 @@ module Program =
         [<JsonPropertyName("help")>]
         help: string
     }
+    let set: Settings = {
+        version = "0.5.0"
+        help = "Comandos:\n- run <PATH>   :: Roda um arquivo PTML.\n- watch <PATH> :: Roda e observa mudanças e atualiza o terminal automaticamente.\n- debug <PATH> :: Ferramenta para debug do pipeline (uso para desenvolvedores).\n----------------------------------------------------------------------------------\nFlags:\n\"--help\" ou \"-h\" -> Executa essa mensagem.\n\"--version\" ou \"-v\" -> Exibe a versão do projeto.\n\"--window\" ou \"-w\" -> Força o programa a rodar em um terminal em janela do sistema Windows com tamanho 460x200"
+    }
     let bruh: string = "Não foi possível obter "
-    let json = File.ReadAllText("./src/application.json")
-    let options = JsonSerializerOptions(PropertyNameCaseInsensitive = true)
-    let settings = JsonSerializer.Deserialize<Settings>(json, options)
-
-
-    let help: string = $"""{settings.help}"""
-    let version: string = settings.version
+    let help: string = $"""{set.help}"""
+    let version: string = set.version
 
     type Command = 
         | Run

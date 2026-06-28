@@ -25,6 +25,7 @@ module Layout =
         | PositionedBlockWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * name:string option * align:Align option * padding:int * int * metrics:Metrics * children:PositionedWidget list
         | PositionedGridWidget of border:Border * borderColor:string option * metrics: Metrics * children: GridLayout list
         | PositionedTerminalWidget of width:Dimension * height:Dimension * xAlign:Align option * yAlign:Align option * metrics:Metrics * children:PositionedWidget list
+        | PositionedProgressWidget of tp: Progress.ProgressType * value: int * max: int * width: Dimension * height: Dimension * show: string option * metrics: Metrics
 
     /// GRID TYPES
     and GridCell = {
@@ -106,6 +107,8 @@ module Layout =
                 PositionedBlockWidget(width, height, border, borderColor, name, align, paddingV, paddingH, shiftMetrics metrics, children)
             | PositionedTerminalWidget(width, height, xAlign, yAlign, metrics, children) ->
                 PositionedTerminalWidget(width, height, xAlign, yAlign, shiftMetrics metrics, children)
+            | PositionedProgressWidget(tp, v, m, w, h, str, metrics) ->
+                PositionedProgressWidget(tp, v, m, w, h, str, shiftMetrics metrics)
 
 
     let private alignOffset containerSize childSize alignOption =
@@ -165,6 +168,7 @@ module Layout =
         | PositionedBoxWidget(_, _, _, _, _, _, _, m, _)
         | PositionedBlockWidget(_, _, _, _, _, _, _, _, m, _)
         | PositionedTerminalWidget(_, _, _, _, m, _)
+        | PositionedProgressWidget(_, _, _, _, _, _, m)
         | PositionedDepthWidget(_, _, _, m, _) -> m
     let private totalWidth widget =
         let metrics = metricsOf widget
@@ -174,6 +178,14 @@ module Layout =
         | PositionedBlockWidget(_, _, border, _, _, _, _, _, m, _) when border <> NoBorder ->
             m.w + 2
         | PositionedDepthWidget(_, _, _, m, _) -> m.w
+        | PositionedProgressWidget(_, value, maxi, _, _, str, m) -> 
+            match str with 
+            | None -> m.w
+            | Some show ->
+                match show with
+                | "true" -> m.w + 2 + Utils.numberLength((int)(Utils.regrade3(maxi, value)))
+                | "false" -> m.w
+                | _ -> failwith $"Caso não abrangível para um booleano: '{str}'"
         | _ -> metrics.w
 
     let private totalHeight widget =
@@ -190,6 +202,10 @@ module Layout =
         match widget with
         (* Layout logic for each widget type *)
         (* Entra em loop até chegar aqui     *)
+        | ProgressWidget(tp, value, maxi, width, height, show: string option) ->
+            let resolvedWidth = resolveDimension width parentWidth maxi
+            let resolvedHeight = max 1 lineHeight
+            PositionedProgressWidget(tp, value, maxi, width, height, show, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight })
         | HrWidget(ori, width: Dimension, height) ->
             let resolvedWidth = resolveDimension width parentWidth 5
             let resolvedHeight = max 1 lineHeight

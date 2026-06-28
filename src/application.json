@@ -1,4 +1,0 @@
-{
-    "version": "0.5.0",
-    "help": "Comandos:\n- run <PATH>   :: Roda um arquivo PTML.\n- watch <PATH> :: Roda e observa mudanças e atualiza o terminal automaticamente.\n- debug <PATH> :: Ferramenta para debug do pipeline (uso para desenvolvedores).\n----------------------------------------------------------------------------------\nFlags:\n\"--help\" ou \"-h\" -> Executa essa mensagem.\n\"--version\" ou \"-v\" -> Exibe a versão do projeto.\n\"--window\" ou \"-w\" -> Força o programa a rodar em um terminal em janela do sistema Windows com tamanho 460x200"
-}

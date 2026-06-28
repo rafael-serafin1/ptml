@@ -60,6 +60,66 @@ Atributo que aplica um identificador único ao elemento.
 Atributo que todos os elementos possuem e que faz a adição dos atributos resumidos no elemento `<snippet>`.
 > OBS.1: Se o `<snippet>` tiver atributos que o elemento não possui, exemplo `padding` para `<text>`, a execução não será interrompida, mas um aviso será gerado no terminal para deixar claro que aquele atributo não existe para tal elemento.
 
+--- 
+## Atributos Compartilhados
+
+Aqui é citado atributos que são compartilhados por mais de 2 elementos simultaneamente e que possuem lógica de funcionamento igual.
+
+### Atributo ***width/height***:
+Compartilhado entre os elementos
+```
+<box>
+<block>
+<hr>
+<bind>
+<progress>
+<frame>
+```
+
+Corresponde a largura e altura do componente. Seus valores são numéricos inteiros ou específicos. Em caso de não declaração, o valor padrão é `auto` (renderiza no tamanho necessário para confortar o texto). Valores não-numéricos específicos:
+```
+auto                                    (renderiza do tamanho necessário)
+Nº%                                     (valor associado ao elemento-pai substituindo Nº por número --> percentage. Exemplo: 40%)
+```
+
+Em caso de não possuir um elemento-pai, a porcentagem será tirada do tamanho total do terminal.
+Exemplo:
+- Input
+```ptml
+<?ptml enconding="UTF-8" terminal-resize="reflow"?>
+<box width="50%" height="50%"></box>                 <!-- ocupa 50% do tamanho total do terminal, já que não possui elemento-pai -->
+```
+
+### Atributo ***overflow***:
+Compartilhado entre os elementos
+```
+<row>
+<column>
+<layer>             (antigo <depth>)
+<box>
+<block>
+<input>
+<frame>
+```
+
+Atributo que define o comportamento do container em caso de overflow de conteúdo. Caso não seja explicitado o resoluto em caso de overflow, o valor por padrão é o `break` (quebra o conteudo em uma nova linha). Valores possíveis:
+``` 
+break                               (quebra em qualquer caractere)
+wrap                                (quebra respeitando palavras)
+cut                                 (corta texto bruto)
+clip                                (recorta área renderizada final)
+```
+
+Caso de containeres compostos<br />
+Exemplo:
+- Input
+```ptml
+<row overflow="wrap">
+    <box width="20"/>
+    <box width="20"/>
+</row>
+```
+
 ---
 ### Elemento `<text>`
 
@@ -222,13 +282,6 @@ vertical
 horizontal
 ```
 
-***width/height***:
-Corresponde a largura e altura do componente. Seus valores são numéricos inteiros ou específicos. Em caso de não declaração, o valor padrão é `auto` (renderiza no tamanho necessário para confortar o texto). Valores não-numéricos específicos:
-```
-auto                                    (renderiza do tamanho necessário)
-Nº%                                     (valor associado ao elemento-pai substituindo Nº por número --> percentage. Exemplo: 40%)
-```
-
 ---
 ## `<hr>` VS `<cell>`
 
@@ -260,30 +313,6 @@ RedJohn
 ```
 
 ### **Atributos:**
-
-***overflow***:
-Atributo que define o comportamento do container em caso de overflow de conteúdo. Caso não seja explicitado o resoluto em caso de overflow, o valor por padrão é o `break` (quebra o conteudo em uma nova linha). Valores possíveis:
-``` 
-break                               (quebra em qualquer caractere)
-wrap                                (quebra respeitando palavras)
-cut                                 (corta texto bruto)
-clip                                (recorta área renderizada final)
-```
-
-Caso de containeres compostos<br />
-Exemplo:
-- Input
-```ptml
-<row overflow="wrap">
-    <box width="20"/>
-    <box width="20"/>
-</row>
-```
-
-- Output
-```terminal
-
-```
 
 ***gap***:
 Define o espaçamento entre um filho e outro no layout. O valor deve ser numérico e inteiro.
@@ -345,15 +374,6 @@ B
 ```
 
 ### **Atributos:**
-
-***overflow***:
-Atributo que define o comportamento do container em caso de overflow de conteúdo. Caso não seja explicitado o resoluto em caso de overflow, o valor por padrão é o `break` (quebra o conteudo em uma nova linha). Valores possíveis:
-```
-break                               (quebra em qualquer caractere)
-wrap                                (quebra respeitando palavras)
-cut                                 (corta texto bruto)
-clip                                (recorta área renderizada final.)
-```
 
 ***gap***:
 Define o espaçamento entre um filho e outro no layout. O valor deve ser numérico e inteiro.
@@ -543,15 +563,6 @@ Exemplo:
  └────────────┘
 ```
 
-***overflow***:
-Atributo que define o comportamento do container em caso de overflow de conteúdo. Caso não seja explicitado o resoluto em caso de overflow, o valor por padrão é o `break` (quebra o conteudo em uma nova linha). Valores possíveis:
-```
-break                               (quebra em qualquer caractere)
-wrap                                (quebra respeitando palavras)
-cut                                 (corta texto bruto)
-clip                                (recorta área renderizada final.)
-```
-
 ***z-align***:
 Atributo que alinha um conteúdo dimensionalmente pela profundidade disponível do container pai. Valores possíveis:
 ```
@@ -660,15 +671,6 @@ Exemplo:
 
 ### **Atributos:**
 
-***overflow***:
-Atributo que define o comportamento do container em caso de overflow de conteúdo. Caso não seja explicitado o resoluto em caso de overflow, o valor por padrão é o `break` (quebra o conteudo em uma nova linha). Valores possíveis:
-```
-break                               (quebra em qualquer caractere)
-wrap                                (quebra respeitando palavras)
-cut                                 (corta texto bruto)
-clip                                (recorta área renderizada final.)
-```
-
 ***border***:
 É um renderer preset que define como a borda vai ser. Em caso de não declaração, o valor padrão é `single`. Valores possíveis:
 ```
@@ -681,21 +683,6 @@ rounded             (╭ ╮ ╰ ╯ ─ │)
 ascii               (+ - |)
 borderless          (tem borda, mas esta invisível)
 none
-```
-
-***width/height***:
-Corresponde a largura e altura do componente. Seus valores são numéricos inteiros ou específicos. Em caso de não declaração, o valor padrão é `auto` (renderiza no tamanho necessário para confortar o texto). Valores não-numéricos específicos:
-```
-auto                                    (renderiza do tamanho necessário)
-Nº%                                     (valor associado ao elemento-pai substituindo Nº por número --> percentage. Exemplo: 40%)
-```
-
-Em caso de não possuir um elemento-pai, a porcentagem será tirada do tamanho total do terminal.
-Exemplo:
-- Input
-```ptml
-<?ptml enconding="UTF-8" terminal-resize="reflow"?>
-<box width="50%" height="50%"></box>                 <!-- ocupa 50% do tamanho total do terminal, já que não possui elemento-pai -->
 ```
 
 ***border-color***:
@@ -790,15 +777,6 @@ Define o nome do bloco, sendo um atributo obrigatório de ter na declaração, m
 </block>
 ```
 
-***overflow***:
-Atributo que define o comportamento do container em caso de overflow de conteúdo. Caso não seja explicitado o resoluto em caso de overflow, o valor por padrão é o `break` (quebra o conteudo em uma nova linha). Valores possíveis:
-```
-break                               (quebra em qualquer caractere)
-wrap                                (quebra respeitando palavras)
-cut                                 (corta texto bruto)
-clip                                (recorta área renderizada final.)
-```
-
 ***border***:
 É um renderer preset que define como a borda vai ser. Em caso de não declaração, o valor padrão é `single`. Valores possíveis:
 ```
@@ -811,21 +789,6 @@ rounded             (╭ ╮ ╰ ╯)
 ascii               (+ - |)
 borderless          (tem borda, mas esta invisível)
 none
-```
-
-***width/height***:
-Corresponde a largura e altura do componente. Seus valores são numéricos inteiros ou específicos. Em caso de não declaração, o valor padrão é `auto` (renderiza no tamanho necessário para confortar o texto). Valores não-numéricos específicos:
-```
-auto                                    (renderiza do tamanho necessário)
-Nº%                                     (valor associado ao elemento-pai substituindo Nº por número --> percentage. Exemplo: 40%)
-```
-
-Em caso de não possuir um elemento-pai, a porcentagem será tirada do tamanho total do terminal.
-Exemplo:
-- Input
-```ptml
-<?ptml enconding="UTF-8" terminal-resize="reflow"?>
-<box width="50%" height="50%"></box>                 <!-- ocupa 50% do tamanho total do terminal, já que não possui elemento-pai -->
 ```
 
 ***border-color***:
@@ -1243,15 +1206,6 @@ Exemplo:
 
 ### **Atributos**:
 
-***overflow***:
-Atributo que define o comportamento do container em caso de overflow de conteúdo. Caso não seja explicitado o resoluto em caso de overflow, o valor por padrão é o `clip`. Valores possíveis:
-``` 
-clip                                (recorta área renderizada final)
-break                               (quebra em qualquer caractere)
-wrap                                (quebra respeitando palavras)
-cut                                 (corta texto bruto)
-```
-
 ***type***:
 Define o tipo do input. Valores possíveis:
 ```
@@ -1336,13 +1290,6 @@ Descreve a relação entre as duas entidades.
 Representa um plano cartesiano de coordenadas.
 
 ### **Atributos**:
-
-***width/height***:
-Corresponde a largura e altura do componente. Seus valores são numéricos inteiros ou específicos. Em caso de não declaração, o valor padrão é `auto` (renderiza no tamanho necessário para confortar o texto). Valores não-numéricos específicos:
-```
-auto                                    (renderiza do tamanho necessário)
-Nº%                                     (valor associado ao elemento-pai substituindo Nº por número --> percentage. Exemplo: 40%)
-```
 
 ***x-coordinates/y-coordinates***:
 Define o valor limite para o crescimento do plano.
@@ -1437,7 +1384,6 @@ Exemplo:
 > O gráfico é definido pelo elemento `<graphs>`, mas os pontos/curvas dentro dele são definidos pelo elemento `<function>`
 
 ---
-### IGNORE POR ENQUANTO!
 ## Elemento `<progress>`
 
 `<progress />`
@@ -1447,24 +1393,80 @@ Exemplo:
 - Input
 ```ptml
 <row gap="1">
-    <text>Progresso: </text>
+    <text>Progresso:</text>
     <progress value="50" max="100"/>
 </row>
 ```
 
 - Output
 ```
-Progresso: █████░░░░░
+Progresso: █████░░░░░ 50%
 ```
 
 ### **Atributos:**
+
+***style***:
+Estilização da barra de progresso. Valores possíveis:
+```
+blocks                      (█ ▒ ░ - valor padrão)
+dots                        (● ◍ ○)
+square                      (■ ◩ □)
+tiny-square                 (▪ ◾ ▫)
+rhombus                     (◆ ◈ ◇)
+```
 
 ***max***:
 Valor máximo do progresso. Valor padrão 100.
 
 ***value***:
 Valor atual do progresso. Valor padrão 0.
+
+***show-value***:
+Valor booleano para mostrar ou não porcentagem. Valor possíveis:
+```
+true
+false               (valor padrão)
+```
  
+--- 
+### IGNORE POR ENQUANTO!!
+## Elemento `<frame>`
+
+`<frame></frame>`
+Elemento concreto com foco em enquadrar o conteúdo dentro.
+
+Exemplo:
+- Input
+```ptml
+<frame>
+    <text>Hello World!</text>
+</frame>
+```
+
+- Output
+```
+▛            ▜
+ Hello World!
+▙            ▟
+```
+
+### **Atributos:**
+
+***framework***;
+Estilização do enquadramento. Valores possíveis:
+```
+bold                (▛ ▜ ▙ ▟ valor padrão)
+pixels              (▞ ▚ ▚ ▞)
+blocks              (▅ ▅ ▅ ▅)
+point               (▘ ▝ ▖ ▗)
+border              (╭ ╮ ╰ ╯)
+picture             (◜ ◝ ◟ ◞)
+photograph          (⌜⌝ ⌞⌟)
+pythagoras          (◤ ◥ ◣ ◢)
+arrow               (↘ ↙ ↗ ↖)
+ascii               (/ \ \ /)
+```
+
 ---
 ## Elementos Banidos
 
