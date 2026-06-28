@@ -12,7 +12,7 @@
         <!-- Children are distributed in column pattern -->
         <column>
             <!-- Children are distributed in row pattern -->
-            <row>
+            <row>  
                 <!-- Divide first concret parent by the number of cells -->
                 <cell>
                     <box border-color="gray">

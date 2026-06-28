@@ -101,6 +101,19 @@ export const ori = [
     "horizontal"
 ]
 
+export const progressType = [
+    "blocks",
+    "dots",
+    "square",
+    "tiny-square",
+    "rhombus"
+]
+
+export const boolean = [
+    "true",
+    "false"
+]
+
 export class PTMLAttributeValueCompletionProvider
     implements vscode.CompletionItemProvider {
 
@@ -137,6 +150,9 @@ export class PTMLAttributeValueCompletionProvider
         duration: [],
         completed: completed,
         orientation: ori,
+        
+        'show-value': boolean,
+        style: progressType,
     };
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {

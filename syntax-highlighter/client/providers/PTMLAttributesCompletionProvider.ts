@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { align, borders, colors, completed, encoding, fonts, NaNValuesInNumericAttrs, nums, ori, overflow, spinners } from "./PTMLAttributesValueCompletionProvider";
+import { align, boolean, borders, colors, completed, encoding, fonts, NaNValuesInNumericAttrs, nums, ori, overflow, progressType, spinners } from "./PTMLAttributesValueCompletionProvider";
 
 interface AttributeDefinition {
     name: string;
@@ -7,14 +7,15 @@ interface AttributeDefinition {
 }
 
 const globalAttributes = {
-        name: "id",
-        values: []
-    }
+    name: "id",
+    values: []
+}
 
 const globalAttributes2 = {
-        name: "snippet",
-        values: []
-    }
+    name: "snippet",
+    values: []
+}
+
 const widgetAttributes: Record<string, AttributeDefinition[]> = {
     "?ptml?": [
         {
@@ -243,7 +244,33 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         },
         {
             name: "height"
-        }
+        },
+        globalAttributes,   
+        globalAttributes2
+    ],
+    progress: [
+        {
+            name: "style",
+            values: progressType
+        },
+        {
+            name: "width",
+        },
+        {
+            name: "height"
+        },
+        {
+            name: "value",
+        }, 
+        {
+            name: "max"
+        },
+        {
+            name: "show-value",
+            values: boolean
+        },
+        globalAttributes,   
+        globalAttributes2
     ]
 };
 

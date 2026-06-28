@@ -3,6 +3,7 @@ open System
 open PTML.Token
 open PTML.Parser
 open PTML.Spinner
+open PTML.Progress
 
 module Tree =
     type GlobalAttributes = {
@@ -97,7 +98,6 @@ module Tree =
     // discriminated union for semantic tree
     type Widget =
         | HrWidget of orientation: Orientation * width: Dimension * height: Dimension
-        | SpinnerWidget of text:Types * interval: string * duration: string * completed: string * foreground:string option * background:string option
         | TextWidget of text:string * foreground:string option * background:string option * font:string option
         | FragWidget of text:string * foreground:string option * background:string option * font:string option
         | RowWidget of width:Dimension * border:Border * gap:int * align:Align option * children:Widget list
@@ -107,6 +107,8 @@ module Tree =
         | BlockWidget of width:Dimension * height:Dimension * border:Border * borderColor:string option * name:string option * align:Align option * padding:int * int * children:Widget list
         | CellWidget of children: Widget list
         | TerminalWidget of width: Dimension * height: Dimension * alignX: Align option * alignY: Align option * children: Widget list
+        | SpinnerWidget of text:Types * interval: string * duration: string * completed: string * foreground:string option * background:string option
+        | ProgressWidget of tp: ProgressType * value: int * max: int * width: Dimension * height: Dimension * show: string option
 
     ///
     /// AST BUILDING
@@ -431,17 +433,25 @@ module Tree =
 
     let private parseSpinnerType = function
         | "braille" -> Braille
-        | "dots" -> Dots
+        | "dots" -> Spinner.Dots
         | "waiting" -> Waiting
         | "burger" -> Burger
         | "beam" -> Beam
         | "ascii" -> Spinner.Ascii
         | "circle" -> Circle
-        | "square" -> Square
+        | "square" -> Spinner.Square
         | "moon" -> Moon
         | "arrow" -> Arrow
         | "bounce" -> Bounce
         | value -> failwith $"Invalid spinner type: {value}"
+
+    let private parseProgressType = function
+        | "blocks" -> Blocks
+        | "dots" -> Dots
+        | "square" -> Square
+        | "tiny-square" -> TinySquare
+        | "rhombus" -> Rhombus
+        | value -> failwith $"Tipagem inexistente para <progress>: '{value}'"
 
     let private normalizeSpinnerCompleted value =
         if String.IsNullOrWhiteSpace(value) then
@@ -525,7 +535,7 @@ module Tree =
                 let yAlign = tryGetAttr "y-align" attrs |> Option.map parseAlign
                 let childrenWidgets = children |> List.collect buildWidget
                 [ ColumnWidget(width, border, gap, yAlign, childrenWidgets) ]
-            | "depth" ->
+            | "layer" ->
                 let index =
                     match tryGetAttr "index" attrs with
                     | Some value ->
@@ -574,6 +584,14 @@ module Tree =
                 let foreground = tryGetAttr "foreground" attrs
                 let background = tryGetAttr "background" attrs
                 [ SpinnerWidget(spinnerType, interval, duration, completed, foreground, background) ]
+            | "progress" ->
+                let progressType = tryGetAttr "style" attrs |> Option.map parseProgressType |> Option.defaultValue Progress.Blocks
+                let value = tryGetAttr "value" attrs |> Option.defaultValue "0" |> System.Int32.Parse
+                let max = tryGetAttr "max" attrs |> Option.defaultValue "100" |> System.Int32.Parse
+                let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
+                let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
+                let show = tryGetAttr "show-value" attrs |> Option.defaultValue "false"
+                [ ProgressWidget(progressType, value, max, width, height, Some show) ]
             | _ ->
                 failwith $"Unsupported semantic tag: {tag}"
 

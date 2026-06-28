@@ -81,6 +81,11 @@ export class PTMLCompletionProvider
                 snippet: 'hr orientation="$1"/>',
                 documentation: '<hr orientation="..."/>'
             },
+            {
+                name: "progress",
+                snippet: 'progress value="$0" max="$1" />',
+                documentation: '<progress value="$0" max="$1" />'
+            },
         ];
 
         const filtered = tags.filter(t => t.name.startsWith(partial));
