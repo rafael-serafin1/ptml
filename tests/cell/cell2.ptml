@@ -38,13 +38,10 @@
                         </row>
                     </box>
                 </cell>
-                <cell>
-                    <box border-color="gray" padding="0">
-                        <row>
-                            <text>GoodBye <frag font="italic">World</frag>!</text>
-                        </row>
-                    </box>
-                </cell>
+                <!-- AINDA GERA UMA QUARTA CÉLULA, MESMO QUE VAZIA -->
+                <!-- Isso não deveria acontecer, oque deveria acontecer é que a célula de baixo teria largura para cobrir toda a parte de baixo -->
+                <!-- Enquanto que a parte de cima fica dividida pelas duas células -->
+                <!-- TODO: Resolver essa bosta ai -->
             </row>
         </column>
     </block>
