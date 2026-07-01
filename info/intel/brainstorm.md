@@ -1,7 +1,7 @@
 ## Procedural Instruction
 
-`<?ptml encoding="UTF-8" terminal-resize="calculate"?>` <br />
-Serve como Instrução Procedural, além de garantir que ao terminal resize o retained-mode rendering vai ser corretamente aplicado. <br />
+`<?ptml encoding="UTF-8" terminal-resize="calculate"?>` <escape />
+Serve como Instrução Procedural, além de garantir que ao terminal resize o retained-mode rendering vai ser corretamente aplicado. <escape />
 Valores possíveis para atributo ***terminal-resize***:  
 ```
 reflow              (valor padrão)
@@ -27,7 +27,10 @@ Sendo assim, atualmente os concretos são:
 <block>
 <spinner>
 <hr>
+<progress>
 ---> Em desenvolvimento
+<frame>
+<tree>
 <input>
 <output>
 <entity>
@@ -44,6 +47,9 @@ Agora, os abstratos são:
 <cell>
 <snippet>
 ---> Em desenvolvimento
+<escape>
+<carousel>
+<slide>
 <code>
 <function>
 ```
@@ -110,7 +116,7 @@ cut                                 (corta texto bruto)
 clip                                (recorta área renderizada final)
 ```
 
-Caso de containeres compostos<br />
+Caso de containeres compostos<escape />
 Exemplo:
 - Input
 ```ptml
@@ -248,6 +254,46 @@ rapid-blink
 reverse                 (marked)
 conceal                 (hidden)
 strike-through
+```
+
+--- 
+## Elemento `<escape>`
+
+`<escape />`
+Elemento que define uma escape sequence.
+
+### **Atributos:**
+
+***sequence***:
+Define qual escape sequence vai ser usada. Valores possíveis:
+```
+break                               ('\n', valor padrão)
+horizontal-tab                      ('\t')
+audible-bell                        ('\a', som de sino audível?)
+backspace                           ('\b')
+form-feed                           ('\f', move o cursor para o começo da próxima página lógica )
+carriage-return                     ('\r', move o cursor para o começo da linha )
+vertical-tab                        ('\v')
+```
+
+Exemplo
+
+***multiplier***:
+Multiplica a quantidade de quebra de linhas pelo número.
+
+Exemplo:
+- Input
+```ptml
+<text>Hello</text>
+<escape sequence="break" multiplier="2" />
+<text>World</text>
+```
+
+- Output
+```
+Hello\n
+\n
+World
 ```
 
 ---
@@ -1237,7 +1283,26 @@ Coloca um texto explícito em formatação DIM dentro do input. Tem como valor d
 ## Elemento `<output>`
 
 `<output></output>` ou `<output/>`
-É um campo específico onde o valor retornado do elemento `<input />` será mostrado.
+É um campo específico onde o valor retornado através do atributo `print` será mostrado.
+
+Exemplo:
+- Input
+```ptml
+<code>
+    let valor = 30
+    let desconto = 10 / 100
+    let precototal = valor - (valor * desconto)
+    let element = PTML.Elements.FindById('valor-produto')
+    element.AttributeWithValue("print", $"R${precototal}")
+</code>
+
+<text>Valor calculado do produto: <output id="valor-produto"/></text>
+```
+
+- Output
+```
+Valor calculado do produto: R$27
+```
 
 ---
 ## Elemento `<entity>`
@@ -1280,7 +1345,15 @@ Descreve a relação entre as duas entidades.
 ## Elemento `<tree>`
 
 `<tree></tree>`
+Elemento que desenha uma árvore de diretórios no terminal.
 
+### **Atributos**:
+
+***path***:
+Caminho relativo ou absoluto da raiz.
+
+***root-limit***:
+Limite de ramificações totais da árvore final.
 
 ---
 ### IGNORE POR ENQUANTO!
@@ -1445,9 +1518,9 @@ Exemplo:
 
 - Output
 ```
-▛            ▜
+⌜            ⌝
  Hello World!
-▙            ▟
+⌞            ⌟
 ```
 
 ### **Atributos:**
@@ -1455,23 +1528,54 @@ Exemplo:
 ***framework***;
 Estilização do enquadramento. Valores possíveis:
 ```
-bold                (▛ ▜ ▙ ▟ valor padrão)
+bold                (▛ ▜ ▙ ▟)
 pixels              (▞ ▚ ▚ ▞)
 blocks              (▅ ▅ ▅ ▅)
 point               (▘ ▝ ▖ ▗)
 border              (╭ ╮ ╰ ╯)
 picture             (◜ ◝ ◟ ◞)
-photograph          (⌜⌝ ⌞⌟)
+photograph          (⌜⌝ ⌞⌟ valor padrão)
 pythagoras          (◤ ◥ ◣ ◢)
 arrow               (↘ ↙ ↗ ↖)
 ascii               (/ \ \ /)
 ```
 
 ---
+## Elemento `<carousel>` 
+
+`<carousel></carousel>`
+Elemento que define um carrossel de slides que avança o `<slide>` ou `<layer>` conforme o sinal recebido. Sempre começa com o primeiro filho declarado no PTML, não é possível combinar layers com slides.
+
+### **Atributos**:
+
+***mf-signal***:
+Define o sinal para avançar o slide.
+
+***sb-signal***:
+Define o sinal para recuar o slide.
+
+Valores possíveis para ambos:
+```
+keybind->
+keybind-<
+keybind-D
+keybind-A
+crtl+l
+crtl+n
+alt+c
+alt+v
+```
+
+---
+## Elemento `<slide>`
+
+`<slide></slide>`
+Elemento que define o comportamento dos filhos como sendo de um slide. Desenha apenas quando o `<carousel>` avança para seu slide.
+
+---
 ## Elementos Banidos
 
 Elementos que foram cogitados sua adição, mas foram descartados.
 ```
-<br>        -->         Não tem por quê adicionar, já que o objetivo é você formalizar o espaço através de <column> com gap.
 <>          -->         ...
 ```

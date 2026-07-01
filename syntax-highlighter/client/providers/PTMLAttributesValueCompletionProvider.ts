@@ -114,6 +114,16 @@ export const boolean = [
     "false"
 ]
 
+export const escapesSequence = [
+    "break",
+    "horizontal-tab",
+    "vertical-tab",
+    "audible-bell",
+    "backspace",
+    "form-feed",
+    "carriage-return"
+]
+
 export class PTMLAttributeValueCompletionProvider
     implements vscode.CompletionItemProvider {
 
@@ -153,6 +163,7 @@ export class PTMLAttributeValueCompletionProvider
         
         'show-value': boolean,
         style: progressType,
+        sequence: escapesSequence,
     };
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {

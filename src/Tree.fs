@@ -4,6 +4,7 @@ open PTML.Token
 open PTML.Parser
 open PTML.Spinner
 open PTML.Progress
+open PTML.Escape
 
 module Tree =
     type GlobalAttributes = {
@@ -109,6 +110,7 @@ module Tree =
         | TerminalWidget of width: Dimension * height: Dimension * alignX: Align option * alignY: Align option * children: Widget list
         | SpinnerWidget of text:Types * interval: string * duration: string * completed: string * foreground:string option * background:string option
         | ProgressWidget of tp: ProgressType * value: int * max: int * width: Dimension * height: Dimension * show: string option
+        | EscapeWidget of sequence: Escape.EscapeSequence * multiplier: int
 
     ///
     /// AST BUILDING
@@ -465,6 +467,15 @@ module Tree =
         | "bright" -> "✦"
         | _ -> value
         
+    let private parseEscapeSequence = function
+        | "break" -> EscapeSequence.Break
+        | "horizontal-tab" -> HorizontalTab
+        | "vertical-tab" -> VerticalTab
+        | "audible-bell" -> AudibleBell
+        | "backspace" -> BackSpace
+        | "form-feed" -> FormFeed
+        | "carriage-return" -> CarriageReturn
+        | value -> failwith $"Tipagem inexistente para <escape>: '{value}'"
 
     let mutable previousTag: AstNode option = None
 
@@ -477,6 +488,9 @@ module Tree =
 
     let private applyTextStyle widget parentFg parentBg parentFont =
         match widget with
+        | EscapeWidget(seq, multi) ->
+            let char = concatEscapes(seq, multi)
+            TextWidget(char, None, None, None)
         | TextWidget(text, fg, bg, font) ->
             let finalFg = if fg.IsSome then fg else parentFg
             let finalBg = if bg.IsSome then bg else parentBg
@@ -486,6 +500,9 @@ module Tree =
 
     let private applyFragStyle widget parentFg parentBg parentFont =
         match widget with
+        | EscapeWidget(seq, multi) ->
+            let char = concatEscapes(seq, multi)
+            FragWidget(char, None, None, None)
         | FragWidget(text, fg, bg, font) ->
             let finalFg = if fg.IsSome then fg else parentFg
             let finalBg = if bg.IsSome then bg else parentBg
@@ -592,6 +609,10 @@ module Tree =
                 let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
                 let show = tryGetAttr "show-value" attrs |> Option.defaultValue "false"
                 [ ProgressWidget(progressType, value, max, width, height, Some show) ]
+            | "escape" ->
+                let sequence = tryGetAttr "sequence" attrs |> Option.map parseEscapeSequence |> Option.defaultValue EscapeSequence.Break
+                let multiplier = parseIntAttr "multiplier" 1 attrs
+                [ EscapeWidget(sequence, multiplier) ]
             | _ ->
                 failwith $"Unsupported semantic tag: {tag}"
 

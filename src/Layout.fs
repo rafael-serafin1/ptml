@@ -3,6 +3,7 @@ open PTML.Tree
 open PTML.Token
 open System
 open PTML.Spinner
+open PTML.Escape
 
 module Layout = 
     type Metrics = {
@@ -26,6 +27,7 @@ module Layout =
         | PositionedGridWidget of border:Border * borderColor:string option * metrics: Metrics * children: GridLayout list
         | PositionedTerminalWidget of width:Dimension * height:Dimension * xAlign:Align option * yAlign:Align option * metrics:Metrics * children:PositionedWidget list
         | PositionedProgressWidget of tp: Progress.ProgressType * value: int * max: int * width: Dimension * height: Dimension * show: string option * metrics: Metrics
+        | PositionedEscapeWidget of sequence: EscapeSequence * multiplier: int * metrics: Metrics
 
     /// GRID TYPES
     and GridCell = {
@@ -71,6 +73,41 @@ module Layout =
             | Some parent -> max 0 (parent * p / 100)
             | None -> fallback
 
+    let private tabSize = 4
+
+    let private calculateTextMetrics (text: string) =
+        let mutable maxWidth = 0
+        let mutable currentWidth = 0
+        let mutable lines = 0
+        let updateLine () =
+            if currentWidth > maxWidth then maxWidth <- currentWidth
+            currentWidth <- 0
+        for ch in text do
+            match ch with
+            | '\n'
+            | '\v'
+            | '\f' ->
+                updateLine ()
+                lines <- lines + 1
+            | '\r' -> currentWidth <- 0
+            | '\t' ->
+                let spaces = tabSize - (currentWidth % tabSize)
+                currentWidth <- currentWidth + spaces
+            | '\b' -> currentWidth <- max 0 (currentWidth - 1)
+            | _ -> currentWidth <- currentWidth + 1
+        updateLine ()
+        (maxWidth, lines)
+
+    let private resolveEscapeMetrics sequence multiplier =
+        match sequence with
+        | EscapeSequence.Break
+        | EscapeSequence.VerticalTab
+        | EscapeSequence.FormFeed
+        | EscapeSequence.HorizontalTab
+        | EscapeSequence.CarriageReturn
+        | EscapeSequence.BackSpace
+        | EscapeSequence.AudibleBell -> (0, 0)
+
     let rec private shiftWidget dx dy widget =
         let shiftMetrics metrics = { metrics with x = metrics.x + dx; y = metrics.y + dy }
         match widget with
@@ -109,6 +146,8 @@ module Layout =
                 PositionedTerminalWidget(width, height, xAlign, yAlign, shiftMetrics metrics, children)
             | PositionedProgressWidget(tp, v, m, w, h, str, metrics) ->
                 PositionedProgressWidget(tp, v, m, w, h, str, shiftMetrics metrics)
+            | PositionedEscapeWidget(seq, multi, metrics) ->
+                PositionedEscapeWidget(seq, multi, shiftMetrics metrics)
 
 
     let private alignOffset containerSize childSize alignOption =
@@ -169,6 +208,7 @@ module Layout =
         | PositionedBlockWidget(_, _, _, _, _, _, _, _, m, _)
         | PositionedTerminalWidget(_, _, _, _, m, _)
         | PositionedProgressWidget(_, _, _, _, _, _, m)
+        | PositionedEscapeWidget(_, _, m)
         | PositionedDepthWidget(_, _, _, m, _) -> m
     let private totalWidth widget =
         let metrics = metricsOf widget
@@ -198,10 +238,26 @@ module Layout =
         | PositionedDepthWidget(_, _, _, m, _) -> m.h
         | _ -> metrics.h
 
+    let flowAdvance (widget: PositionedWidget) =
+        match widget with
+        | PositionedEscapeWidget(seq, multi, _) ->
+            match seq with
+            | EscapeSequence.Break
+            | EscapeSequence.VerticalTab
+            | EscapeSequence.FormFeed -> (0, max 0 (multi - 1))
+            | EscapeSequence.HorizontalTab -> (tabSize * multi, 0)
+            | EscapeSequence.CarriageReturn
+            | EscapeSequence.BackSpace
+            | EscapeSequence.AudibleBell -> (0, 0)
+        | _ -> (totalWidth widget, totalHeight widget)
+
+    let flowWidth (widget: PositionedWidget) = fst (flowAdvance widget)
+    let flowHeight (widget: PositionedWidget) = snd (flowAdvance widget)
+
     let rec private layoutWidget widget parentWidth parentHeight =
         match widget with
-        (* Layout logic for each widget type *)
-        (* Entra em loop até chegar aqui     *)
+        (* Layout logic for each widget type                   *)
+        (* Chamada recursiva até calcular a ultima geração     *)
         | ProgressWidget(tp, value, maxi, width, height, show: string option) ->
             let resolvedWidth = resolveDimension width parentWidth maxi
             let resolvedHeight = max 1 lineHeight
@@ -215,17 +271,18 @@ module Layout =
             let h = lineHeight 
             PositionedSpinnerWidget(types, interval, duration, completed, fg, bg, { x = 0; y = 0; w = w; h = h })
         | TextWidget(text, fg, bg, font) ->
-            let w = text.Length * charWidth
-            let h = lineHeight
-            PositionedTextWidget(text, fg, bg, font, { x = 0; y = 0; w = w; h = h })
+            let w, h = calculateTextMetrics text
+            PositionedTextWidget(text, fg, bg, font, { x = 0; y = 0; w = w * charWidth; h = max lineHeight h })
         | FragWidget(text, fg, bg, font) ->
-            let w = text.Length * charWidth
-            let h = lineHeight
-            PositionedFragWidget(text, fg, bg, font, { x = 0; y = 0; w = w; h = h })
+            let w, h = calculateTextMetrics text
+            PositionedFragWidget(text, fg, bg, font, { x = 0; y = 0; w = w * charWidth; h = max lineHeight h })
+        | EscapeWidget(seq, multi) ->
+            let w, h = resolveEscapeMetrics seq multi
+            PositionedEscapeWidget(seq, multi, { x = 0; y = 0; w = w; h = h })
         | RowWidget(width, border, gap, align, children) ->
             let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
 
-            let childWidths = positionedChildren |> List.map totalWidth
+            let childWidths = positionedChildren |> List.map flowWidth
             let childHeights = positionedChildren |> List.map totalHeight
 
             let totalChildWidth = if List.isEmpty childWidths then 0 else List.sum childWidths + gap * (List.length childWidths - 1)
@@ -243,14 +300,14 @@ module Layout =
                         let childTotalHeight = totalHeight child
                         let yOffset = alignOffset resolvedHeight childTotalHeight align
                         let positioned = shiftWidget xOffset yOffset child
-                        let nextX = xOffset + childTotalWidth + gap
+                        let nextX = xOffset + flowWidth child + gap
                         place rest nextX (positioned :: acc)
                 place positionedChildren 0 []
             PositionedRowWidget(width, border, gap, align, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
         | ColumnWidget(width, border, gap, yAlign, children) ->
             let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
             let childWidths = positionedChildren |> List.map totalWidth
-            let childHeights = positionedChildren |> List.map totalHeight
+            let childHeights = positionedChildren |> List.map flowHeight
             let maxChildWidth = if List.isEmpty childWidths then 0 else List.max childWidths
             let totalChildHeight = if List.isEmpty childHeights then 0 else List.sum childHeights + gap * (List.length childHeights - 1)
             let resolvedWidth = resolveDimension width parentWidth maxChildWidth
@@ -261,10 +318,10 @@ module Layout =
                     | [] -> List.rev acc
                     | child :: rest ->
                         let childTotalWidth = totalWidth child
-                        let childTotalHeight = totalHeight child
+                        let childFlowHeight = flowHeight child
                         let xOffset = alignOffset resolvedWidth childTotalWidth yAlign
                         let positioned = shiftWidget xOffset yOffset child
-                        let nextY = yOffset + childTotalHeight + gap
+                        let nextY = yOffset + childFlowHeight + gap
                         place rest nextY (positioned :: acc)
                 place positionedChildren 0 []
             PositionedColumnWidget(width, border, gap, yAlign, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
@@ -368,25 +425,31 @@ module Layout =
             let positionedChildren = children |> List.map (fun child -> layoutWidget child (Some cmd.SafeWidth) (Some cmd.SafeHeight))
 
             let childWidths = positionedChildren |> List.map totalWidth
-            let childHeights = positionedChildren |> List.map totalHeight
+            let childHeights = positionedChildren |> List.map flowHeight
 
-            let maxChildWidth = if List.isEmpty childWidths then 0 else List.max childWidths
-            let totalChildHeight = if List.isEmpty childHeights then 0 else List.max childHeights
+            let contentWidth = if List.isEmpty childWidths then 0 else List.max childWidths
+            let contentHeight = if List.isEmpty childHeights then 0 else List.sum childHeights
 
-            let resolvedWidth = resolveDimension width (Some cmd.SafeWidth) maxChildWidth
-            let resolvedHeight = resolveDimension height (Some cmd.SafeHeight) totalChildHeight
+            let resolvedWidth = resolveDimension width (Some cmd.SafeWidth) cmd.SafeWidth
+            let resolvedHeight = resolveDimension height (Some cmd.SafeHeight) cmd.SafeHeight
+
+            let baseX = alignOffset cmd.SafeWidth resolvedWidth alignX
+            let baseY = alignOffset cmd.SafeHeight resolvedHeight alignY
 
             let positionedChildren =
-                positionedChildren
-                |> List.map (fun child ->
-                    let childTotalWidth = totalWidth child
-                    let childTotalHeight = totalHeight child
-
-                    let xOffset = alignOffset cmd.SafeWidth childTotalWidth alignX
-                    let yOffset = alignOffset cmd.SafeHeight childTotalHeight alignY
-                    // offsets = (0, 0) com resolvedWidt e resolvedHeight 
-                    shiftWidget xOffset yOffset child)
-            PositionedTerminalWidget(width, height, alignX, alignY, { x = 0; y = 0; w = cmd.SafeWidth; h = cmd.SafeHeight }, positionedChildren)
+                let rec place children yOffset acc =
+                    match children with
+                    | [] -> List.rev acc
+                    | child :: rest ->
+                        let childTotalWidth = totalWidth child
+                        let childFlowHeight = flowHeight child
+                        let xOffset = alignOffset resolvedWidth childTotalWidth alignX
+                        let positioned = shiftWidget xOffset yOffset child
+                        let nextY = yOffset + childFlowHeight
+                        place rest nextY (positioned :: acc)
+                place positionedChildren 0 []
+            let positionedChildren = positionedChildren |> List.map (shiftWidget baseX baseY)
+            PositionedTerminalWidget(width, height, alignX, alignY, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
     and private layoutCellGrid children width parentWidth height parentHeight border borderColor =
         let rows = collectCellRowsFromChildren children
         if List.isEmpty rows then None else

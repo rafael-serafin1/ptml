@@ -150,6 +150,8 @@ module Depth =
             (Some (PositionedHrWidget(ori, width, height, metrics)), [])
         | PositionedProgressWidget(tp, value, maxi, w, h, str, metrics) ->
             (Some (PositionedProgressWidget(tp, value, maxi, w, h, str, metrics)), [])
+        | PositionedEscapeWidget(seq, multi, metrics) ->
+            (Some (PositionedEscapeWidget(seq, multi, metrics)), [])
 
     let extractDepthLayers widgets =
         let results = widgets |> List.map (extractWidget 0 0)

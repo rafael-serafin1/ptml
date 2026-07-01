@@ -64,6 +64,13 @@ module Token =
             SafeHeight = max 0 (outputHeight - 1)
         }
 
+    let basicTerminal: Terminal = {
+        ViewWidth = 480
+        ViewHeight = 270
+        SafeWidth = max 0 (480 - 1)
+        SafeHeight = max 0 (270 - 1)
+    }
+
     type Status =
         | Success = 0
         | Error = 1

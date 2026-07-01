@@ -106,6 +106,7 @@ module Render =
 
     let rec private renderWidget offsetX offsetY widget =
         match widget with
+        | PositionedEscapeWidget(_, _, _) -> []
         | PositionedProgressWidget(tp, value, max, width, height, show, metrics) ->
             let mutable baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y

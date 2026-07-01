@@ -1,0 +1,6 @@
+<?ptml encoding="UTF-8" terminal-resize="static"?>
+<terminal x-align="start">
+    <text>Escape</text>
+    <escape sequence="break" multiplier="1"/>    
+    <text>Sequence</text>
+</terminal>

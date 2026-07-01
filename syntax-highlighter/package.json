@@ -2,7 +2,7 @@
     "name": "ptml-language",
     "displayName": "PTML Language Support",
     "description": "Language support for PTML",
-    "version": "1.12.3",
+    "version": "1.12.4",
     "publisher": "Skrom",
     "repository": {
         "type": "git",

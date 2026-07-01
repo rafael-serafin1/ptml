@@ -307,11 +307,11 @@ Comece apenas com:
 
 # Estado Atual
 ```
-✅ Funcionando: Sistema de layout, Componentes visuais, Estilização ANSI, Containers e Profundidade com Layers  |
-⚠️ Funcionando de forma errada: Spinners e Grid com Cells                                                       |
-⛔ Não funcionando: ...                                                                                         |
-🚧 Em construção: Conserto no Spinner                                                                           |
-📜 Planejados: Inputs avançados, Graphs, Trees, Output binding e Execução integrada de código                   |
+✅ Funcionando: Spinners, Barra de Progresso                                                                                |
+⚠️ Funcionando de forma errada: ...                                                                                         |
+⛔ Não funcionando: ...                                                                                                     |
+🚧 Em construção: Escape Sequence                                                                                           |
+📜 Planejados: Inputs avançados, Graphs, Trees, Output binding e Execução integrada de código                               |
 ```
 
 ---
