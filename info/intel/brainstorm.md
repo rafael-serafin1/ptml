@@ -1,7 +1,7 @@
 ## Procedural Instruction
 
-`<?ptml encoding="UTF-8" terminal-resize="calculate"?>` <escape />
-Serve como Instrução Procedural, além de garantir que ao terminal resize o retained-mode rendering vai ser corretamente aplicado. <escape />
+`<?ptml encoding="UTF-8" terminal-resize="calculate"?>` <br />
+Serve como Instrução Procedural, além de garantir que ao terminal resize o retained-mode rendering vai ser corretamente aplicado. <br />
 Valores possíveis para atributo ***terminal-resize***:  
 ```
 reflow              (valor padrão)
@@ -42,12 +42,12 @@ Agora, os abstratos são:
 ```ptml
 <row>
 <column>
-<depth>
+<layer>
 <terminal>
 <cell>
 <snippet>
----> Em desenvolvimento
 <escape>
+---> Em desenvolvimento
 <carousel>
 <slide>
 <code>
@@ -101,7 +101,7 @@ Compartilhado entre os elementos
 ```
 <row>
 <column>
-<layer>             (antigo <depth>)
+<layer>             (antigo <layer>)
 <box>
 <block>
 <input>
@@ -116,7 +116,7 @@ cut                                 (corta texto bruto)
 clip                                (recorta área renderizada final)
 ```
 
-Caso de containeres compostos<escape />
+Caso de containeres compostos<br />
 Exemplo:
 - Input
 ```ptml
@@ -276,7 +276,19 @@ carriage-return                     ('\r', move o cursor para o começo da linha
 vertical-tab                        ('\v')
 ```
 
-Exemplo
+Exemplo:
+- Input
+```
+<text>Lista:</text>
+<escape sequence="horizontal-tab" />
+<text>- 69 Ketchups</text>
+```
+
+- Output
+```
+List:
+    - 69 Ketchups
+```
 
 ***multiplier***:
 Multiplica a quantidade de quebra de linhas pelo número.
@@ -465,29 +477,29 @@ Exemplo:
 ```
 
 ---
-## Elemento `<depth>`
+## Elemento `<layer>`
 
-`<depth></depth>`
+`<layer></layer>`
 Faz juz a profundidade. Seus filhos são distribuídos por índice da 3º dimensão espacial.
 
 Exemplo .1:
 - Input
 ```ptml
-<depth index="0">
+<layer index="0">
     <box>
         <text>Hello World!</text>
     </box>
-</depth>
-<depth index="-1">
+</layer>
+<layer index="-1">
     <box>
         <text>GoodBye World!</text>
     </box>
-</depth>
-<depth index="-2">
+</layer>
+<layer index="-2">
     <box>
         <text>Hello Again!</text>
     </box>
-</depth>
+</layer>
 ```
 
 - Output
@@ -505,14 +517,14 @@ Exemplo .1:
 Exemplo .(1.5):
 - Input
 ```ptml
-<depth index="0">
+<layer index="0">
     <box>
         <text>Hello World!</text>
     </box>
     <box>
         <text>GoodBye World!</text>
     </box>
-</depth>
+</layer>
 ```
 
 - Output
@@ -523,7 +535,7 @@ Erro: não pode haver dois filhos com índice de mesmo valor!
 Exemplo .2:
 - Input
 ```ptml
-<depth index="0">
+<layer index="0">
     <column>
         <row>
             <box border="single">
@@ -542,8 +554,8 @@ Exemplo .2:
             </box>
         </row>
     </column>
-</depth>
-<depth index="-1">
+</layer>
+<layer index="-1">
     <column>
         <row>
             <box border="single">
@@ -562,7 +574,7 @@ Exemplo .2:
             </box>
         </row>
     </column>
-</depth>
+</layer>
 ```
 
 - Output
@@ -585,20 +597,20 @@ Define o índice de profundidade do elemento-filho.
 Exemplo:
 - Input
 ```ptml
-<depth index="0">
+<layer index="0">
     <column>
         <box>
             <text>Hello World!</text>
         </box>
     </column>
-</depth>
-<depth index="-1">
+</layer>
+<layer index="-1">
     <column>
         <box>
             <text>GoodBye World!</text>
         </box>
     </column>
-</depth>
+</layer>
 ```
 
 - Output
@@ -620,16 +632,16 @@ end         (valor default APENAS para o cenário descrito na observação N2)
 Exemplo
 - Input
 ```ptml
-<depth index="0" z-align="center">
+<layer index="0" z-align="center">
     <column>
         <text>Hello World!</text>
     </column>
-</depth>
-<depth index="-1" z-align="center">
+</layer>
+<layer index="-1" z-align="center">
     <column>
         <text>Bye World!</text>
     </column>
-</depth>
+</layer>
 ```
 
 - Output
@@ -647,16 +659,16 @@ Define o espaçamento entre um filho e outro no layout. O valor deve ser numéri
 Exemplo:
 - Input
 ```ptml
-<depth index="0" gap="1">
+<layer index="0" gap="1">
     <column>
         <text>Hello World!</text>
     </column>
-</depth>
-<depth index="-1" gap="1">
+</layer>
+<layer index="-1" gap="1">
     <column>
         <text>Bye World!</text>
     </column>
-</depth>
+</layer>
 ```
 
 - Output
@@ -668,18 +680,18 @@ Exemplo:
  └────────────┘ 
 ```
 
-### **OBS** N2 --> Caso o elemento `<depth>` tenha gap igual ou maior que 1 ***E*** o conteúdo do elemento `<column>`, de índice menor que a da superfície, for maior que o conteúdo do elemento da superfície, um aviso deve ser gerado no terminal e a coluna deve ser exibida da seguinte forma:
+### **OBS** N2 --> Caso o elemento `<layer>` tenha gap igual ou maior que 1 ***E*** o conteúdo do elemento `<column>`, de índice menor que a da superfície, for maior que o conteúdo do elemento da superfície, um aviso deve ser gerado no terminal e a coluna deve ser exibida da seguinte forma:
 
 - Input 
 ```ptml
-<depth gap="1">
+<layer gap="1">
     <column index="0">
         <text>Hello World!</text>
     </column>
     <column index="-1">
         <text>GoodBye World!</text>
     </column>
-</depth>
+</layer>
 ```
 
 - Output
@@ -1208,8 +1220,37 @@ alphabet            (ex: a, b, c)
 Alphabet            (ex: A, B, C)
 ```
 
+***items-behavior***:
+Define o comportamento dos items da lista. Valores possíveis:
+```
+text                        (valor padrão, apenas texto)
+radio-collection            (os itens se comportam como itens de escolha única)
+checklist                   (os itens se comportam como itens de múltipla escolha)
+```
+
 ***before/after***:
 Descreve o que deve vir antes ou depois do caractere de lista.
+
+Exemplo:
+- Input
+```ptml
+<column>
+    <text>How to use `HTML`: </text>
+    <list oftype="enum" before="Step " after=" " items-behaviour="text">
+        <item>Create a HTML file.</item>
+        <item>Configure DOM.</item>
+        <item>Open file on browser.</item>
+    </list>
+</column>
+```
+
+- Output
+```
+How to use `HTML`: 
+Step 1. Create a HTML file.
+Step 2. Configure DOM.
+Step 3. Open file on browser.
+```
 
 ---
 ### IGNORE POR ENQUANTO!

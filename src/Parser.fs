@@ -210,8 +210,8 @@ module Parser =
                     | UnknownAttribute _ -> failwith $"Invalid attribute for attribute '{tag}': {name}"
                 if tag = "block" && not (List.exists (fun (name, _) -> name = "title") attrs) then
                     failwith "Missing required attribute for block: title"
-                if tag = "depth" && not (List.exists (fun (name, _) -> name = "index") attrs) then
-                    failwith "Missing required attribute for depth: index"
+                if tag = "layer" && not (List.exists (fun (name, _) -> name = "index") attrs) then
+                    failwith "Missing required attribute for layer: index"
             if selfClosing then
                 parser(rest, stack)
             else

@@ -559,7 +559,7 @@ module Tree =
                         let mutable i = 0
                         if System.Int32.TryParse(value, &i) then i
                         else failwith $"Invalid integer value for index: {value}"
-                    | None -> failwith "Missing required attribute for depth: index"
+                    | None -> failwith "Missing required attribute for layer: index"
                 let gap = parseIntAttr "gap" 0 attrs
                 let zAlign = tryGetAttr "z-align" attrs |> Option.map parseAlign
                 let childrenWidgets = children |> List.collect buildWidget

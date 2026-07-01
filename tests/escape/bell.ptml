@@ -1,0 +1,10 @@
+<?ptml encoding="UTF-8" terminal-resize="static"?>
+<terminal x-align="start">
+    <snippet id="error">
+        foreground="red"
+        background="fire"
+        font="italic"
+    </snippet>
+    <text snippet="error">!ERROR!</text>
+    <escape sequence="audible-bell" />
+</terminal>

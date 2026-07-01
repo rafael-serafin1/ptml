@@ -174,7 +174,7 @@
         "tag-name": {
             "patterns": [
                 {
-                    "match": "\\b(block|column|row|text|box|div|depth)\\b",
+                    "match": "\\b(block|column|row|text|box|layer|cell|hr|escape|spinner|snippet|progress|frag|terminal|frame)\\b",
                     "name": "entity.name.tag"
                 },
 

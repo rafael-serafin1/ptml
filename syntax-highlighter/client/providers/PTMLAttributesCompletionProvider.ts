@@ -150,7 +150,7 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         globalAttributes2
     ],
 
-    depth: [
+    layer: [
         {
             name: "index",
             values: nums && NaNValuesInNumericAttrs

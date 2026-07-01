@@ -1,0 +1,5 @@
+<?ptml encoding="UTF-8" terminal-resize="static"?>
+<terminal x-align="start">
+    <escape sequence="vertical-tab" />
+    <text>Hello World!</text>
+</terminal>

@@ -27,7 +27,7 @@ module Layout =
         | PositionedGridWidget of border:Border * borderColor:string option * metrics: Metrics * children: GridLayout list
         | PositionedTerminalWidget of width:Dimension * height:Dimension * xAlign:Align option * yAlign:Align option * metrics:Metrics * children:PositionedWidget list
         | PositionedProgressWidget of tp: Progress.ProgressType * value: int * max: int * width: Dimension * height: Dimension * show: string option * metrics: Metrics
-        | PositionedEscapeWidget of sequence: EscapeSequence * multiplier: int * metrics: Metrics
+        | PositionedEscapeWidget of escseq: string *sequence: EscapeSequence * multiplier: int * metrics: Metrics
 
     /// GRID TYPES
     and GridCell = {
@@ -98,12 +98,12 @@ module Layout =
         updateLine ()
         (maxWidth, lines)
 
-    let private resolveEscapeMetrics sequence multiplier =
+    let private resolveEscapeMetrics(sequence: EscapeSequence, multiplier: int) =
         match sequence with
         | EscapeSequence.Break
         | EscapeSequence.VerticalTab
-        | EscapeSequence.FormFeed
-        | EscapeSequence.HorizontalTab
+        | EscapeSequence.FormFeed -> (0, max 1 multiplier)
+        | EscapeSequence.HorizontalTab -> (tabSize * multiplier, 0)
         | EscapeSequence.CarriageReturn
         | EscapeSequence.BackSpace
         | EscapeSequence.AudibleBell -> (0, 0)
@@ -146,8 +146,8 @@ module Layout =
                 PositionedTerminalWidget(width, height, xAlign, yAlign, shiftMetrics metrics, children)
             | PositionedProgressWidget(tp, v, m, w, h, str, metrics) ->
                 PositionedProgressWidget(tp, v, m, w, h, str, shiftMetrics metrics)
-            | PositionedEscapeWidget(seq, multi, metrics) ->
-                PositionedEscapeWidget(seq, multi, shiftMetrics metrics)
+            | PositionedEscapeWidget(esc, seq, multi, metrics) ->
+                PositionedEscapeWidget(esc, seq, multi, shiftMetrics metrics)
 
 
     let private alignOffset containerSize childSize alignOption =
@@ -208,7 +208,7 @@ module Layout =
         | PositionedBlockWidget(_, _, _, _, _, _, _, _, m, _)
         | PositionedTerminalWidget(_, _, _, _, m, _)
         | PositionedProgressWidget(_, _, _, _, _, _, m)
-        | PositionedEscapeWidget(_, _, m)
+        | PositionedEscapeWidget(_, _, _, m)
         | PositionedDepthWidget(_, _, _, m, _) -> m
     let private totalWidth widget =
         let metrics = metricsOf widget
@@ -240,11 +240,11 @@ module Layout =
 
     let flowAdvance (widget: PositionedWidget) =
         match widget with
-        | PositionedEscapeWidget(seq, multi, _) ->
+        | PositionedEscapeWidget(_, seq, multi, _) ->
             match seq with
             | EscapeSequence.Break
             | EscapeSequence.VerticalTab
-            | EscapeSequence.FormFeed -> (0, max 0 (multi - 1))
+            | EscapeSequence.FormFeed -> (0, max 1 multi)
             | EscapeSequence.HorizontalTab -> (tabSize * multi, 0)
             | EscapeSequence.CarriageReturn
             | EscapeSequence.BackSpace
@@ -277,8 +277,9 @@ module Layout =
             let w, h = calculateTextMetrics text
             PositionedFragWidget(text, fg, bg, font, { x = 0; y = 0; w = w * charWidth; h = max lineHeight h })
         | EscapeWidget(seq, multi) ->
-            let w, h = resolveEscapeMetrics seq multi
-            PositionedEscapeWidget(seq, multi, { x = 0; y = 0; w = w; h = h })
+            let w, h = resolveEscapeMetrics(seq, multi)
+            let esc = Escape.concatEscapes(seq, multi)
+            PositionedEscapeWidget(esc, seq, multi, { x = 0; y = 0; w = w; h = h })
         | RowWidget(width, border, gap, align, children) ->
             let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
 
@@ -300,7 +301,7 @@ module Layout =
                         let childTotalHeight = totalHeight child
                         let yOffset = alignOffset resolvedHeight childTotalHeight align
                         let positioned = shiftWidget xOffset yOffset child
-                        let nextX = xOffset + flowWidth child + gap
+                        let nextX = xOffset + totalWidth child + gap
                         place rest nextX (positioned :: acc)
                 place positionedChildren 0 []
             PositionedRowWidget(width, border, gap, align, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
