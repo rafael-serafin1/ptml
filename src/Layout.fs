@@ -73,6 +73,19 @@ module Layout =
             | Some parent -> max 0 (parent * p / 100)
             | None -> fallback
 
+    let resolveDimensionHr (dimension, parentSize: int option): int =
+        match dimension with
+        | Auto -> 
+            match parentSize with
+            | Some p -> p
+            | None -> 0
+        | Fixed value -> value
+        | Percent p ->
+            match parentSize with
+            | Some parent -> max 0 (parent * p / 100)
+            | None -> 0
+
+
     let private tabSize = 4
 
     let private calculateTextMetrics (text: string) =
@@ -306,13 +319,28 @@ module Layout =
                 place positionedChildren 0 []
             PositionedRowWidget(width, border, gap, align, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
         | ColumnWidget(width, border, gap, yAlign, children) ->
-            let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
-            let childWidths = positionedChildren |> List.map totalWidth
-            let childHeights = positionedChildren |> List.map flowHeight
-            let maxChildWidth = if List.isEmpty childWidths then 0 else List.max childWidths
-            let totalChildHeight = if List.isEmpty childHeights then 0 else List.sum childHeights + gap * (List.length childHeights - 1)
+            let measuredChildren = children |> List.map (fun child -> layoutWidget child parentWidth None)
+
+            let childWidths = measuredChildren |> List.map totalWidth
+            let childHeights = measuredChildren |> List.map flowHeight
+
+            let maxChildWidth =
+                if List.isEmpty childWidths then 0 else List.max childWidths
+
+            let totalChildHeight =
+                if List.isEmpty childHeights then
+                    0
+                else
+                    List.sum childHeights + gap * (List.length childHeights - 1)
+
             let resolvedWidth = resolveDimension width parentWidth maxChildWidth
             let resolvedHeight = resolveDimension (Fixed totalChildHeight) parentHeight totalChildHeight
+
+            let positionedChildren =
+                children
+                |> List.map (fun child ->
+                    layoutWidget child (Some resolvedWidth) None)
+
             let positionedChildren =
                 let rec place children yOffset acc =
                     match children with
@@ -321,11 +349,14 @@ module Layout =
                         let childTotalWidth = totalWidth child
                         let childFlowHeight = flowHeight child
                         let xOffset = alignOffset resolvedWidth childTotalWidth yAlign
-                        let positioned = shiftWidget xOffset yOffset child
-                        let nextY = yOffset + childFlowHeight + gap
-                        place rest nextY (positioned :: acc)
+
+                        let positioned =
+                            shiftWidget xOffset yOffset child
+
+                        place rest (yOffset + childFlowHeight + gap) (positioned :: acc)
+
                 place positionedChildren 0 []
-            PositionedColumnWidget(width, border, gap, yAlign, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
+            PositionedColumnWidget(width,border,gap,yAlign,{ x = 0; y = 0; w = resolvedWidth; h = resolvedHeight },positionedChildren)
         | DepthWidget(index, zAlign, gap, children) ->
             let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
             let childWidths = positionedChildren |> List.map totalWidth
@@ -450,7 +481,7 @@ module Layout =
                         place rest nextY (positioned :: acc)
                 place positionedChildren 0 []
             let positionedChildren = positionedChildren |> List.map (shiftWidget baseX baseY)
-            PositionedTerminalWidget(width, height, alignX, alignY, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
+            PositionedTerminalWidget(width, height, alignX, alignY, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren) 
     and private layoutCellGrid children width parentWidth height parentHeight border borderColor =
         let rows = collectCellRowsFromChildren children
         if List.isEmpty rows then None else

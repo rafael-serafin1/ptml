@@ -1,0 +1,16 @@
+<?ptml encoding="UTF-8"?>
+<terminal x-align="center">
+  <block title="rafael.serafin" border="rounded">
+    <column>
+      <text foreground="gold" font="bold">
+        Rafael Engel Serafin
+      </text>
+      <text>desenvolvedor e language designer</text>
+      <hr orientation="horizontal" width="100%" />
+      <row gap="2">
+        <text foreground="lightblue">constrói</text>
+        <text>DSLs, APIs e ferramentas de terminal</text>
+      </row>
+    </column>
+  </block>
+</terminal>

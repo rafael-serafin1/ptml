@@ -111,6 +111,7 @@ module Tree =
         | SpinnerWidget of text:Types * interval: string * duration: string * completed: string * foreground:string option * background:string option
         | ProgressWidget of tp: ProgressType * value: int * max: int * width: Dimension * height: Dimension * show: string option
         | EscapeWidget of sequence: Escape.EscapeSequence * multiplier: int
+        (*| FrameWidget of tp: Frames.FrameWorks * width: Dimension * heigth: Dimension * padding: int * int * children:Widget list*)
 
     ///
     /// AST BUILDING
@@ -613,6 +614,13 @@ module Tree =
                 let sequence = tryGetAttr "sequence" attrs |> Option.map parseEscapeSequence |> Option.defaultValue EscapeSequence.Break
                 let multiplier = parseIntAttr "multiplier" 1 attrs
                 [ EscapeWidget(sequence, multiplier) ]
+            (*| "frame" ->
+                let fw = tryGetAttr "framework" attrs |> Option.map Frames.parseFrameWork |> Option.defaultValue Frames.FrameWorks.Photograph
+                let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
+                let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
+                let paddingV, paddingH = tryGetAttr "padding" attrs |> Option.map parsePadding |> Option.defaultValue (0, 0)
+                let childrenWidgets = children |> List.collect buildWidget
+                [ FrameWidget(fw, width, height, paddingV, paddingH, childrenWidgets) ]*)
             | _ ->
                 failwith $"Unsupported semantic tag: {tag}"
 

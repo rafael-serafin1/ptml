@@ -101,7 +101,7 @@ Compartilhado entre os elementos
 ```
 <row>
 <column>
-<layer>             (antigo <layer>)
+<layer>             (antigo <depth>)
 <box>
 <block>
 <input>
@@ -125,6 +125,56 @@ Exemplo:
     <box width="20"/>
 </row>
 ```
+
+
+### Atributo ***padding***:
+Atributo que define o espaço entre a borda e o conteúdo, sendo seu valor padrão 0. Compartilhado entre os elementos
+```
+<box>
+<block>
+<frame>
+```
+
+- Input 
+```ptml
+<box padding="1">
+    <text>Olá</text>
+</box>
+```
+
+- Output
+```cmd
+┌─────┐
+│     │
+│ Olá │
+│     │
+└─────┘
+```
+
+> Como é possível ver, a distância do conteúdo para as bordas verticais e horizontais são de 1 assim como foi referenciado no atributo padding.
+> No entanto, é possível definir o padding vertical e horizontal através de valores separados por 'x'. O número que antecede o caractere define o padding vertical, enquanto que o número que precede o caractere 'x' define o padding horizontal. 
+
+Exemplo:
+- Input
+```ptml
+<box padding="1x0">
+    <text>Olá</text>
+</box>
+```
+
+- Output
+```cmd
+┌───┐
+│   │
+│Olá│
+│   │
+└───┘
+```
+
+> Em caso de ter um valor negativo para o padding, um erro vai aparecer na tela e a execução será forçada a parar.
+
+### OBS:
+Textos crus existem, mas eles não causam inutilização do elemento `<text>` pelo fato de eles não possuírem outra forma de serem estilizados, mas no fim eles acabam virando nó padrão de `<text>`.
 
 ---
 ### Elemento `<text>`
@@ -754,50 +804,6 @@ center
 end
 ```
 
-***padding***:
-Atributo que define o espaço entre a borda e o conteúdo, sendo seu valor padrão 0.
-
-- Input 
-```ptml
-<box padding="1">
-    <text>Olá</text>
-</box>
-```
-
-- Output
-```cmd
-┌─────┐
-│     │
-│ Olá │
-│     │
-└─────┘
-```
-
-> Como é possível ver, a distância do conteúdo para as bordas verticais e horizontais são de 1 assim como foi referenciado no atributo padding.
-> No entanto, é possível definir o padding vertical e horizontal através de valores separados por 'x'. O número que antecede o caractere define o padding vertical, enquanto que o número que precede o caractere 'x' define o padding horizontal. 
-
-Exemplo:
-- Input
-```ptml
-<box padding="1x0">
-    <text>Olá</text>
-</box>
-```
-
-- Output
-```cmd
-┌───┐
-│   │
-│Olá│
-│   │
-└───┘
-```
-
-> Em caso de ter um valor negativo para o padding, um erro vai aparecer na tela e a execução será forçada a parar.
-
-### OBS:
-Textos crus existem, mas eles não causam inutilização do elemento `<text>` pelo fato de eles não possuírem outra forma de serem estilizados, mas no fim eles acabam virando nó padrão de `<text>`.
-
 --- 
 ## Elemento `<block>`
 
@@ -875,47 +881,6 @@ Exemplo:
 │Red John │
 └─────────┘
 ```
-
-***padding***:
-Atributo que define o espaço entre a borda e o conteúdo, sendo seu valor padrão 0.
-
-- Input 
-```ptml
-<box padding="1">
-    <text>Olá</text>
-</box>
-```
-
-- Output
-```cmd
-┌─────┐
-│     │
-│ Olá │
-│     │
-└─────┘
-```
-
-> Como é possível ver, a distância do conteúdo para as bordas verticais e horizontais são de 1 assim como foi referenciado no atributo padding.
-> No entanto, é possível definir o padding vertical e horizontal através de valores separados por 'x'. O número que antecede o caractere define o padding vertical, enquanto que o número que precede o caractere 'x' define o padding horizontal. 
-
-Exemplo:
-- Input
-```ptml
-<box padding="1x0">
-    <text>Olá</text>
-</box>
-```
-
-- Output
-```cmd
-┌───┐
-│   │
-│Olá│
-│   │
-└───┘
-```
-
-> Em caso de ter um valor negativo para o padding, um erro vai aparecer na tela e a execução será forçada a parar.
 
 --- 
 ## Elemento `<terminal>`
@@ -1579,6 +1544,27 @@ photograph          (⌜⌝ ⌞⌟ valor padrão)
 pythagoras          (◤ ◥ ◣ ◢)
 arrow               (↘ ↙ ↗ ↖)
 ascii               (/ \ \ /)
+```
+
+***frame-color***:
+Define a cor do enquadramento. Valores possíveis:
+```
+none 
+black 
+red 
+green 
+gold 
+blue 
+purple
+cyan 
+fire
+limegreen 
+yellow 
+lightblue 
+lilac 
+crystal 
+gray 
+lightgray
 ```
 
 ---

@@ -16,6 +16,7 @@
     <Compile Include="components/Progress.fs"   />
     <Compile Include="components/Escape.fs"     />
     <Compile Include="components/Collections.fs"/>
+    <Compile Include="components/Frame.fs"      />
     <Compile Include="PiAttrs.fs"               />
     <Compile Include="Token.fs"                 />
     <Compile Include="Lexer.fs"                 />

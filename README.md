@@ -308,9 +308,9 @@ Comece apenas com:
 # Estado Atual
 ```
 ✅ Funcionando: Spinners, Barra de Progresso                                                                                |
-⚠️ Funcionando de forma errada: Escape Sequence                                                                             |
+⚠️ Funcionando de forma errada: Depth Layer                                                                                 |
 ⛔ Não funcionando: ...                                                                                                     |
-🚧 Em construção: Escape Sequence                                                                                           |
+🚧 Em construção: Frames                                                                                                    |
 📜 Planejados: Listas, Inputs avançados, Graphs, Trees, Output binding e Execução integrada de código                       |
 ```
 
