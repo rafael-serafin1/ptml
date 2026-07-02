@@ -1544,7 +1544,7 @@ photograph          (⌜⌝ ⌞⌟ valor padrão)
 pythagoras          (◤ ◥ ◣ ◢)
 arrow               (↘ ↙ ↗ ↖)
 ascii               (/ \ \ /)
-```
+``` 
 
 ***frame-color***:
 Define a cor do enquadramento. Valores possíveis:
