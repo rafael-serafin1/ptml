@@ -307,10 +307,10 @@ Comece apenas com:
 
 # Estado Atual
 ```
-✅ Funcionando: Spinners, Barra de Progresso                                                                                |
+✅ Funcionando: Spinners, Barra de Progresso, Frames                                                                        |
 ⚠️ Funcionando de forma errada: Depth Layer                                                                                 |
 ⛔ Não funcionando: ...                                                                                                     |
-🚧 Em construção: Frames                                                                                                    |
+🚧 Em construção: ...                                                                                                       |
 📜 Planejados: Listas, Inputs avançados, Graphs, Trees, Output binding e Execução integrada de código                       |
 ```
 

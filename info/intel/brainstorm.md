@@ -28,8 +28,8 @@ Sendo assim, atualmente os concretos são:
 <spinner>
 <hr>
 <progress>
----> Em desenvolvimento
 <frame>
+---> Em desenvolvimento
 <tree>
 <input>
 <output>
@@ -1536,7 +1536,7 @@ Estilização do enquadramento. Valores possíveis:
 ```
 bold                (▛ ▜ ▙ ▟)
 pixels              (▞ ▚ ▚ ▞)
-blocks              (▅ ▅ ▅ ▅)
+cubic               (▅ ▅ ▅ ▅)
 point               (▘ ▝ ▖ ▗)
 border              (╭ ╮ ╰ ╯)
 picture             (◜ ◝ ◟ ◞)
@@ -1565,6 +1565,32 @@ lilac
 crystal 
 gray 
 lightgray
+```
+
+***align***:
+Atributo que alinha um conteúdo horizontalmente pela largura disponível do container pai. Valores possíveis:
+```
+start               (valor padrão/default)
+center 
+end
+```
+
+Exemplo:
+- Input
+```ptml
+<frame framework="photograph" width="10" align="center">
+    <row gap="1">
+        <text foreground="red">Red</text>
+        <text>John</text>
+    </row>
+</frame>
+```
+
+- Output (exemplo em terminal 12cols)
+```terminal
+⌜          ⌝
+  Red John  
+⌞          ⌟
 ```
 
 ---

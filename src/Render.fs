@@ -135,6 +135,22 @@ module Render =
 
         List.rev ops
 
+    let private drawFrame x y width height fw fwColor =
+        match fw with
+        | _ ->
+            let topLeft, topRight, bottomLeft, bottomRight = Frames.frameChars(fw)
+            let left = x
+            let right = x + width + 1
+            let top = y
+            let bottom = y + height + 1
+            let fore = fwColor
+
+            [ 
+            DrawChar(topLeft, left, top, fore, None, None)
+            DrawChar(topRight, right, top, fore, None, None)
+            DrawChar(bottomLeft, left, bottom, fore, None, None)
+            DrawChar(bottomRight, right, bottom, fore, None, None) ]
+
     let rec private renderWidget offsetX offsetY widget =
         match widget with
         | PositionedEscapeWidget(esc, _, _, metrics) -> 
@@ -181,9 +197,12 @@ module Render =
         | PositionedBoxWidget(_, _, border, borderColor, _, _, _, metrics, children) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
+
             let borderOps = drawBorder baseX baseY metrics.w metrics.h border borderColor
+
             let childBaseX = if border <> NoBorder then baseX + 1 else baseX
             let childBaseY = if border <> NoBorder then baseY + 1 else baseY
+
             let childOps = children |> List.collect (renderWidget childBaseX childBaseY)
             borderOps @ childOps
 
@@ -279,6 +298,18 @@ module Render =
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
             children |> List.collect (renderWidget baseX baseY)
+
+        | PositionedFrameWidget(fw, fc, w, h, align, paddingV, paddingH, metrics, children) ->
+            let baseX = offsetX + metrics.x
+            let baseY = offsetY + metrics.y
+
+            let borderOps = drawFrame baseX baseY metrics.w metrics.h fw fc
+
+            let childBaseX = baseX + 1
+            let childBaseY = baseY + 1
+            
+            let childOps = children |> List.collect (renderWidget childBaseX childBaseY)
+            borderOps @ childOps
 
         | PositionedDepthWidget(_, _, _, _, _) -> []
 

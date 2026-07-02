@@ -5,18 +5,11 @@ pack:
 	dotnet build
 	dotnet publish -c Release -r win-x64 --self-contained true -o ./build
 
-pack-win: pack
-	.\package.ps1 pack
+packpy:
+	python package.py "pack"
 
-pack-linux: pack
-	.\package.sh pack
-
-build-win:
-	.\build.ps1
-
-build-linux:
-	.\build.sh
-	
+build_ptml:
+	python build.py
 
 
 # Receitas de teste para desenvolvimento

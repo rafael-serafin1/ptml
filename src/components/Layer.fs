@@ -152,6 +152,12 @@ module Depth =
             (Some (PositionedProgressWidget(tp, value, maxi, w, h, str, metrics)), [])
         | PositionedEscapeWidget(str, seq, multi, metrics) ->
             (Some (PositionedEscapeWidget(str, seq, multi, metrics)), [])
+        | PositionedFrameWidget(fw, fc, w, h, align, pv, ph, metrics, children) ->
+            let childResults = children |> List.map (extractWidget (offsetX + metrics.x) (offsetY + metrics.y))
+            let filteredChildren = childResults |> List.choose fst
+            let nestedLayers = childResults |> List.collect snd
+            (Some (PositionedFrameWidget(fw, fc, w, h, align, pv, ph, metrics, filteredChildren)), nestedLayers)
+        
 
     let extractDepthLayers widgets =
         let results = widgets |> List.map (extractWidget 0 0)
