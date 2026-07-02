@@ -4,7 +4,7 @@
 *.tmp
 *.temp
 *.fake
-*.vsix
+ptml-language-*.vsix
 *.txt
 
 # dirs
