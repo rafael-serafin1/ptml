@@ -91,6 +91,11 @@ export class PTMLCompletionProvider
                 snippet: 'escape sequence="$0" /',
                 documentation: '<escape sequence="$0" />'
             },
+            {
+                name: "frame",
+                snippet: 'frame',
+                documentation: '<frame></frame>'
+            }
         ];
 
         const filtered = tags.filter(t => t.name.startsWith(partial));

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { align, boolean, borders, colors, completed, encoding, escapesSequence, fonts, NaNValuesInNumericAttrs, nums, ori, overflow, progressType, spinners } from "./PTMLAttributesValueCompletionProvider";
+import { align, boolean, borders, colors, completed, encoding, escapesSequence, fonts, frameworks, NaNValuesInNumericAttrs, nums, ori, overflow, progressType, spinners } from "./PTMLAttributesValueCompletionProvider";
 
 interface AttributeDefinition {
     name: string;
@@ -279,6 +279,36 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         },
         {
             name: "multiplier"
+        },
+        globalAttributes,
+        globalAttributes2
+    ],
+    frame: [
+        {
+            name: "framework",
+            values: frameworks
+        },
+        {
+            name: "frame-color",
+            values: colors
+        },
+        {
+            name: "overflow",
+            values: overflow
+        },
+        {
+            name: "width"
+        },
+        {
+            name: "height"
+        },
+        {
+            name: "align",
+            values: align
+        },
+        {
+            name: "padding",
+            values: NaNValuesInNumericAttrs
         },
         globalAttributes,
         globalAttributes2

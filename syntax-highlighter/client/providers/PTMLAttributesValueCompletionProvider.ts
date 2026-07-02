@@ -124,6 +124,20 @@ export const escapesSequence = [
     "carriage-return"
 ]
 
+export const frameworks = [
+    "cubic",
+    "arrow",
+    "dots",
+    "photograph",
+    "picture",
+    "bold",
+    "pixels",
+    "point",
+    "border",
+    "ascii",
+    "pythagoras"
+]
+
 export class PTMLAttributeValueCompletionProvider
     implements vscode.CompletionItemProvider {
 
@@ -164,6 +178,10 @@ export class PTMLAttributeValueCompletionProvider
         'show-value': boolean,
         style: progressType,
         sequence: escapesSequence,
+
+        framework: frameworks,
+        "frame-color": colors,
+        
     };
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {

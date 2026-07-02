@@ -13,7 +13,7 @@ module Parser =
     let orientation = Set.ofList ["vertical"; "horizontal"]
     let progresstype = Set.ofList ["blocks"; "square"; "dots"; "tiny-square"; "rhombus"]
     let boolean = Set.ofList ["true"; "false"]
-    let frameworks = Set.ofList ["bold"; "pixels"; "blocks"; "point"; "border"; "picture"; "photograph"; "pythagoras"; "arrow"; "ascii"]
+    let frameworks = Set.ofList ["bold"; "pixels"; "cubic"; "point"; "border"; "picture"; "photograph"; "pythagoras"; "arrow"; "ascii"]
 
     let validAttributes = Map.ofList [
         "hr", Map.ofList [
@@ -93,9 +93,13 @@ module Parser =
         ]
         "frame", Map.ofList [
             "framework", frameworks
+            "frame-color", colorValues
             "overflow", overflowValues
             "width", Set.empty
             "height", Set.empty
+            "align", alignValues
+            "padding", Set.empty
+            "overflow", overflowValues
         ]
     ]
 
