@@ -27,7 +27,10 @@ Sendo assim, atualmente os concretos são:
 <block>
 <spinner>
 <hr>
+<progress>
 ---> Em desenvolvimento
+<frame>
+<tree>
 <input>
 <output>
 <entity>
@@ -39,11 +42,14 @@ Agora, os abstratos são:
 ```ptml
 <row>
 <column>
-<depth>
+<layer>
 <terminal>
 <cell>
 <snippet>
+<escape>
 ---> Em desenvolvimento
+<carousel>
+<slide>
 <code>
 <function>
 ```
@@ -119,6 +125,56 @@ Exemplo:
     <box width="20"/>
 </row>
 ```
+
+
+### Atributo ***padding***:
+Atributo que define o espaço entre a borda e o conteúdo, sendo seu valor padrão 0. Compartilhado entre os elementos
+```
+<box>
+<block>
+<frame>
+```
+
+- Input 
+```ptml
+<box padding="1">
+    <text>Olá</text>
+</box>
+```
+
+- Output
+```cmd
+┌─────┐
+│     │
+│ Olá │
+│     │
+└─────┘
+```
+
+> Como é possível ver, a distância do conteúdo para as bordas verticais e horizontais são de 1 assim como foi referenciado no atributo padding.
+> No entanto, é possível definir o padding vertical e horizontal através de valores separados por 'x'. O número que antecede o caractere define o padding vertical, enquanto que o número que precede o caractere 'x' define o padding horizontal. 
+
+Exemplo:
+- Input
+```ptml
+<box padding="1x0">
+    <text>Olá</text>
+</box>
+```
+
+- Output
+```cmd
+┌───┐
+│   │
+│Olá│
+│   │
+└───┘
+```
+
+> Em caso de ter um valor negativo para o padding, um erro vai aparecer na tela e a execução será forçada a parar.
+
+### OBS:
+Textos crus existem, mas eles não causam inutilização do elemento `<text>` pelo fato de eles não possuírem outra forma de serem estilizados, mas no fim eles acabam virando nó padrão de `<text>`.
 
 ---
 ### Elemento `<text>`
@@ -248,6 +304,58 @@ rapid-blink
 reverse                 (marked)
 conceal                 (hidden)
 strike-through
+```
+
+--- 
+## Elemento `<escape>`
+
+`<escape />`
+Elemento que define uma escape sequence.
+
+### **Atributos:**
+
+***sequence***:
+Define qual escape sequence vai ser usada. Valores possíveis:
+```
+break                               ('\n', valor padrão)
+horizontal-tab                      ('\t')
+audible-bell                        ('\a', som de sino audível?)
+backspace                           ('\b')
+form-feed                           ('\f', move o cursor para o começo da próxima página lógica )
+carriage-return                     ('\r', move o cursor para o começo da linha )
+vertical-tab                        ('\v')
+```
+
+Exemplo:
+- Input
+```
+<text>Lista:</text>
+<escape sequence="horizontal-tab" />
+<text>- 69 Ketchups</text>
+```
+
+- Output
+```
+List:
+    - 69 Ketchups
+```
+
+***multiplier***:
+Multiplica a quantidade de quebra de linhas pelo número.
+
+Exemplo:
+- Input
+```ptml
+<text>Hello</text>
+<escape sequence="break" multiplier="2" />
+<text>World</text>
+```
+
+- Output
+```
+Hello\n
+\n
+World
 ```
 
 ---
@@ -419,29 +527,29 @@ Exemplo:
 ```
 
 ---
-## Elemento `<depth>`
+## Elemento `<layer>`
 
-`<depth></depth>`
+`<layer></layer>`
 Faz juz a profundidade. Seus filhos são distribuídos por índice da 3º dimensão espacial.
 
 Exemplo .1:
 - Input
 ```ptml
-<depth index="0">
+<layer index="0">
     <box>
         <text>Hello World!</text>
     </box>
-</depth>
-<depth index="-1">
+</layer>
+<layer index="-1">
     <box>
         <text>GoodBye World!</text>
     </box>
-</depth>
-<depth index="-2">
+</layer>
+<layer index="-2">
     <box>
         <text>Hello Again!</text>
     </box>
-</depth>
+</layer>
 ```
 
 - Output
@@ -459,14 +567,14 @@ Exemplo .1:
 Exemplo .(1.5):
 - Input
 ```ptml
-<depth index="0">
+<layer index="0">
     <box>
         <text>Hello World!</text>
     </box>
     <box>
         <text>GoodBye World!</text>
     </box>
-</depth>
+</layer>
 ```
 
 - Output
@@ -477,7 +585,7 @@ Erro: não pode haver dois filhos com índice de mesmo valor!
 Exemplo .2:
 - Input
 ```ptml
-<depth index="0">
+<layer index="0">
     <column>
         <row>
             <box border="single">
@@ -496,8 +604,8 @@ Exemplo .2:
             </box>
         </row>
     </column>
-</depth>
-<depth index="-1">
+</layer>
+<layer index="-1">
     <column>
         <row>
             <box border="single">
@@ -516,7 +624,7 @@ Exemplo .2:
             </box>
         </row>
     </column>
-</depth>
+</layer>
 ```
 
 - Output
@@ -539,20 +647,20 @@ Define o índice de profundidade do elemento-filho.
 Exemplo:
 - Input
 ```ptml
-<depth index="0">
+<layer index="0">
     <column>
         <box>
             <text>Hello World!</text>
         </box>
     </column>
-</depth>
-<depth index="-1">
+</layer>
+<layer index="-1">
     <column>
         <box>
             <text>GoodBye World!</text>
         </box>
     </column>
-</depth>
+</layer>
 ```
 
 - Output
@@ -574,16 +682,16 @@ end         (valor default APENAS para o cenário descrito na observação N2)
 Exemplo
 - Input
 ```ptml
-<depth index="0" z-align="center">
+<layer index="0" z-align="center">
     <column>
         <text>Hello World!</text>
     </column>
-</depth>
-<depth index="-1" z-align="center">
+</layer>
+<layer index="-1" z-align="center">
     <column>
         <text>Bye World!</text>
     </column>
-</depth>
+</layer>
 ```
 
 - Output
@@ -601,16 +709,16 @@ Define o espaçamento entre um filho e outro no layout. O valor deve ser numéri
 Exemplo:
 - Input
 ```ptml
-<depth index="0" gap="1">
+<layer index="0" gap="1">
     <column>
         <text>Hello World!</text>
     </column>
-</depth>
-<depth index="-1" gap="1">
+</layer>
+<layer index="-1" gap="1">
     <column>
         <text>Bye World!</text>
     </column>
-</depth>
+</layer>
 ```
 
 - Output
@@ -622,18 +730,18 @@ Exemplo:
  └────────────┘ 
 ```
 
-### **OBS** N2 --> Caso o elemento `<depth>` tenha gap igual ou maior que 1 ***E*** o conteúdo do elemento `<column>`, de índice menor que a da superfície, for maior que o conteúdo do elemento da superfície, um aviso deve ser gerado no terminal e a coluna deve ser exibida da seguinte forma:
+### **OBS** N2 --> Caso o elemento `<layer>` tenha gap igual ou maior que 1 ***E*** o conteúdo do elemento `<column>`, de índice menor que a da superfície, for maior que o conteúdo do elemento da superfície, um aviso deve ser gerado no terminal e a coluna deve ser exibida da seguinte forma:
 
 - Input 
 ```ptml
-<depth gap="1">
+<layer gap="1">
     <column index="0">
         <text>Hello World!</text>
     </column>
     <column index="-1">
         <text>GoodBye World!</text>
     </column>
-</depth>
+</layer>
 ```
 
 - Output
@@ -695,50 +803,6 @@ start               (valor padrão/default)
 center 
 end
 ```
-
-***padding***:
-Atributo que define o espaço entre a borda e o conteúdo, sendo seu valor padrão 0.
-
-- Input 
-```ptml
-<box padding="1">
-    <text>Olá</text>
-</box>
-```
-
-- Output
-```cmd
-┌─────┐
-│     │
-│ Olá │
-│     │
-└─────┘
-```
-
-> Como é possível ver, a distância do conteúdo para as bordas verticais e horizontais são de 1 assim como foi referenciado no atributo padding.
-> No entanto, é possível definir o padding vertical e horizontal através de valores separados por 'x'. O número que antecede o caractere define o padding vertical, enquanto que o número que precede o caractere 'x' define o padding horizontal. 
-
-Exemplo:
-- Input
-```ptml
-<box padding="1x0">
-    <text>Olá</text>
-</box>
-```
-
-- Output
-```cmd
-┌───┐
-│   │
-│Olá│
-│   │
-└───┘
-```
-
-> Em caso de ter um valor negativo para o padding, um erro vai aparecer na tela e a execução será forçada a parar.
-
-### OBS:
-Textos crus existem, mas eles não causam inutilização do elemento `<text>` pelo fato de eles não possuírem outra forma de serem estilizados, mas no fim eles acabam virando nó padrão de `<text>`.
 
 --- 
 ## Elemento `<block>`
@@ -817,47 +881,6 @@ Exemplo:
 │Red John │
 └─────────┘
 ```
-
-***padding***:
-Atributo que define o espaço entre a borda e o conteúdo, sendo seu valor padrão 0.
-
-- Input 
-```ptml
-<box padding="1">
-    <text>Olá</text>
-</box>
-```
-
-- Output
-```cmd
-┌─────┐
-│     │
-│ Olá │
-│     │
-└─────┘
-```
-
-> Como é possível ver, a distância do conteúdo para as bordas verticais e horizontais são de 1 assim como foi referenciado no atributo padding.
-> No entanto, é possível definir o padding vertical e horizontal através de valores separados por 'x'. O número que antecede o caractere define o padding vertical, enquanto que o número que precede o caractere 'x' define o padding horizontal. 
-
-Exemplo:
-- Input
-```ptml
-<box padding="1x0">
-    <text>Olá</text>
-</box>
-```
-
-- Output
-```cmd
-┌───┐
-│   │
-│Olá│
-│   │
-└───┘
-```
-
-> Em caso de ter um valor negativo para o padding, um erro vai aparecer na tela e a execução será forçada a parar.
 
 --- 
 ## Elemento `<terminal>`
@@ -1162,8 +1185,37 @@ alphabet            (ex: a, b, c)
 Alphabet            (ex: A, B, C)
 ```
 
+***items-behavior***:
+Define o comportamento dos items da lista. Valores possíveis:
+```
+text                        (valor padrão, apenas texto)
+radio-collection            (os itens se comportam como itens de escolha única)
+checklist                   (os itens se comportam como itens de múltipla escolha)
+```
+
 ***before/after***:
 Descreve o que deve vir antes ou depois do caractere de lista.
+
+Exemplo:
+- Input
+```ptml
+<column>
+    <text>How to use `HTML`: </text>
+    <list oftype="enum" before="Step " after=" " items-behaviour="text">
+        <item>Create a HTML file.</item>
+        <item>Configure DOM.</item>
+        <item>Open file on browser.</item>
+    </list>
+</column>
+```
+
+- Output
+```
+How to use `HTML`: 
+Step 1. Create a HTML file.
+Step 2. Configure DOM.
+Step 3. Open file on browser.
+```
 
 ---
 ### IGNORE POR ENQUANTO!
@@ -1237,7 +1289,26 @@ Coloca um texto explícito em formatação DIM dentro do input. Tem como valor d
 ## Elemento `<output>`
 
 `<output></output>` ou `<output/>`
-É um campo específico onde o valor retornado do elemento `<input />` será mostrado.
+É um campo específico onde o valor retornado através do atributo `print` será mostrado.
+
+Exemplo:
+- Input
+```ptml
+<code>
+    let valor = 30
+    let desconto = 10 / 100
+    let precototal = valor - (valor * desconto)
+    let element = PTML.Elements.FindById('valor-produto')
+    element.AttributeWithValue("print", $"R${precototal}")
+</code>
+
+<text>Valor calculado do produto: <output id="valor-produto"/></text>
+```
+
+- Output
+```
+Valor calculado do produto: R$27
+```
 
 ---
 ## Elemento `<entity>`
@@ -1280,7 +1351,15 @@ Descreve a relação entre as duas entidades.
 ## Elemento `<tree>`
 
 `<tree></tree>`
+Elemento que desenha uma árvore de diretórios no terminal.
 
+### **Atributos**:
+
+***path***:
+Caminho relativo ou absoluto da raiz.
+
+***root-limit***:
+Limite de ramificações totais da árvore final.
 
 ---
 ### IGNORE POR ENQUANTO!
@@ -1445,9 +1524,9 @@ Exemplo:
 
 - Output
 ```
-▛            ▜
+⌜            ⌝
  Hello World!
-▙            ▟
+⌞            ⌟
 ```
 
 ### **Atributos:**
@@ -1455,23 +1534,75 @@ Exemplo:
 ***framework***;
 Estilização do enquadramento. Valores possíveis:
 ```
-bold                (▛ ▜ ▙ ▟ valor padrão)
+bold                (▛ ▜ ▙ ▟)
 pixels              (▞ ▚ ▚ ▞)
 blocks              (▅ ▅ ▅ ▅)
 point               (▘ ▝ ▖ ▗)
 border              (╭ ╮ ╰ ╯)
 picture             (◜ ◝ ◟ ◞)
-photograph          (⌜⌝ ⌞⌟)
+photograph          (⌜⌝ ⌞⌟ valor padrão)
 pythagoras          (◤ ◥ ◣ ◢)
 arrow               (↘ ↙ ↗ ↖)
 ascii               (/ \ \ /)
 ```
+
+***frame-color***:
+Define a cor do enquadramento. Valores possíveis:
+```
+none 
+black 
+red 
+green 
+gold 
+blue 
+purple
+cyan 
+fire
+limegreen 
+yellow 
+lightblue 
+lilac 
+crystal 
+gray 
+lightgray
+```
+
+---
+## Elemento `<carousel>` 
+
+`<carousel></carousel>`
+Elemento que define um carrossel de slides que avança o `<slide>` ou `<layer>` conforme o sinal recebido. Sempre começa com o primeiro filho declarado no PTML, não é possível combinar layers com slides.
+
+### **Atributos**:
+
+***mf-signal***:
+Define o sinal para avançar o slide.
+
+***sb-signal***:
+Define o sinal para recuar o slide.
+
+Valores possíveis para ambos:
+```
+keybind->
+keybind-<
+keybind-D
+keybind-A
+crtl+l
+crtl+n
+alt+c
+alt+v
+```
+
+---
+## Elemento `<slide>`
+
+`<slide></slide>`
+Elemento que define o comportamento dos filhos como sendo de um slide. Desenha apenas quando o `<carousel>` avança para seu slide.
 
 ---
 ## Elementos Banidos
 
 Elementos que foram cogitados sua adição, mas foram descartados.
 ```
-<br>        -->         Não tem por quê adicionar, já que o objetivo é você formalizar o espaço através de <column> com gap.
 <>          -->         ...
 ```

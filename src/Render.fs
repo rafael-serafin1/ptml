@@ -104,8 +104,43 @@ module Render =
             @ drawVertical left (top + 1) (bottom - 1) vertical fore
             @ drawVertical right (top + 1) (bottom - 1) vertical fore
 
+    let private drawEscapedText baseX baseY text fg bg font =
+        let mutable x = baseX
+        let mutable y = baseY
+        let mutable ops = []
+
+        for ch in text do
+            match ch with
+            | '\n' ->
+                y <- y + 1
+                x <- baseX
+            | '\r' ->
+                x <- baseX
+            | '\t' ->
+                let spaces = 4 - ((x - baseX) % 4)
+                for offset in 0 .. spaces - 1 do
+                    ops <- DrawChar(" ", x + offset, y, fg, bg, font) :: ops
+                x <- x + spaces
+            | '\b' ->
+                x <- max baseX (x - 1)
+            | '\f' ->
+                y <- y + 1
+                x <- baseX
+            | '\v' ->
+                y <- y + 1
+                x <- baseX
+            | _ ->
+                ops <- DrawChar(string ch, x, y, fg, bg, font) :: ops
+                x <- x + 1
+
+        List.rev ops
+
     let rec private renderWidget offsetX offsetY widget =
         match widget with
+        | PositionedEscapeWidget(esc, _, _, metrics) -> 
+            let baseX = offsetX + metrics.x
+            let baseY = offsetY + metrics.y
+            drawEscapedText baseX baseY esc None None None
         | PositionedProgressWidget(tp, value, max, width, height, show, metrics) ->
             let mutable baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y

@@ -2,7 +2,7 @@
 <terminal x-align="start">
     <column>
         <box>
-            <row>
+            <row gap="1">
                 <text>Olá</text>
                 <hr orientation="vertical" width="1"/>
                 <spinner type="braille" interval="50ms" duration="3s" completed="check"/>

@@ -1,18 +1,18 @@
 <?ptml encoding="UTF-8" terminal-resize="static"?>
 <terminal x-align="start">
-<depth index="0">
-    <box>
-        <text>aa</text>
-    </box>
-</depth>
-<depth index="-1">
-    <box>
-        <text>aaa</text>
-    </box>
-</depth>
-<depth index="-2">
-    <box>
-        <text>aaaa</text>
-    </box>
-</depth>
+    <layer index="0">
+        <box>
+            <text>aa</text>
+        </box>
+    </layer>
+    <layer index="-1">
+        <box>
+            <text>aaa</text>
+        </box>
+    </layer>
+    <layer index="-2">
+        <box>
+            <text>aaaa</text>
+        </box>
+    </layer>
 </terminal>

@@ -13,9 +13,14 @@ open PTML.Depth
 
 module Runner =
     let run(path: string): Status =
-        let terminal = getViewport()
+        let mutable terminal: Terminal option = None
+        if Utils.shouldWindow then
+            terminal <- Some (basicTerminal)
+        else
+            terminal <- Some (getViewport())
+
         let input: string = File.ReadAllText(path)
-        if input = "" then  
+        if input = "" || input = String.Empty then  
             printfn "\x1b[31mError\x1b[0m -- PTML File is empty."
             Status.Error
         else
@@ -28,7 +33,11 @@ module Runner =
         let layout = layoutTree semantic
         let filteredLayout, depthLayers = Depth.extractDepthLayers layout
         let renderOps = renderTree filteredLayout
-        let baseBuffer = processRenderTree renderOps (terminal.ViewWidth) (terminal.ViewHeight)
+        match terminal with 
+        | None -> 
+            Status.Error
+        | Some t ->
+        let baseBuffer = processRenderTree renderOps (t.ViewWidth) (t.ViewHeight)
         let buffer: Cell array2d = Depth.composeDepthLayers baseBuffer depthLayers
 
         if Utils.shouldWindow = false then

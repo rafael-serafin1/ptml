@@ -4,6 +4,7 @@ open PTML.Token
 open PTML.Parser
 open PTML.Spinner
 open PTML.Progress
+open PTML.Escape
 
 module Tree =
     type GlobalAttributes = {
@@ -109,6 +110,8 @@ module Tree =
         | TerminalWidget of width: Dimension * height: Dimension * alignX: Align option * alignY: Align option * children: Widget list
         | SpinnerWidget of text:Types * interval: string * duration: string * completed: string * foreground:string option * background:string option
         | ProgressWidget of tp: ProgressType * value: int * max: int * width: Dimension * height: Dimension * show: string option
+        | EscapeWidget of sequence: Escape.EscapeSequence * multiplier: int
+        (*| FrameWidget of tp: Frames.FrameWorks * width: Dimension * heigth: Dimension * padding: int * int * children:Widget list*)
 
     ///
     /// AST BUILDING
@@ -465,6 +468,15 @@ module Tree =
         | "bright" -> "✦"
         | _ -> value
         
+    let private parseEscapeSequence = function
+        | "break" -> EscapeSequence.Break
+        | "horizontal-tab" -> HorizontalTab
+        | "vertical-tab" -> VerticalTab
+        | "audible-bell" -> AudibleBell
+        | "backspace" -> BackSpace
+        | "form-feed" -> FormFeed
+        | "carriage-return" -> CarriageReturn
+        | value -> failwith $"Tipagem inexistente para <escape>: '{value}'"
 
     let mutable previousTag: AstNode option = None
 
@@ -477,6 +489,9 @@ module Tree =
 
     let private applyTextStyle widget parentFg parentBg parentFont =
         match widget with
+        | EscapeWidget(seq, multi) ->
+            let char = concatEscapes(seq, multi)
+            TextWidget(char, None, None, None)
         | TextWidget(text, fg, bg, font) ->
             let finalFg = if fg.IsSome then fg else parentFg
             let finalBg = if bg.IsSome then bg else parentBg
@@ -486,6 +501,9 @@ module Tree =
 
     let private applyFragStyle widget parentFg parentBg parentFont =
         match widget with
+        | EscapeWidget(seq, multi) ->
+            let char = concatEscapes(seq, multi)
+            FragWidget(char, None, None, None)
         | FragWidget(text, fg, bg, font) ->
             let finalFg = if fg.IsSome then fg else parentFg
             let finalBg = if bg.IsSome then bg else parentBg
@@ -542,7 +560,7 @@ module Tree =
                         let mutable i = 0
                         if System.Int32.TryParse(value, &i) then i
                         else failwith $"Invalid integer value for index: {value}"
-                    | None -> failwith "Missing required attribute for depth: index"
+                    | None -> failwith "Missing required attribute for layer: index"
                 let gap = parseIntAttr "gap" 0 attrs
                 let zAlign = tryGetAttr "z-align" attrs |> Option.map parseAlign
                 let childrenWidgets = children |> List.collect buildWidget
@@ -592,6 +610,17 @@ module Tree =
                 let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
                 let show = tryGetAttr "show-value" attrs |> Option.defaultValue "false"
                 [ ProgressWidget(progressType, value, max, width, height, Some show) ]
+            | "escape" ->
+                let sequence = tryGetAttr "sequence" attrs |> Option.map parseEscapeSequence |> Option.defaultValue EscapeSequence.Break
+                let multiplier = parseIntAttr "multiplier" 1 attrs
+                [ EscapeWidget(sequence, multiplier) ]
+            (*| "frame" ->
+                let fw = tryGetAttr "framework" attrs |> Option.map Frames.parseFrameWork |> Option.defaultValue Frames.FrameWorks.Photograph
+                let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
+                let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
+                let paddingV, paddingH = tryGetAttr "padding" attrs |> Option.map parsePadding |> Option.defaultValue (0, 0)
+                let childrenWidgets = children |> List.collect buildWidget
+                [ FrameWidget(fw, width, height, paddingV, paddingH, childrenWidgets) ]*)
             | _ ->
                 failwith $"Unsupported semantic tag: {tag}"
 

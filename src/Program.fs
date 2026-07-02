@@ -76,7 +76,7 @@ module Program =
 
         let psi = ProcessStartInfo()
         psi.FileName <- "cmd.exe"
-        psi.Arguments <- sprintf "/c start \"PTML\" cmd /k \"mode con: cols=460 lines=200 && %s\"" childCommand
+        psi.Arguments <- sprintf "/c start \"PTML\" cmd /k \"mode con: cols=480 lines=270 && %s\"" childCommand
         psi.UseShellExecute <- false
         psi.Environment.["PTML_WINDOW_CHILD"] <- "1"
         Process.Start(psi) |> ignore

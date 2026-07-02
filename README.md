@@ -79,7 +79,7 @@ Organização de conteúdo através de:
 
 - `<row>` → distribuição horizontal
 - `<column>` → distribuição vertical
-- `<depth>` → profundidade (camadas)
+- `<layer>` → profundidade (camadas)
 - `<cell>` → grids e divisões
 
 Exemplo:
@@ -211,7 +211,7 @@ Exemplos:
 ```ptml
 <row>
 <column>
-<depth>
+<layer>
 <cell>
 <terminal>
 ```
@@ -307,11 +307,11 @@ Comece apenas com:
 
 # Estado Atual
 ```
-✅ Funcionando: Sistema de layout, Componentes visuais, Estilização ANSI, Containers e Profundidade com Layers  |
-⚠️ Funcionando de forma errada: Spinners e Grid com Cells                                                       |
-⛔ Não funcionando: ...                                                                                         |
-🚧 Em construção: Conserto no Spinner                                                                           |
-📜 Planejados: Inputs avançados, Graphs, Trees, Output binding e Execução integrada de código                   |
+✅ Funcionando: Spinners, Barra de Progresso                                                                                |
+⚠️ Funcionando de forma errada: Depth Layer                                                                                 |
+⛔ Não funcionando: ...                                                                                                     |
+🚧 Em construção: Frames                                                                                                    |
+📜 Planejados: Listas, Inputs avançados, Graphs, Trees, Output binding e Execução integrada de código                       |
 ```
 
 ---

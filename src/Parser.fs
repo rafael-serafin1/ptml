@@ -3,7 +3,7 @@ open PTML.Lexer
 open PTML.Token
 
 module Parser =
-    let validTags = Set.ofList ["frag"; "text"; "row"; "column"; "layer"; "box"; "block"; "terminal"; "cell"; "snippet"; "spinner"; "hr"; "progress"]
+    let validTags = Set.ofList ["frag"; "text"; "row"; "column"; "layer"; "box"; "block"; "terminal"; "cell"; "snippet"; "spinner"; "hr"; "progress"; "escape"; "frame"]
     let colorValues = Set.ofList ["none"; "black"; "red"; "green"; "gold"; "blue"; "purple"; "cyan"; "fire"; "limegreen"; "yellow"; "lightblue"; "lilac"; "crystal"; "gray"; "lightgray"; "white"]
     let fontValues = Set.ofList ["none"; "bold"; "dim"; "italic"; "underline"; "slow-blink"; "rapid-blink"; "reverse"; "conceal"; "strike-through"]
     let overflowValues = Set.ofList ["break"; "wrap"; "cut"; "clip"]
@@ -13,7 +13,7 @@ module Parser =
     let orientation = Set.ofList ["vertical"; "horizontal"]
     let progresstype = Set.ofList ["blocks"; "square"; "dots"; "tiny-square"; "rhombus"]
     let boolean = Set.ofList ["true"; "false"]
-
+    let frameworks = Set.ofList ["bold"; "pixels"; "blocks"; "point"; "border"; "picture"; "photograph"; "pythagoras"; "arrow"; "ascii"]
 
     let validAttributes = Map.ofList [
         "hr", Map.ofList [
@@ -87,6 +87,16 @@ module Parser =
             "foreground", colorValues
             "background", colorValues
         ]
+        "escape", Map.ofList [
+            "sequence", Set.ofList ["break"; "horizontal-tab"; "vertical-tab"; "audible-bell"; "backspace"; "form-feed"; "carriage-return"]
+            "multiplier", Set.empty
+        ]
+        "frame", Map.ofList [
+            "framework", frameworks
+            "overflow", overflowValues
+            "width", Set.empty
+            "height", Set.empty
+        ]
     ]
 
     let globalAttributes = Set.ofList ["id"; "snippet"]
@@ -121,6 +131,10 @@ module Parser =
                             let mutable i = 0
                             if System.Int32.TryParse(value, &i) then Valid
                             else InvalidValue $"Gap must be int: {value}"
+                        | "multiplier" ->
+                            let mutable i = 0
+                            if System.Int32.TryParse(value, &i) && i > 0 then Valid
+                            else InvalidValue $"Multiplier must be int and positive: {value}"
                         | "max" | "value" ->
                             let mutable i = 0
                             if System.Int32.TryParse(value, &i) then Valid
@@ -179,7 +193,7 @@ module Parser =
                 failwith "Elemento <frag> só pode existir dentro de <text>."
             if isInsideTag "frag" stack then
                 failwith "Elemento <frag> não pode conter outro <frag>."
-        elif isInsideTag "text" stack && tag <> "frag" then
+        elif isInsideTag "text" stack && tag <> "frag" && tag <> "escape" then
             failwith $"Elemento <{tag}> não é permitido dentro de <text>."
 
     let rec parser(tokens, stack ) =
@@ -202,8 +216,8 @@ module Parser =
                     | UnknownAttribute _ -> failwith $"Invalid attribute for attribute '{tag}': {name}"
                 if tag = "block" && not (List.exists (fun (name, _) -> name = "title") attrs) then
                     failwith "Missing required attribute for block: title"
-                if tag = "depth" && not (List.exists (fun (name, _) -> name = "index") attrs) then
-                    failwith "Missing required attribute for depth: index"
+                if tag = "layer" && not (List.exists (fun (name, _) -> name = "index") attrs) then
+                    failwith "Missing required attribute for layer: index"
             if selfClosing then
                 parser(rest, stack)
             else

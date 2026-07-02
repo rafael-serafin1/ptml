@@ -15,7 +15,7 @@ module Debug =
     let debug(path: string): Status = 
         let terminal: Terminal = getOutputViewport()
         let input: string = File.ReadAllText(path)
-        if input = "" then  
+        if input = "" || input = String.Empty then  
             printfn "\x1b[31mError\x1b[0m -- PTML File is empty."
             Status.Error
         else

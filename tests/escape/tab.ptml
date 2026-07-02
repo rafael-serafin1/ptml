@@ -1,0 +1,9 @@
+<?ptml encoding="UTF-8" terminal-resize="static"?>
+<terminal x-align="start">
+    <row>
+        <text>Lista: </text>
+        <escape sequence="horizontal-tab" />
+        <text>- Viado</text>
+    </row>
+    <!-- TODO: Resolver essa bosta de horizontal-tab, com certeza ele não é o único não funcionando -->
+</terminal>

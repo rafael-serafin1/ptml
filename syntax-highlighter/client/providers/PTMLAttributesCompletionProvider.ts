@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { align, boolean, borders, colors, completed, encoding, fonts, NaNValuesInNumericAttrs, nums, ori, overflow, progressType, spinners } from "./PTMLAttributesValueCompletionProvider";
+import { align, boolean, borders, colors, completed, encoding, escapesSequence, fonts, NaNValuesInNumericAttrs, nums, ori, overflow, progressType, spinners } from "./PTMLAttributesValueCompletionProvider";
 
 interface AttributeDefinition {
     name: string;
@@ -150,7 +150,7 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         globalAttributes2
     ],
 
-    depth: [
+    layer: [
         {
             name: "index",
             values: nums && NaNValuesInNumericAttrs
@@ -270,6 +270,17 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
             values: boolean
         },
         globalAttributes,   
+        globalAttributes2
+    ],
+    escape: [
+        {
+            name: "sequence",
+            values: escapesSequence
+        },
+        {
+            name: "multiplier"
+        },
+        globalAttributes,
         globalAttributes2
     ]
 };
