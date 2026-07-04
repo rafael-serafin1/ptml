@@ -1,6 +1,8 @@
 <?ptml encoding="UTF-8" terminal-resize="static"?>
 <terminal x-align="start">
-    <frame framework="cubic" width="19" align="center" frame-color="cyan">
-        bitch ass dog
-    </frame>
+    <box padding="0x1">
+        <frame framework="photograph" width="19" align="center" frame-color="cyan">
+            bitch ass dog
+        </frame>
+    </box>
 </terminal>

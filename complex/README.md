@@ -1,0 +1,10 @@
+### Complex
+
+ESSA PASTA TERÁ COMO OBJETIVO FAZER COMPONENTES MAIS COMPLEXOS EM UMA LINGUAGEM A QUAL EU TENHO MAIS FAMILIARIDADE COM.
+
+## IMPORTANTO EM F#
+
+```fs
+[<DllImport("NativeComponentsLib.dll")>]
+extern type Button()
+```

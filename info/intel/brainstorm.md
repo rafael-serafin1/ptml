@@ -1,6 +1,6 @@
 ## Procedural Instruction
 
-`<?ptml encoding="UTF-8" terminal-resize="calculate"?>` <br />
+`<?ptml encoding="UTF-8" terminal-resize="reflow"?>` <br />
 Serve como Instrução Procedural, além de garantir que ao terminal resize o retained-mode rendering vai ser corretamente aplicado. <br />
 Valores possíveis para atributo ***terminal-resize***:  
 ```
@@ -1508,7 +1508,6 @@ false               (valor padrão)
 ```
  
 --- 
-### IGNORE POR ENQUANTO!!
 ## Elemento `<frame>`
 
 `<frame></frame>`
@@ -1594,6 +1593,19 @@ Exemplo:
 ```
 
 ---
+### IGNORE POR ENQUANTO!!   
+## Elemento `<include>`
+
+`<include />`
+Elemento que renderiza o conteúdo de um arquivo PTML alvo.
+
+### **Atributos**:
+
+***src***:
+Define a fonte do conteúdo.
+
+---
+### IGNORE POR ENQUANTO!!
 ## Elemento `<carousel>` 
 
 `<carousel></carousel>`
@@ -1620,6 +1632,7 @@ alt+v
 ```
 
 ---
+### IGNORE POR ENQUANTO!!
 ## Elemento `<slide>`
 
 `<slide></slide>`
