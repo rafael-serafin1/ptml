@@ -46,8 +46,15 @@ git clone "https://github.com/rafael-serafin1/ptml.git"
 ### **Passo 2**:
 Adicionar o executável ao PATH.
 ```sh
-.\build.ps1                 # se estiver no windows
-.\build.sh                  # se estiver no linux
+python build.py
+```
+
+ou
+
+```sh
+cd ./shell
+.\build.ps1
+.\build.sh
 ```
 
 ### **Passo 3**:
@@ -62,8 +69,15 @@ Instalação da extensão em desenvolvimento, siga os passos:
 ### **Passo 1**:
 Execute o script.
 ```sh
-.\package.ps1                 # se estiver no windows
-.\package.sh                  # se estiver no linux
+python package.py "pack"
+```
+
+ou 
+
+```sh
+cd ./shell
+.\package.ps1 "pack"
+.\package.sh "pack"
 ```
 
 ### **Passo 2**:

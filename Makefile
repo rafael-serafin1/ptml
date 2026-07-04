@@ -3,7 +3,7 @@
 # Receitas para build
 pack: 
 	dotnet build
-	dotnet publish -c Release -r win-x64 --self-contained true -o ./build
+	dotnet publish -c Release -r win-x64 --self-contained true -o ./dist/build
 
 packpy:
 	python package.py "pack"
@@ -20,7 +20,7 @@ script:
 build_fs: 
 	dotnet build
 pub:
-	dotnet publish -c Release -r win-x64 --self-contained true -o ./build
+	dotnet publish -c Release -r win-x64 --self-contained true -o ./dist/build
 dobuild: build_fs pub
 
 
