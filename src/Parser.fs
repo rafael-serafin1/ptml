@@ -5,7 +5,7 @@ open PTML.Token
 module Parser =
     let validTags = Set.ofList ["frag"; "text"; "row"; "column"; "layer"; "box"; "block"; "terminal"; "cell"; "snippet"; "spinner"; "hr"; "progress"; "escape"; "frame"]
     let colorValues = Set.ofList ["none"; "black"; "red"; "green"; "gold"; "blue"; "purple"; "cyan"; "fire"; "limegreen"; "yellow"; "lightblue"; "lilac"; "crystal"; "gray"; "lightgray"; "white"]
-    let fontValues = Set.ofList ["none"; "bold"; "dim"; "italic"; "underline"; "slow-blink"; "rapid-blink"; "reverse"; "conceal"; "strike-through"]
+    let fontValues = Set.ofList ["none"; "bold"; "dim"; "italic"; "underline"; "slow-blink"; "rapid-blink"; "reverse"; "conceal"; "strike-through"; "double-underline"; "overline"]
     let overflowValues = Set.ofList ["break"; "wrap"; "cut"; "clip"]
     let alignValues = Set.ofList ["start"; "center"; "end"]
     let borderValues = Set.ofList ["single"; "double"; "classic"; "bold"; "strange"; "rounded"; "ascii"; "none"; "borderless"]

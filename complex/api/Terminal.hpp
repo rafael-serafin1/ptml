@@ -20,7 +20,6 @@ private:
     // cursor visibility
     bool isCursorVisible;
 
-public:
     /// @brief set cursor position info into pointer _cursor_pos
     /// @param X position
     /// @param Y position
@@ -46,6 +45,8 @@ public:
     bool get_cursor_visibility() const {
         return this->isCursorVisible;
     }
+    
+public:
 
     /// @brief Constructor
     Terminal() {
@@ -103,6 +104,8 @@ public:
     /// @brief kinda obvious ngl
     inline static void ClearAll() {
         std::cout << "\x1B[2J";
+        Terminal t = Terminal(); 
+        t.SetCursorPos(0, 0);
     }
 
     inline static void ClearLine(int X, int Y) {
@@ -113,5 +116,6 @@ public:
 
         std::string final_msn = CLEAR_ESCAPE + X + ';' + Y + 'H' + std::string(CLEAR_ESCAPE) + "2K";
         std::cout << final_msn;
+        T.SetCursorPos(0, Y);
     }
 };

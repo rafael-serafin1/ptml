@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Receitas para build
-pack: 
+all: 
 	dotnet build
 	dotnet publish -c Release -r win-x64 --self-contained true -o ./dist/build
 

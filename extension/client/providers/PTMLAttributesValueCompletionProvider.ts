@@ -47,7 +47,9 @@ export const fonts = [
     "rapid-blink",
     "reverse",
     "conceal",
-    "strike-through"
+    "strike-through",
+    "overline",
+    "double-underline"
 ]
 
 export const overflow = [

@@ -1,8 +1,11 @@
 #!/bin/make
 
 test:
-	g++ NativeComponentsLib.cpp -o ./output/test.exe
+	g++ TestingBehaviour.cpp components/Button.cpp components/Input.cpp -o ./output/test.exe
 	./output/test
+
+memory:
+	g++ -g -fsanitize=address -o ./output/memory TestingBehaviour.cpp components/Button.cpp components/Input.cpp
 
 dll:
 	g++ -shared NativeComponentsLib.cpp \

@@ -91,6 +91,8 @@ module Tree =
         | Marked = 7
         | Conceal = 8
         | StrikeThrough = 9
+        | Overline = 10
+        | DoubleUnderLine = 11
 
     type Orientation =
     | Vertical
