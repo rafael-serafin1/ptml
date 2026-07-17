@@ -1,5 +1,5 @@
 #pragma once
-#include "./components/Button.cpp"
+#include "./components/Components.hpp"
 
 #ifdef _WIN32
     #define DLL_EXPORT extern "C" __declspec(dllexport)
@@ -8,3 +8,4 @@
 #endif
 
 DLL_EXPORT class Button;
+DLL_EXPORT class Input;

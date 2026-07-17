@@ -48,6 +48,7 @@ Agora, os abstratos são:
 <snippet>
 <escape>
 ---> Em desenvolvimento
+<cursor>
 <carousel>
 <slide>
 <code>
@@ -176,6 +177,25 @@ Exemplo:
 ### OBS:
 Textos crus existem, mas eles não causam inutilização do elemento `<text>` pelo fato de eles não possuírem outra forma de serem estilizados, mas no fim eles acabam virando nó padrão de `<text>`.
 
+### Atributo ***url***:
+Atributo responsável por aderir uma url de um site ao texto. Compartilhado entre os elementos:
+```
+<text>
+<frag>
+```
+
+Seu uso é simples:
+
+- Input
+```ptml
+<text url="https://github.com/rafael-serafin1">Github</text>
+```
+
+- Output
+```
+Github  
+```
+
 ---
 ### Elemento `<text>`
 
@@ -243,6 +263,8 @@ rapid-blink
 reverse                 (marked)
 conceal                 (hidden)
 strike-through
+overline
+double-underline
 ```
 
 ### OBS:
@@ -304,6 +326,8 @@ rapid-blink
 reverse                 (marked)
 conceal                 (hidden)
 strike-through
+overline
+double-underline
 ```
 
 --- 
@@ -357,6 +381,42 @@ Hello\n
 \n
 World
 ```
+
+---
+## Elemento `<cursor>`
+
+`<cursor />`
+Elemento abstrato cujo propósito é estilizar o cursor.
+
+### **Atributos**:
+
+***shape***:
+Define o formato do cursor.
+```
+block
+bar
+underline
+```
+
+***blink***:
+Atributo booleano que define se o cursor vai ficar piscando ou não.
+
+***color***:
+Define a cor do cursor. Aceita qualquer valor hexadecimal. Valores não-hexadecimais aceitos também:
+```
+red     (traduz para #f00)
+yellow  (traduz para #ff0)
+white   (traduz para #fff)
+black   (traduz para #000)
+cyan    (traduz para #0ff)
+blue    (traduz para #00f)
+pink    (traduz para #f0f)
+green   (traduz para #0f0)
+purple  (traduz para #50f)
+```
+
+***visible***:
+Define se o cursor é visível ou não. Valor booleano (true || false).
 
 ---
 ## Elemento `<hr>`
@@ -1236,6 +1296,26 @@ defer               (em paralelo, mas apenas se o PTML ja foi totalmente process
 async               (de forma assíncrona)
 ```
 
+---
+## Elemento `<button>`
+
+`<button />`
+Elemento com handling de evento para clique.
+
+Exemplo:
+- Input
+```ptml
+<button handler="" />
+```
+
+### **Atributos**:
+
+***type***:
+Define o tipo de botão. Valores possíveis:
+```
+
+```
+
 --- 
 ### IGNORE POR ENQUANTO!
 ## Elemento `<input>`
@@ -1251,9 +1331,7 @@ Exemplo:
 
 - Output
 ```cmd
-┌───────────┐
-│Click here!|
-└───────────┘
+[Click here!               ]
 ```
 
 ### **Atributos**:
@@ -1261,11 +1339,9 @@ Exemplo:
 ***type***:
 Define o tipo do input. Valores possíveis:
 ```
-scan
-button
+scanner
 radio-button
 check-box
-...
 ```
 
 ***event***:

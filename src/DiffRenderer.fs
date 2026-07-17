@@ -45,6 +45,8 @@ module DiffRenderer =
         | Some "reverse" -> Some "7"
         | Some "conceal" -> Some "8"
         | Some "strike-through" -> Some "9"
+        | Some "overline" -> Some "53"
+        | Some "double-underline" -> Some "21"
         | _ -> None
 
     let private styleCodes cell =

@@ -44,33 +44,35 @@
 #pragma endregion
 
 // * optional handler for missing function in parameter
-void Button::BasicHandler()
-{
+void Button::BasicHandler() {
     register Couple<int, int> coordinates = T->GetCursorPos();
     T->SetCursorVisibility(false);
 
     counter += 1;
 
     SetCursorPos(coordinates.first, coordinates.second);
-    std::cout << "Contagem: " << counter;
+    std::cout << "Contagem: " << counter << std::endl;
     SetCursorPos(coordinates.first, coordinates.second);
 }
 
 /// @brief Draw and watches button
 /// @param handler handler for click event
 /// @param placeholder button placeholder string
-inline void Button::SetButton(std::function<void()> handler, const std::string& placeholder)
-{
+void Button::SetButton(std::function<void()> handler, const std::string& placeholder) {
     if (!handler) handler = [this]() { BasicHandler(); };
+    Coordinates cdn = this->GetPosition();
 
     T->SetCursorVisibility(false);
 
     // Desenha o botão
-    int bx = 0;
-    int by = 0;
-
+    Button::SetPosition(0, 0);
     Terminal::ClearAll();
+
+    int bx = cdn.first;
+    int by = cdn.second;
+
     T->SetCursorPos(bx, by);
+
     std::cout << placeholder;
 
     // Habilita eventos do mouse
