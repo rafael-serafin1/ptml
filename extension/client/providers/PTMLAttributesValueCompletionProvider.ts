@@ -205,7 +205,8 @@ export class PTMLAttributeValueCompletionProvider
         shape: shape,
         color: cursorColor,
         visible: boolean,
-        blink: boolean
+        blink: boolean,
+        url: [""]
     };
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {

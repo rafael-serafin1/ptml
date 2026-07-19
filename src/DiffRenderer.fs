@@ -5,6 +5,7 @@ open PTML.Buffer
 
 module DiffRenderer =
     let private ansi = "\x1b["
+    let private ocs = "\x1b]"
     let private foregroundCode = function
         | Some "black" -> Some "30"
         | Some "red" -> Some "31"

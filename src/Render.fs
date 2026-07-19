@@ -5,7 +5,7 @@ open PTML.Spinner
 
 module Render =
     type RenderOperation =
-        | DrawChar of string * int * int * string option * string option * string option
+        | DrawChar of string * int * int * string option * string option * string option * string option
         | DrawSpinner of Types * int * int * string * string * string * string option * string option
         | CursorStyle of Cursor.Shape * int * int * string option * string option * string option
 
@@ -39,10 +39,10 @@ module Render =
         | Horizontal -> "─"
 
     let private drawHorizontal xStart xEnd y char fore =
-        [ for x in xStart .. xEnd -> DrawChar(char, x, y, fore, None, None) ]
+        [ for x in xStart .. xEnd -> DrawChar(char, x, y, fore, None, None, None) ]
 
     let private drawVertical x yStart yEnd char fore =
-        [ for y in yStart .. yEnd -> DrawChar(char, x, y, fore, None, None) ]
+        [ for y in yStart .. yEnd -> DrawChar(char, x, y, fore, None, None, None) ]
 
     let private drawBorder x y width height border borderColor =
         match border with
@@ -57,10 +57,10 @@ module Render =
             let fore = borderColor
 
             [ 
-            DrawChar(topLeft, left, top, fore, None, None)
-            DrawChar(topRight, right, top, fore, None, None)
-            DrawChar(bottomLeft, left, bottom, fore, None, None)
-            DrawChar(bottomRight, right, bottom, fore, None, None) ]
+            DrawChar(topLeft, left, top, fore, None, None, None)
+            DrawChar(topRight, right, top, fore, None, None, None)
+            DrawChar(bottomLeft, left, bottom, fore, None, None, None)
+            DrawChar(bottomRight, right, bottom, fore, None, None, None) ]
             @ drawHorizontal (left + 1) (right - 1) top horizontal fore
             @ drawHorizontal (left + 1) (right - 1) bottom horizontal fore
             @ drawVertical left (top + 1) (bottom - 1) vertical fore
@@ -90,22 +90,22 @@ module Render =
                     let rightFill = interiorWidth - leftFill - titleText.Length
                     let leftOps = drawHorizontal interiorStart (interiorStart + leftFill - 1) top horizontal fore
                     let titleOps =
-                        [ for i in 0 .. titleText.Length - 1 -> DrawChar(string titleText.[i], interiorStart + leftFill + i, top, fore, None, None) ]
+                        [ for i in 0 .. titleText.Length - 1 -> DrawChar(string titleText.[i], interiorStart + leftFill + i, top, fore, None, None, None) ]
                     let rightOps = if rightFill > 0 then drawHorizontal (interiorStart + leftFill + titleText.Length) interiorEnd top horizontal fore else []
                     leftOps @ titleOps @ rightOps
                 | _ -> drawHorizontal interiorStart interiorEnd top horizontal fore
 
             [ 
-            DrawChar(topLeft, left, top, fore, None, None)
-            DrawChar(topRight, right, top, fore, None, None)
-            DrawChar(bottomLeft, left, bottom, fore, None, None)
-            DrawChar(bottomRight, right, bottom, fore, None, None) ]
+            DrawChar(topLeft, left, top, fore, None, None, None)
+            DrawChar(topRight, right, top, fore, None, None, None)
+            DrawChar(bottomLeft, left, bottom, fore, None, None, None)
+            DrawChar(bottomRight, right, bottom, fore, None, None, None) ]
             @ titleOps
             @ drawHorizontal interiorStart interiorEnd bottom horizontal fore
             @ drawVertical left (top + 1) (bottom - 1) vertical fore
             @ drawVertical right (top + 1) (bottom - 1) vertical fore
 
-    let private drawEscapedText baseX baseY text fg bg font =
+    let private drawEscapedText baseX baseY text fg bg font url =
         let mutable x = baseX
         let mutable y = baseY
         let mutable ops = []
@@ -120,7 +120,7 @@ module Render =
             | '\t' ->
                 let spaces = 4 - ((x - baseX) % 4)
                 for offset in 0 .. spaces - 1 do
-                    ops <- DrawChar(" ", x + offset, y, fg, bg, font) :: ops
+                    ops <- DrawChar(" ", x + offset, y, fg, bg, font, url) :: ops
                 x <- x + spaces
             | '\b' ->
                 x <- max baseX (x - 1)
@@ -131,7 +131,7 @@ module Render =
                 y <- y + 1
                 x <- baseX
             | _ ->
-                ops <- DrawChar(string ch, x, y, fg, bg, font) :: ops
+                ops <- DrawChar(string ch, x, y, fg, bg, font, url) :: ops
                 x <- x + 1
 
         List.rev ops
@@ -147,10 +147,10 @@ module Render =
             let fore = fwColor
 
             [ 
-            DrawChar(topLeft, left, top, fore, None, None)
-            DrawChar(topRight, right, top, fore, None, None)
-            DrawChar(bottomLeft, left, bottom, fore, None, None)
-            DrawChar(bottomRight, right, bottom, fore, None, None) ]
+            DrawChar(topLeft, left, top, fore, None, None, None)
+            DrawChar(topRight, right, top, fore, None, None, None)
+            DrawChar(bottomLeft, left, bottom, fore, None, None, None)
+            DrawChar(bottomRight, right, bottom, fore, None, None, None) ]
 
     let rec private renderWidget offsetX offsetY widget =
         match widget with
@@ -161,7 +161,7 @@ module Render =
         | PositionedEscapeWidget(esc, _, _, metrics) -> 
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
-            drawEscapedText baseX baseY esc None None None
+            drawEscapedText baseX baseY esc None None None None
         | PositionedProgressWidget(tp, value, max, width, height, show, metrics) ->
             let mutable baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
@@ -171,7 +171,7 @@ module Render =
                 charFrames <- Progress.framefy(metrics.w, metrics.h, tp, value, max, "false")
             | Some str ->
                 charFrames <- Progress.framefy(metrics.w, metrics.h, tp, value, max, str)
-            [ DrawChar(charFrames, baseX, baseY, None, None, None) ]
+            [ DrawChar(charFrames, baseX, baseY, None, None, None, None) ]
         | PositionedHrWidget(ori, _, _, metrics) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
@@ -180,11 +180,12 @@ module Render =
                 drawHorizontal baseX (baseX + metrics.w - 1) baseY (hrChars Horizontal) None
             | Vertical ->
                 drawVertical baseX baseY (baseY + metrics.h - 1) (hrChars Vertical) None
-        | PositionedTextWidget(text, fg, bg, font, metrics) ->
-            [ DrawChar(text, offsetX + metrics.x, offsetY + metrics.y, fg, bg, font) ]
-        | PositionedFragWidget(text, fg, bg, font, metrics) ->
-            [ DrawChar(text, offsetX + metrics.x, offsetY + metrics.y, fg, bg, font) ]
 
+        | PositionedTextWidget(text, fg, bg, font, url, metrics) ->
+            [ DrawChar(text, offsetX + metrics.x, offsetY + metrics.y, fg, bg, font, url) ]
+        | PositionedFragWidget(text, fg, bg, font, url, metrics) ->
+            [ DrawChar(text, offsetX + metrics.x, offsetY + metrics.y, fg, bg, font, url) ]
+        
         | PositionedSpinnerWidget(tp, inter, dur, comp, fg, bg, metrics) ->
             [ DrawSpinner(tp, offsetX + metrics.x, offsetY + metrics.y, inter, dur, comp, fg, bg) ]
 
@@ -254,14 +255,14 @@ module Render =
                             for ySep in grid.separators do
                                 match xSep, ySep with
                                 | VerticalSeparator vx, HorizontalSeparator hy ->
-                                    yield DrawChar(middleCross, baseX + vx, baseY + hy, borderColor, None, None)
+                                    yield DrawChar(middleCross, baseX + vx, baseY + hy, borderColor, None, None, None)
                                 | _ -> () ]
 
                     let borderTopIntersections =
                         if border <> NoBorder then
                             grid.separators
                             |> List.choose (function
-                                | VerticalSeparator x -> Some (DrawChar(topCross, baseX + x, baseY - 1, borderColor, None, None))
+                                | VerticalSeparator x -> Some (DrawChar(topCross, baseX + x, baseY - 1, borderColor, None, None, None))
                                 | _ -> None)
                         else []
 
@@ -269,7 +270,7 @@ module Render =
                         if border <> NoBorder then
                             grid.separators
                             |> List.choose (function
-                                | VerticalSeparator x -> Some (DrawChar(bottomCross, baseX + x, baseY + metrics.h, borderColor, None, None))
+                                | VerticalSeparator x -> Some (DrawChar(bottomCross, baseX + x, baseY + metrics.h, borderColor, None, None, None))
                                 | _ -> None)
                         else []
 
@@ -277,7 +278,7 @@ module Render =
                         if border <> NoBorder then
                             grid.separators
                             |> List.choose (function
-                                | HorizontalSeparator y -> Some (DrawChar(leftCross, baseX - 1, baseY + y, borderColor, None, None))
+                                | HorizontalSeparator y -> Some (DrawChar(leftCross, baseX - 1, baseY + y, borderColor, None, None, None))
                                 | _ -> None)
                         else []
 
@@ -285,7 +286,7 @@ module Render =
                         if border <> NoBorder then
                             grid.separators
                             |> List.choose (function
-                                | HorizontalSeparator y -> Some (DrawChar(rightCross, baseX + metrics.w, baseY + y, borderColor, None, None))
+                                | HorizontalSeparator y -> Some (DrawChar(rightCross, baseX + metrics.w, baseY + y, borderColor, None, None, None))
                                 | _ -> None)
                         else []
 

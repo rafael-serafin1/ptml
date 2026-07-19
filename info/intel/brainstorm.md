@@ -31,8 +31,9 @@ Sendo assim, atualmente os concretos são:
 <frame>
 ---> Em desenvolvimento
 <tree>
+<toast>
+<option>
 <input>
-<output>
 <entity>
 <bind>
 <graphs>
@@ -47,8 +48,11 @@ Agora, os abstratos são:
 <cell>
 <snippet>
 <escape>
----> Em desenvolvimento
 <cursor>
+---> Em desenvolvimento
+<timeline>
+<radio>
+<checkbox>
 <carousel>
 <slide>
 <code>
@@ -1297,6 +1301,7 @@ async               (de forma assíncrona)
 ```
 
 ---
+### IGNORE POR ENQUANTO!
 ## Elemento `<button>`
 
 `<button />`
@@ -1321,7 +1326,7 @@ Define o tipo de botão. Valores possíveis:
 ## Elemento `<input>`
 
 `<input></input>` ou `<input />`
-Elemento que recebe valores e/ou escuta eventos.
+Elemento que recebe valores em formato de string.
 
 Exemplo:
 - Input
@@ -1335,14 +1340,6 @@ Exemplo:
 ```
 
 ### **Atributos**:
-
-***type***:
-Define o tipo do input. Valores possíveis:
-```
-scanner
-radio-button
-check-box
-```
 
 ***event***:
 Define o tipo de evento que o input vai ser ativado por. Valores possíveis:
@@ -1359,32 +1356,6 @@ Define a função que será executada ao detectar que o evento foi chamado. A fu
 
 ***placeholder***:
 Coloca um texto explícito em formatação DIM dentro do input. Tem como valor default, um caractere escondido.
-
----
-### IGNORE POR ENQUANTO!
-## Elemento `<output>`
-
-`<output></output>` ou `<output/>`
-É um campo específico onde o valor retornado através do atributo `print` será mostrado.
-
-Exemplo:
-- Input
-```ptml
-<code>
-    let valor = 30
-    let desconto = 10 / 100
-    let precototal = valor - (valor * desconto)
-    let element = PTML.Elements.FindById('valor-produto')
-    element.AttributeWithValue("print", $"R${precototal}")
-</code>
-
-<text>Valor calculado do produto: <output id="valor-produto"/></text>
-```
-
-- Output
-```
-Valor calculado do produto: R$27
-```
 
 ---
 ## Elemento `<entity>`
@@ -1715,9 +1686,97 @@ alt+v
 Elemento que define o comportamento dos filhos como sendo de um slide. Desenha apenas quando o `<carousel>` avança para seu slide.
 
 ---
+### IGNORE POR ENQUANTO!!
+## Elemento `<timeline>`
+
+`<timeline></timeline>`
+Elemento abstrato que define uma linha temporal entre seus elementos filhos.
+
+Exemplo:
+- Input
+```ptml
+<timeline>
+    <text>Starte</text>
+    <text>Downloading</text>
+    <text>Completed</text>
+</timeline>
+```
+
+- Output
+```cmd
+● Started
+│
+● Downloading
+│
+● Completed
+```
+
+---
+### IGNORE POR ENQUANTO!!
+## Elemento `<toast>`
+
+`<toast></toast>`
+Elemento concreto que cria um texto temporário na tela.
+
+### **Atributos**:
+
+***duration***:
+Duração extendida do texto em tela, Valor padrão '500ms'.
+
+---
+### IGNORE POR ENQUANTO!!
+## Elemento `<tabs>`
+
+`<tabs></tabs>`
+Elemento que define um atalho de navegação para páginas de terminal.
+
+Exemplo:
+- Input
+```ptml
+<tabs selected="1" selected-color="#0f0">
+    <tab>Home</tab>
+    <tab>About</tab>
+    <tab>Contact</tab>
+</tabs>
+```
+
+- Output
+```cmd
+- Home - | About | Contact
+```
+
+> Pressione 'TAB'
+- Output
+```cmd
+Home | - About - | Contact
+```
+
+--- 
+### IGNORE POR ENQUANTO!!
+## Elemento `<radio>`
+
+`<radio></radio>`
+Elemento abstrato que define uma lista de opções com escolha única.
+
+---
+### IGNORE POR ENQUANTO!!
+## Elemento `<checkbox>`
+
+`<checkbox></checkbox>`
+Elemento abstrato que define uma lista de opções com múltipla escolha.
+
+---
+### IGNORE POR ENQUANTO!!
+## Elemento `<option>`
+
+`<option></option>`
+Elemento concreto que desenha a opção com a regra definida pelo pai.
+
+---
 ## Elementos Banidos
 
 Elementos que foram cogitados sua adição, mas foram descartados.
 ```
 <>          -->         ...
 ```
+

@@ -1,0 +1,162 @@
+<?ptml encoding="UTF-8"?>
+
+<snippet id="title">
+    foreground="cyan"
+    font="bold"
+</snippet>
+
+<snippet id="header">
+    foreground="crystal"
+    font="bold"
+</snippet>
+
+<snippet id="ok">
+    foreground="green"
+</snippet>
+
+<snippet id="warn">
+    foreground="yellow"
+</snippet>
+
+<snippet id="error">
+    foreground="red"
+</snippet>
+
+<snippet id="link">
+    foreground="cyan"
+    font="underline"
+</snippet>
+
+<terminal y-align="center">
+    <cursor shape="underline" color="#00f"/>
+
+    <block title="source">
+        <column gap="1">
+            <text snippet="title">PTML System Dashboard</text>
+            <text foreground="lightgray">Interactive demonstration of PTML capabilities.</text>
+
+            <hr width="100%" />
+
+            <row gap="3">
+                <box width="40%">
+                    <text snippet="header">SYSTEM</text>
+
+                    <column gap="1">
+                        <row>
+                            <text>Operating System:</text>
+                            <text snippet="ok">
+                                Windows
+                            </text>
+                        </row>
+                        <row>
+                            <text>Architecture:</text>
+                            <text>x86_64</text>
+                        </row>
+                        <row>
+                            <text>Terminal: </text>
+                            <text>Windows Terminal</text>
+                        </row>
+                        <row>
+                            <text>Renderer: </text>
+                            <text snippet="ok">
+                                PTML Renderer
+                            </text>
+                        </row>
+                    </column>
+
+                </box>
+
+                <box width="60%">
+                    <column gap="1">
+                        <text snippet="header">
+                            RESOURCE USAGE
+                        </text>
+    
+                        <column gap="1">
+    
+                            <text>CPU</text>
+    
+                            <progress style="blocks" value="37" max="100"/>
+    
+                            <text>Memory</text>
+    
+                            <progress value="64" max="100"/>
+    
+                            <text>Disk</text>
+    
+                            <progress value="81" max="100"/>
+    
+                        </column>
+                    </column>
+
+                </box>
+            </row>
+
+            <hr orientation="horizontal" width="100%"/>
+
+            <box>
+                <text snippet="header">
+                    BUILD PIPELINE
+                </text>
+
+                <column gap="1">
+
+                    <row gap="1">
+
+                        <text>
+                            Compiling PTML parser...
+                        </text>
+
+                    </row>
+
+                    <row gap="1">
+
+                        <text>
+                            Generating renderer...
+                        </text>
+
+                    </row>
+
+                    <row gap="1">
+
+                        <text>
+                            Waiting for terminal...
+                        </text>
+
+                    </row>
+
+                </column>
+
+            </box>
+
+            <hr width="100%"/>
+
+            <block title="Project">
+                <column gap="1">
+                    <row>
+                        <text>Repository:</text>
+
+                        <text snippet="link" url="https://github.com/rafael-serafin1/ptml">
+                            github.com/rafael-serafin1/ptml
+                        </text>
+                    </row>
+
+                    <row>
+                        <text>Documentation:</text>
+                        <text snippet="link" url="https://ptml.dev/docs">ptml.dev/docs</text>
+                    </row>
+                </column>
+            </block>
+
+            <hr orientation="horizontal" width="100%"/>
+
+            <row gap="1">
+                <text snippet="ok">● ONLINE</text>
+                <text foreground="lightgray">PTML v1.0 Preview</text>
+            </row>
+
+        </column>
+
+    </block>
+
+</terminal>

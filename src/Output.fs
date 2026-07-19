@@ -57,6 +57,23 @@ module Output =
         | Some "double-underline" -> Some "21"
         | _ -> None
 
+    // OSC 8 ; ; URL BEL -> abre um hyperlink; o mesmo OSC com URL vazia fecha
+    let private urlCode = function
+        | Some (url: string) -> Some(sprintf "%s]8;;%s%s" escape url bell)
+        | None -> None
+
+    let private urlCloseCode = sprintf "%s]8;;%s" escape bell
+ 
+    // escreve o char da célula, envolvendo-o em OSC 8 (hyperlink) quando cell.url = Some url
+    let private appendCellChar (sb: StringBuilder) (cell: Cell) =
+        match urlCode cell.url with
+        | Some openCode ->
+            sb.Append(openCode) |> ignore
+            sb.Append(cell.char) |> ignore
+            sb.Append(urlCloseCode) |> ignore
+        | None ->
+            sb.Append(cell.char) |> ignore
+
     // OSC 12 ;color BEL -> define a cor do cursor de texto
     let private cursorColorCode (color: string option) =
         color
@@ -111,6 +128,7 @@ module Output =
         || Option.isSome (foregroundCode cell.foreground)
         || Option.isSome (backgroundCode cell.background)
         || Option.isSome (fontCode cell.font)
+        || Option.isSome (urlCode cell.url)
 
     let private shouldRenderSpinner(cell: Cell) =
         cell.char <> ' '
@@ -145,7 +163,7 @@ module Output =
                             sb.Append(resetCode) |> ignore
                             currentStyle <- ""
                         | _ -> ()
-                        sb.Append(cell.char) |> ignore
+                        appendCellChar sb cell
 
         if currentStyle <> "" then
             sb.Append(resetCode) |> ignore
@@ -215,7 +233,7 @@ module Output =
                                     sb.Append(resetCode) |> ignore
                                     currentStyle <- ""
                                 | _ -> ()
-                                sb.Append(cell.char) |> ignore
+                                appendCellChar sb cell
                 if currentStyle <> "" then
                     sb.Append(resetCode) |> ignore
                 sb.ToString()
@@ -239,7 +257,7 @@ module Output =
 
                             if shouldRenderCell cell then
                                 sb.Append(cursorTo x y) |> ignore
-                                sb.Append(cell.char) |> ignore
+                                appendCellChar sb cell
 
                         lock Console.Out (fun () ->
                             Console.Out.Write(sb.ToString())

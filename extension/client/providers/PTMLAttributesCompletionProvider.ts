@@ -184,6 +184,10 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
             name: "font",
             values: fonts
         },
+        {
+            name: "url",
+            values: [""]
+        },
         globalAttributes,   
         globalAttributes2
     ],
@@ -200,6 +204,10 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         {
             name: "font",
             values: fonts
+        },
+        {
+            name: "url",
+            values: [""]
         },
         globalAttributes,   
         globalAttributes2

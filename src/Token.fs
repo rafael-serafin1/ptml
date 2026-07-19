@@ -87,3 +87,10 @@ module Token =
         | StartTag of string * bool * list<string * string>  // tagName, selfClosing, attrs
         | EndTag of string
         | Text of string
+
+    let isSecureUrl (url: string) =
+        match Uri.TryCreate(url, UriKind.Absolute) with
+        | true, uri ->
+            uri.Scheme = Uri.UriSchemeHttps
+        | false, _ ->
+            false
