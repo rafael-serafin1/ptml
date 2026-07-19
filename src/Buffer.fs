@@ -10,9 +10,17 @@ module Buffer =
         dur: string
         complete: string
     }
+    type Cursor = {
+        sh: Cursor.Shape
+        blk: string option
+        clr: string option
+        v: string option
+    }
+
     type Cell = {
         char: char
         spinner: Spinner option
+        cursor: Cursor option
         foreground: string option
         background: string option
         font: string option
@@ -22,6 +30,7 @@ module Buffer =
     let emptyCell: Cell = {
         char = ' '
         spinner = None
+        cursor = None
         foreground = None
         background = None
         font = None
@@ -32,11 +41,28 @@ module Buffer =
         Array2D.create height width emptyCell
 
     (* SET CELL IN BUFFER *)
+    let setCursorStyle (buffer, x: int, y: int, shape: Cursor.Shape, blink: string option, color: string option, visible: string option) =
+        if x >= 0 && x < Array2D.length2 buffer && y >= 0 && y < Array2D.length1 buffer then
+            buffer.[y, x] <- {
+                char = ' ' 
+                spinner = None
+                cursor = Some {
+                    sh = shape
+                    blk = blink
+                    clr = color
+                    v = visible
+                }
+                foreground = color
+                background = None
+                font = None
+            }
+
     let setCell buffer x y char foreground background font =
         if x >= 0 && x < Array2D.length2 buffer && y >= 0 && y < Array2D.length1 buffer then
             buffer.[y, x] <- {
                 char = char
                 spinner = None
+                cursor = None
                 foreground = foreground
                 background = background
                 font = font
@@ -53,6 +79,7 @@ module Buffer =
                     dur = dur
                     complete = complete
                 }
+                cursor = None
                 foreground = fg
                 background = bg
                 font = None
@@ -74,11 +101,13 @@ module Buffer =
     let renderToBuffer buffer renderOps =
         renderOps |> List.iter (fun op ->
             match op with
+            | Render.CursorStyle(sp, x, y, blk, clr, v) ->
+                setCursorStyle (buffer, x, y, sp, blk, clr, v)
             | Render.DrawChar(text, x, y, fg, bg, font) ->
                 text
                 |> Seq.iteri (fun offset ch ->
                     setCell buffer (x + offset) y (char ch) fg bg font)
-            | Render.DrawSpinner(tp, x, y, inter, dur, complete, fg, bg) -> 
+            | Render.DrawSpinner(tp: Types, x, y, inter, dur, complete, fg, bg) -> 
                 tp 
                 |> firstFrame
                 |> Seq.iteri (fun offset ch -> 

@@ -1,0 +1,4 @@
+1. [ ] Atributo 'overflow' nao possui implementacao
+2. [ ] o diff renderer ainda está bugado e precisa ser corrigido, junto com o Watcher
+3. [ ] elemento '<cursor>' exibe duas linhas vazias no terminal que podem causar erros de renderizacao
+4. [ ] Elemento '<escape>' tem tambem o mesmo erro de espaco vazio indesejado

@@ -3,7 +3,7 @@ open PTML.Lexer
 open PTML.Token
 
 module Parser =
-    let validTags = Set.ofList ["frag"; "text"; "row"; "column"; "layer"; "box"; "block"; "terminal"; "cell"; "snippet"; "spinner"; "hr"; "progress"; "escape"; "frame"]
+    let validTags = Set.ofList ["frag"; "text"; "row"; "column"; "layer"; "box"; "block"; "terminal"; "cell"; "snippet"; "spinner"; "hr"; "progress"; "escape"; "frame"; "cursor"]
     let colorValues = Set.ofList ["none"; "black"; "red"; "green"; "gold"; "blue"; "purple"; "cyan"; "fire"; "limegreen"; "yellow"; "lightblue"; "lilac"; "crystal"; "gray"; "lightgray"; "white"]
     let fontValues = Set.ofList ["none"; "bold"; "dim"; "italic"; "underline"; "slow-blink"; "rapid-blink"; "reverse"; "conceal"; "strike-through"; "double-underline"; "overline"]
     let overflowValues = Set.ofList ["break"; "wrap"; "cut"; "clip"]
@@ -100,6 +100,12 @@ module Parser =
             "align", alignValues
             "padding", Set.empty
             "overflow", overflowValues
+        ]
+        "cursor", Map.ofList [
+            "shape", Set.ofList ["block"; "bar"; "underline"]
+            "blink", boolean
+            "visible", boolean
+            "color", Set.empty
         ]
     ]
 

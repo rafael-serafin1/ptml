@@ -41,6 +41,9 @@ module Debug =
         printfn "Render Tree: %A" renderOps
 
         let baseBuffer = processRenderTree renderOps (terminal.ViewWidth) (terminal.ViewHeight)
+        for y = 0 to 1 do
+            for x = 0 to 20 do
+                printfn "Buffer: %A" baseBuffer[y, x]
         let buffer = Depth.composeDepthLayers baseBuffer depthLayers
 
         if Utils.shouldWindow = false then

@@ -86,7 +86,6 @@ module Watch =
         watcher.NotifyFilter <- NotifyFilters.LastWrite
 
         asyncSetting(terminal, path) |> Async.RunSynchronously
-
         // do smthng when file is changed
         watcher.Changed.Add(fun _ ->
             try

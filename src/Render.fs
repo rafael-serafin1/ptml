@@ -7,6 +7,7 @@ module Render =
     type RenderOperation =
         | DrawChar of string * int * int * string option * string option * string option
         | DrawSpinner of Types * int * int * string * string * string * string option * string option
+        | CursorStyle of Cursor.Shape * int * int * string option * string option * string option
 
     let private borderChars(border: Border) =
         match border with
@@ -153,6 +154,10 @@ module Render =
 
     let rec private renderWidget offsetX offsetY widget =
         match widget with
+        | PositionedCursorWidget(sh, blk, clr, v, metrics) ->
+            let baseX = offsetX + metrics.x
+            let baseY = offsetY + metrics.y
+            [ CursorStyle(sh, baseX, baseY, blk, clr, v) ]
         | PositionedEscapeWidget(esc, _, _, metrics) -> 
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y

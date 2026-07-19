@@ -14,6 +14,7 @@ module Layout =
     }
 
     type PositionedWidget =
+        | PositionedCursorWidget of shape: Cursor.Shape * blink: string option * color: string option * visible: string option * metrics: Metrics
         | PositionedHrWidget of ori:Orientation * width: Dimension * height: Dimension * metrics: Metrics
         | PositionedSpinnerWidget of text:Types * interval:string * duration:string * completed:string * foreground:string option * background:string option * metrics:Metrics
         | PositionedTextWidget of text:string * foreground:string option * background:string option * font:string option * metrics:Metrics
@@ -125,6 +126,8 @@ module Layout =
     let rec private shiftWidget dx dy widget =
         let shiftMetrics metrics = { metrics with x = metrics.x + dx; y = metrics.y + dy }
         match widget with
+            | PositionedCursorWidget(sh, blk, clr, v, m) ->
+                PositionedCursorWidget(sh, blk, clr, v, shiftMetrics m) 
             | PositionedHrWidget(ori, width, height, metrics) ->
                 PositionedHrWidget(ori, width, height, shiftMetrics metrics)
             | PositionedSpinnerWidget(tp, interval, duration, completed, fg, bg, metrics) -> 
@@ -212,6 +215,7 @@ module Layout =
 
     let private metricsOf widget =
         match widget with
+        | PositionedCursorWidget(_, _, _, _, m)
         | PositionedHrWidget(_, _, _, m)
         | PositionedSpinnerWidget(_,_,_,_,_,_,m)
         | PositionedTextWidget(_, _, _, _, m)
@@ -282,6 +286,11 @@ module Layout =
         match widget with
         (* Layout logic for each widget type                   *)
         (* Chamada recursiva até calcular a ultima geração     *)
+        | CursorWidget(sh, blk, clr, v) ->
+            let cursorPos = Console.GetCursorPosition()
+            match cursorPos with
+            | x, y ->
+                PositionedCursorWidget(sh, blk, clr, v, { x = x; y = y; w = 0; h = 0 })
         | ProgressWidget(tp, value, maxi, width, height, show: string option) ->
             let resolvedWidth = resolveDimension width parentWidth maxi
             let resolvedHeight = max 1 lineHeight

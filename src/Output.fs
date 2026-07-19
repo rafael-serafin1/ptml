@@ -8,6 +8,7 @@ open PTML.Spinner
 module Output =
     let private escape = "\x1b"
     let private resetCode = sprintf "%s[0m" escape
+    let private bell = "\x07"
 
     let private cursorTo x y =
         sprintf "%s[%d;%dH" escape (y + 1) (x + 1)
@@ -56,6 +57,44 @@ module Output =
         | Some "double-underline" -> Some "21"
         | _ -> None
 
+    // OSC 12 ;color BEL -> define a cor do cursor de texto
+    let private cursorColorCode (color: string option) =
+        color
+        |> Option.map (fun hex -> sprintf "%s]12;%s%s" escape hex bell)
+
+    // ***shape*** + ***blink***: DECSCUSR combina os dois num único parâmetro
+    // 1/2 = block (piscando/estático), 3/4 = underline, 5/6 = bar
+    let private cursorShapeParam (shape: Cursor.Shape) (blinking: bool) =
+        match shape, blinking with
+        | Cursor.Block, true -> "1"
+        | Cursor.Block, false -> "2"
+        | Cursor.Underline, true -> "3"
+        | Cursor.Underline, false -> "4"
+        | Cursor.Bar, true -> "5"
+        | Cursor.Bar, false -> "6"
+
+    let private cursorShapeCode (shape: Cursor.Shape) (blink: string option) =
+        let blinking =
+            match blink with
+            | Some "false" -> false
+            | _ -> true // padrão do terminal é piscando
+        Some(sprintf "%s[%s q" escape (cursorShapeParam shape blinking))
+
+    // ***visible***: DECTCEM, só emite algo se o atributo foi declarado
+    let private cursorVisibilityCode (visible: string option) =
+        match visible with
+        | Some "false" -> Some(sprintf "%s[?25l" escape)
+        | Some "true" -> Some(sprintf "%s[?25h" escape)
+        | _ -> None
+
+    // Junta tudo que o <cursor> estiliza numa única sequência a ser escrita
+    let private ansiCursorStyle (cursor: Cursor) =
+        [ cursorShapeCode cursor.sh cursor.blk
+          cursorColorCode cursor.clr
+          cursorVisibilityCode cursor.v ]
+        |> List.choose id
+        |> String.concat ""
+
     let private styleCodes (cell: Cell) =
         [ 
         yield! Option.toList (foregroundCode cell.foreground)
@@ -88,10 +127,13 @@ module Output =
         for y in 0 .. height - 1 do
             for x in 0 .. width - 1 do
                 let cell = buffer.[y, x]
-                if shouldRenderCell cell then
-                    match cell.spinner with
-                    | Some c -> ()
-                    | None ->
+                if shouldRenderCell cell || Option.isSome cell.cursor then
+                    match cell.spinner, cell.cursor with
+                    | Some c, cc -> ()
+                    | None, Some cc ->
+                        sb.Append(cursorTo x y) |> ignore
+                        sb.Append(ansiCursorStyle cc) |> ignore
+                    | None, None ->
                         sb.Append(cursorTo x y) |> ignore
                         match ansiStyle cell with
                         | Some style when style <> currentStyle ->
@@ -156,19 +198,24 @@ module Output =
 
                             | _ -> ()
                     | None ->
-                        if shouldRenderCell cell then
+                        match cell.cursor with
+                        | Some cursor ->
                             sb.Append(cursorTo x y) |> ignore
-                            match ansiStyle cell with
-                            | Some style when style <> currentStyle ->
-                                if currentStyle <> "" then
+                            sb.Append(ansiCursorStyle cursor) |> ignore
+                        | None ->
+                            if shouldRenderCell cell then
+                                sb.Append(cursorTo x y) |> ignore
+                                match ansiStyle cell with
+                                | Some style when style <> currentStyle ->
+                                    if currentStyle <> "" then
+                                        sb.Append(resetCode) |> ignore
+                                    sb.Append(style) |> ignore
+                                    currentStyle <- style
+                                | None when currentStyle <> "" ->
                                     sb.Append(resetCode) |> ignore
-                                sb.Append(style) |> ignore
-                                currentStyle <- style
-                            | None when currentStyle <> "" ->
-                                sb.Append(resetCode) |> ignore
-                                currentStyle <- ""
-                            | _ -> ()
-                            sb.Append(cell.char) |> ignore
+                                    currentStyle <- ""
+                                | _ -> ()
+                                sb.Append(cell.char) |> ignore
                 if currentStyle <> "" then
                     sb.Append(resetCode) |> ignore
                 sb.ToString()

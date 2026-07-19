@@ -95,6 +95,11 @@ export class PTMLCompletionProvider
                 name: "frame",
                 snippet: 'frame',
                 documentation: '<frame></frame>'
+            }, 
+            {
+                name: "cursor",
+                snippet: 'cursor',
+                documentation: '<cursor shape="$0" />'
             }
         ];
 

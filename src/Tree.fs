@@ -113,6 +113,7 @@ module Tree =
         | SpinnerWidget of text:Types * interval: string * duration: string * completed: string * foreground:string option * background:string option
         | ProgressWidget of tp: ProgressType * value: int * max: int * width: Dimension * height: Dimension * show: string option
         | EscapeWidget of sequence: Escape.EscapeSequence * multiplier: int
+        | CursorWidget of shape: Cursor.Shape * blink: string option * color: string option * visible: string option
         | FrameWidget of tp: Frames.FrameWorks * color: string option * width: Dimension * heigth: Dimension * align:Align option * padding: int * int * children:Widget list
 
     ///
@@ -625,6 +626,12 @@ module Tree =
                 let paddingV, paddingH = tryGetAttr "padding" attrs |> Option.map parsePadding |> Option.defaultValue (0, 0)
                 let childrenWidgets = children |> List.collect buildWidget
                 [ FrameWidget(fw, fc, width, height, align, paddingV, paddingH, childrenWidgets) ]
+            | "cursor" ->
+                let shape = tryGetAttr "shape" attrs |> Option.map Cursor.parseShape |> Option.defaultValue Cursor.Shape.Underline
+                let color = tryGetAttr "color" attrs |> Option.map Cursor.parseCursorColor |> Option.defaultValue "#fff"
+                let blink = tryGetAttr "blink" attrs |> Option.defaultValue "false"
+                let visible = tryGetAttr "visible" attrs |> Option.defaultValue "true"
+                [ CursorWidget(shape, Some blink, Some color, Some visible) ]
             | _ ->
                 failwith $"Unsupported semantic tag: {tag}"
 

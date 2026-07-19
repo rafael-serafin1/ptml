@@ -1,0 +1,9 @@
+<?ptml encoding="UTF-8" terminal-resize="static"?>
+<terminal x-align="start">
+    <block title="Opa" padding="0x1">
+        <row gap="1">
+            <text>Hello World!</text>
+            <text>GoodBye World!</text>
+        </row>
+    </block>
+</terminal>
