@@ -1,3 +1,4 @@
+
 namespace PTML
 open PTML.Buffer
 
@@ -14,6 +15,8 @@ module Diff =
         && a.foreground = b.foreground
         && a.background = b.background
         && a.font = b.font
+        && a.cursor = b.cursor
+        && a.spinner = b.spinner
 
     let diffBuffers (oldBuffer: Cell[,]) (newBuffer: Cell[,]) : CellChange list =
         let oldHeight = Array2D.length1 oldBuffer

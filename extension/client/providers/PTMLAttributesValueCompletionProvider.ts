@@ -140,6 +140,24 @@ export const frameworks = [
     "pythagoras"
 ]
 
+export const shape = [
+    "block",
+    "underline",
+    "bar"
+]
+
+export const cursorColor = [
+    "red",
+    "green",
+    "blue",
+    "purple",
+    "pink",
+    "white",
+    "black",
+    "yellow",
+    "teal"
+]
+
 export class PTMLAttributeValueCompletionProvider
     implements vscode.CompletionItemProvider {
 
@@ -183,7 +201,11 @@ export class PTMLAttributeValueCompletionProvider
 
         framework: frameworks,
         "frame-color": colors,
-        
+
+        shape: shape,
+        color: cursorColor,
+        visible: boolean,
+        blink: boolean
     };
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {

@@ -62,6 +62,8 @@ module Depth =
 
     let rec private extractWidget offsetX offsetY widget =
         match widget with
+        | PositionedCursorWidget(s, b, c, v, m) ->
+            (Some (PositionedCursorWidget(s, b, c, v, m)), [])
         | PositionedDepthWidget(index, zAlign, gap, metrics, children) ->
             let absoluteX = offsetX + metrics.x
             let absoluteY = offsetY + metrics.y
