@@ -30,6 +30,7 @@ module Tree =
     }
 
     type FragmentNode = {
+            Url: string option
             Foreground : string option
             Background : string option
             Font : string option
@@ -101,8 +102,8 @@ module Tree =
     // discriminated union for semantic tree
     type Widget =
         | HrWidget of orientation: Orientation * width: Dimension * height: Dimension
-        | TextWidget of text:string * foreground:string option * background:string option * font:string option
-        | FragWidget of text:string * foreground:string option * background:string option * font:string option
+        | TextWidget of text:string * foreground:string option * background:string option * font:string option * url: string option
+        | FragWidget of text:string * foreground:string option * background:string option * font:string option * url: string option
         | RowWidget of width:Dimension * border:Border * gap:int * align:Align option * children:Widget list
         | ColumnWidget of width:Dimension * border:Border * gap:int * yAlign:Align option * children:Widget list
         | DepthWidget of index:int * zAlign: Align option * gap: int * children: Widget list
@@ -164,6 +165,7 @@ module Tree =
             |> String.concat ""
 
         let buildFragmentNode attrs children = {
+            Url = tryGetAttrLocal "url" attrs
             Foreground = tryGetAttrLocal "foreground" attrs
             Background = tryGetAttrLocal "background" attrs
             Font = tryGetAttrLocal "font" attrs
@@ -486,32 +488,34 @@ module Tree =
     let private buildTextNodeWidgets contents =
         contents
         |> List.collect (function
-            | RawText text -> [ TextWidget(text, None, None, None) ]
-            | Fragment fragment -> [ TextWidget(fragment.Content, fragment.Foreground, fragment.Background, fragment.Font) ]
+            | RawText text -> [ TextWidget(text, None, None, None, None) ]
+            | Fragment fragment -> [ TextWidget(fragment.Content, fragment.Foreground, fragment.Background, fragment.Font, fragment.Url) ]
         )
 
-    let private applyTextStyle widget parentFg parentBg parentFont =
+    let private applyTextStyle widget parentFg parentBg parentFont parentUrl =
         match widget with
         | EscapeWidget(seq, multi) ->
             let char = concatEscapes(seq, multi)
-            TextWidget(char, None, None, None)
-        | TextWidget(text, fg, bg, font) ->
+            TextWidget(char, None, None, None, None)
+        | TextWidget(text, fg, bg, font, url) ->
             let finalFg = if fg.IsSome then fg else parentFg
             let finalBg = if bg.IsSome then bg else parentBg
             let finalFont = if font.IsSome then font else parentFont
-            TextWidget(text, finalFg, finalBg, finalFont)
+            let finalUrl = if url.IsSome then url else parentUrl
+            TextWidget(text, finalFg, finalBg, finalFont, finalUrl)
         | _ -> failwith "Invalid child inside <text>."
 
-    let private applyFragStyle widget parentFg parentBg parentFont =
+    let private applyFragStyle widget parentFg parentBg parentFont parentUrl =
         match widget with
         | EscapeWidget(seq, multi) ->
             let char = concatEscapes(seq, multi)
-            FragWidget(char, None, None, None)
-        | FragWidget(text, fg, bg, font) ->
+            FragWidget(char, None, None, None, None)
+        | FragWidget(text, fg, bg, font, url) ->
             let finalFg = if fg.IsSome then fg else parentFg
             let finalBg = if bg.IsSome then bg else parentBg
             let finalFont = if font.IsSome then font else parentFont
-            FragWidget(text, finalFg, finalBg, finalFont)
+            let finalUrl = if url.IsSome then url else parentUrl
+            FragWidget(text, finalFg, finalBg, finalFont, url)
         | _ -> failwith "Invalid child inside <frag>."
 
     let rec buildSemanticTree ast =
@@ -532,16 +536,18 @@ module Tree =
                 let parentFg = tryGetAttr "foreground" attrs
                 let parentBg = tryGetAttr "background" attrs
                 let parentFont = tryGetAttr "font" attrs
+                let url = tryGetAttr "url" attrs
                 let childrenWidgets = children |> List.collect buildWidget
                 childrenWidgets
-                |> List.map (fun widget -> applyTextStyle widget parentFg parentBg parentFont)
+                |> List.map (fun widget -> applyTextStyle widget parentFg parentBg parentFont url)
             | "frag" ->
                 let parentFg = tryGetAttr "foreground" attrs
                 let parentBg = tryGetAttr "background" attrs
                 let parentFont = tryGetAttr "font" attrs
+                let url = tryGetAttr "url" attrs
                 let childrenWidgets = children |> List.collect buildWidget
                 childrenWidgets
-                |> List.map (fun widget -> applyFragStyle widget parentFg parentBg parentFont)
+                |> List.map (fun widget -> applyFragStyle widget parentFg parentBg parentFont url)
             | "row" ->
                 let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
                 let border = tryGetAttr "border" attrs |> Option.map parseBorder |> Option.defaultValue NoBorder

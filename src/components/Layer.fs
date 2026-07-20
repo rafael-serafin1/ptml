@@ -144,10 +144,10 @@ module Depth =
         | PositionedSpinnerWidget(tp, interval, duration, completed, foreground, background, metrics) ->
             (Some (PositionedSpinnerWidget(tp, interval, duration, completed, foreground, background, metrics)), [])
 
-        | PositionedTextWidget(text, foreground, background, font, metrics) ->
-            (Some (PositionedTextWidget(text, foreground, background, font, metrics)), [])
-        | PositionedFragWidget(text, foreground, background, font, metrics) ->
-            (Some (PositionedFragWidget(text, foreground, background, font, metrics)), [])
+        | PositionedTextWidget(text, foreground, background, font, url, metrics) ->
+            (Some (PositionedTextWidget(text, foreground, background, font, url, metrics)), [])
+        | PositionedFragWidget(text, foreground, background, font, url, metrics) ->
+            (Some (PositionedFragWidget(text, foreground, background, font, url, metrics)), [])
         | PositionedHrWidget(ori, width, height, metrics) -> 
             (Some (PositionedHrWidget(ori, width, height, metrics)), [])
         | PositionedProgressWidget(tp, value, maxi, w, h, str, metrics) ->
@@ -180,7 +180,7 @@ module Depth =
                 for x in 0 .. layer.Width - 1 do
                     let cell = layer.Buffer.[y, x]
                     if isVisibleCell cell then
-                        setCell baseBuffer (xOffset + x) (yOffset + y) cell.char cell.foreground cell.background cell.font
+                        setCell baseBuffer (xOffset + x) (yOffset + y) cell.char cell.foreground cell.background cell.font cell.url
             )
         baseBuffer
 

@@ -14,6 +14,7 @@ open PTML.Depth
 module Runner =
     let run(path: string): Status =
         let mutable terminal: Terminal option = None
+        let T = getViewport()
         if Utils.shouldWindow then
             terminal <- Some (basicTerminal)
         else
@@ -41,8 +42,9 @@ module Runner =
         let buffer: Cell array2d = Depth.composeDepthLayers baseBuffer depthLayers
 
         if Utils.shouldWindow = false then
-            Console.WindowWidth <- 203
-            Console.WindowHeight <- 30
+            Console.WindowWidth <- T.SafeWidth
+            Console.WindowHeight <- T.SafeHeight
+
         Console.Write("\x1b[2J\x1b[H")
         Output.printAnsiBuffer(buffer)
         for y = 0 to buffer.GetLength(0) - 1 do

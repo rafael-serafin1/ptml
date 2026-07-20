@@ -24,6 +24,7 @@ module Buffer =
         foreground: string option
         background: string option
         font: string option
+        url: string option
     }
 
     (* EMPTY CELL *)
@@ -34,6 +35,7 @@ module Buffer =
         foreground = None
         background = None
         font = None
+        url = None
     }
 
     (* BUFFER INITIALIZATION *)
@@ -55,9 +57,10 @@ module Buffer =
                 foreground = color
                 background = None
                 font = None
+                url = None
             }
 
-    let setCell buffer x y char foreground background font =
+    let setCell buffer x y char foreground background font url =
         if x >= 0 && x < Array2D.length2 buffer && y >= 0 && y < Array2D.length1 buffer then
             buffer.[y, x] <- {
                 char = char
@@ -66,6 +69,7 @@ module Buffer =
                 foreground = foreground
                 background = background
                 font = font
+                url = url
             }
     
     let setSpinnerCell(buffer, typ, x, y, inter, dur, complete, fg, bg)=
@@ -83,6 +87,7 @@ module Buffer =
                 foreground = fg
                 background = bg
                 font = None
+                url = None
             }
 
     (* STEP 1: CLEAR BUFFER *)
@@ -103,10 +108,10 @@ module Buffer =
             match op with
             | Render.CursorStyle(sp, x, y, blk, clr, v) ->
                 setCursorStyle (buffer, x, y, sp, blk, clr, v)
-            | Render.DrawChar(text, x, y, fg, bg, font) ->
+            | Render.DrawChar(text, x, y, fg, bg, font, url) ->
                 text
                 |> Seq.iteri (fun offset ch ->
-                    setCell buffer (x + offset) y (char ch) fg bg font)
+                    setCell buffer (x + offset) y (char ch) fg bg font url)
             | Render.DrawSpinner(tp: Types, x, y, inter, dur, complete, fg, bg) -> 
                 tp 
                 |> firstFrame

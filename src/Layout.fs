@@ -17,8 +17,8 @@ module Layout =
         | PositionedCursorWidget of shape: Cursor.Shape * blink: string option * color: string option * visible: string option * metrics: Metrics
         | PositionedHrWidget of ori:Orientation * width: Dimension * height: Dimension * metrics: Metrics
         | PositionedSpinnerWidget of text:Types * interval:string * duration:string * completed:string * foreground:string option * background:string option * metrics:Metrics
-        | PositionedTextWidget of text:string * foreground:string option * background:string option * font:string option * metrics:Metrics
-        | PositionedFragWidget of text: string * foreground: string option * background: string option * font: string option * metrics: Metrics
+        | PositionedTextWidget of text:string * foreground:string option * background:string option * font:string option * url:string option * metrics:Metrics
+        | PositionedFragWidget of text: string * foreground: string option * background: string option * font: string option * url:string option * metrics: Metrics
         | PositionedRowWidget of width:Dimension * border:Border * gap:int * align:Align option * metrics:Metrics * children:PositionedWidget list
         | PositionedColumnWidget of width:Dimension * border:Border * gap:int * yAlign:Align option * metrics:Metrics * children:PositionedWidget list
         | PositionedDepthWidget of index:int * zAlign:Align option * gap:int * metrics:Metrics * children:PositionedWidget list
@@ -132,8 +132,8 @@ module Layout =
                 PositionedHrWidget(ori, width, height, shiftMetrics metrics)
             | PositionedSpinnerWidget(tp, interval, duration, completed, fg, bg, metrics) -> 
                 PositionedSpinnerWidget(tp, interval, duration, completed, fg, bg, shiftMetrics metrics)
-            | PositionedTextWidget(text, fg, bg, font, metrics) -> PositionedTextWidget(text, fg, bg, font, shiftMetrics metrics)
-            | PositionedFragWidget(text, fg, bg, font, metrics) -> PositionedTextWidget(text, fg, bg, font, shiftMetrics metrics)
+            | PositionedTextWidget(text, fg, bg, font, url,  metrics) -> PositionedTextWidget(text, fg, bg, font, url, shiftMetrics metrics)
+            | PositionedFragWidget(text, fg, bg, font, url, metrics) -> PositionedTextWidget(text, fg, bg, font, url, shiftMetrics metrics)
             | PositionedRowWidget(width, border, gap, align, metrics, children) ->
                 PositionedRowWidget(width, border, gap, align, shiftMetrics metrics, children)
             | PositionedColumnWidget(width, border, gap, yAlign, metrics, children) ->
@@ -218,8 +218,8 @@ module Layout =
         | PositionedCursorWidget(_, _, _, _, m)
         | PositionedHrWidget(_, _, _, m)
         | PositionedSpinnerWidget(_,_,_,_,_,_,m)
-        | PositionedTextWidget(_, _, _, _, m)
-        | PositionedFragWidget(_, _, _, _, m)
+        | PositionedTextWidget(_, _, _, _, _, m)
+        | PositionedFragWidget(_, _, _, _, _, m)
         | PositionedRowWidget(_, _, _, _, m, _)
         | PositionedColumnWidget(_, _, _, _, m, _)
         | PositionedCellWidget(m, _)
@@ -303,12 +303,12 @@ module Layout =
             let w = Spinner.maxFrameWidth types
             let h = lineHeight 
             PositionedSpinnerWidget(types, interval, duration, completed, fg, bg, { x = 0; y = 0; w = w; h = h })
-        | TextWidget(text, fg, bg, font) ->
+        | TextWidget(text, fg, bg, font, url) ->
             let w, h = calculateTextMetrics text
-            PositionedTextWidget(text, fg, bg, font, { x = 0; y = 0; w = w * charWidth; h = max lineHeight h })
-        | FragWidget(text, fg, bg, font) ->
+            PositionedTextWidget(text, fg, bg, font, url, { x = 0; y = 0; w = w * charWidth; h = max lineHeight h })
+        | FragWidget(text, fg, bg, font, url) ->
             let w, h = calculateTextMetrics text
-            PositionedFragWidget(text, fg, bg, font, { x = 0; y = 0; w = w * charWidth; h = max lineHeight h })
+            PositionedFragWidget(text, fg, bg, font, url, { x = 0; y = 0; w = w * charWidth; h = max lineHeight h })
         | EscapeWidget(seq, multi) ->
             let w, h = resolveEscapeMetrics(seq, multi)
             let esc = Escape.concatEscapes(seq, multi)

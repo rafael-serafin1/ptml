@@ -2,3 +2,6 @@
 2. [ ] o diff renderer ainda está bugado e precisa ser corrigido, junto com o Watcher
 3. [ ] elemento '<cursor>' exibe duas linhas vazias no terminal que podem causar erros de renderizacao
 4. [ ] Elemento '<escape>' tem tambem o mesmo erro de espaco vazio indesejado
+5. [X] Implementar o atributo 'url' para os elementos '<text>' e '<frag>'
+6. [X] Bom, o hiperlink atraves do atributo 'url' funciona, so que cada caracter da string fica com o hiperlink ao inves da string inteira. Nao acho que isso seja um problema, mas vou deixar aqui como lembraca
+7. [ ] Adicionar um sistema de observação do arquivo PTML que simule o funcionamento de uma web aplicacao, com hotload em tempo real e consistente

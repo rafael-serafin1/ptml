@@ -12,6 +12,7 @@ module Diff =
 
     let private cellEquals (a: Cell) (b: Cell) =
         a.char = b.char
+        && a.url = b.url
         && a.foreground = b.foreground
         && a.background = b.background
         && a.font = b.font

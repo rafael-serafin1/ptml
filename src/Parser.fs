@@ -33,11 +33,13 @@ module Parser =
             "foreground", colorValues
             "background", colorValues
             "font", fontValues
+            "url", Set.empty
         ]   
         "text", Map.ofList [
             "foreground", colorValues
             "background", colorValues
             "font", fontValues
+            "url", Set.empty
         ]
         "row", Map.ofList [
             "overflow", overflowValues
@@ -156,6 +158,11 @@ module Parser =
                                 else InvalidValue $"Invalid {name}: {value}"
                             else
                                 Valid
+                        | "url" -> 
+                            if isSecureUrl(value) then
+                                Valid
+                            else
+                                InvalidValue $"Invalid URL: {value}"
                         | "padding" ->
                             let parts : string[] = value.Split([| 'x' |])
                             let parsePaddingPart (part: string) =
