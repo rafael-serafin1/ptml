@@ -37,8 +37,13 @@ Terminal Buffer
 
 ↓
 
+Terminal State 
+"estado do terminal"
+
+↓
+
 Diff Engine
-“detecta mudanças”
+“detecta mudanças e renderiza”
 
 ↓
 

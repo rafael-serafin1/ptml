@@ -46,7 +46,7 @@ module Runner =
             Console.WindowHeight <- T.SafeHeight
 
         Console.Write("\x1b[2J\x1b[H")
-        Output.printAnsiBuffer(buffer)
+        Output.writeAnsiBuffer(buffer)
         for y = 0 to buffer.GetLength(0) - 1 do
             for x = 0 to buffer.GetLength(0) - 1 do
                 let cell = buffer[y, x]

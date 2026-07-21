@@ -4,6 +4,7 @@ open System.Text
 open PTML.Buffer
 open System.Threading
 open PTML.Spinner
+open PTML.State
 
 module Output =
     let private escape = "\x1b"
@@ -267,3 +268,69 @@ module Output =
 
         threads |> Array.iter (fun t -> t.Start())
         threads |> Array.iter (fun t -> t.Join())
+
+    (* ===================== BUFFER STATE ===================== *)
+    // A Output é quem de fato escreve no terminal físico, então é o lugar
+    // certo pra saber "o terminal mudou de tamanho desde a última vez que
+    // eu escrevi nele?" e reagir sozinha — sem depender de quem chama
+    // lembrar de checar isso a cada frame.
+
+    // O que a Output acredita estar na tela agora (último frame desenhado).
+    let mutable private terminalState: State.BufferState option = None
+
+    // Tamanho físico atual do terminal. Terminais sem TTY (pipe, CI, etc.)
+    // lançam exceção ao ler WindowWidth/WindowHeight; nesse caso caímos
+    // pro próprio tamanho do buffer que está sendo desenhado.
+    let private physicalDimensions (fallbackWidth: int) (fallbackHeight: int) =
+        try
+            Console.WindowWidth, Console.WindowHeight
+        with _ ->
+            fallbackWidth, fallbackHeight
+
+    let private ensureState width height =
+        match terminalState with
+        | Some s -> s
+        | None ->
+            let s = State.createState width height
+            terminalState <- Some s
+            s
+            
+    let getState () = terminalState
+    let invalidateState () = terminalState <- None
+    let private fullRedraw (buffer: Cell[,]) =
+        Console.Clear()
+        writeAnsiBuffer buffer
+
+    // Trava de segurança: se o usuário estiver arrastando a borda da janela
+    // continuamente, não queremos entrar num loop de redraw infinito.
+    let private maxRedrawAttempts = 3
+    let render (buffer: Cell[,]) =
+        let bufferHeight = Array2D.length1 buffer
+        let bufferWidth = Array2D.length2 buffer
+
+        let rec attempt (n: int) =
+            let state = ensureState bufferWidth bufferHeight
+            let (widthBefore, heightBefore) = physicalDimensions bufferWidth bufferHeight
+            let needsFullRedraw =
+                state.firstRender || State.hasResized state widthBefore heightBefore
+
+            if needsFullRedraw then
+                fullRedraw buffer
+            else
+                writeAnsiBuffer buffer
+
+            let (widthAfter, heightAfter) = physicalDimensions bufferWidth bufferHeight
+            let changedDuringWrite =
+                widthAfter <> widthBefore || heightAfter <> heightBefore
+
+            if changedDuringWrite && n < maxRedrawAttempts then
+                // o terminal mudou de tamanho embaixo da gente: descarta o
+                // estado conhecido e tenta desenhar de novo já ciente disso
+                terminalState <- Some(State.invalidate state widthAfter heightAfter)
+                attempt (n + 1)
+            else
+                let (finalWidth, finalHeight) = physicalDimensions bufferWidth bufferHeight
+                let synced, _ = State.sync state buffer finalWidth finalHeight
+                terminalState <- Some synced
+
+        attempt 1

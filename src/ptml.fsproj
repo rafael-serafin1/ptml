@@ -26,6 +26,7 @@
     <Compile Include="Layout.fs"                    />
     <Compile Include="Render.fs"                    />
     <Compile Include="Buffer.fs"                    />
+    <Compile Include="BufferState.fs"               />
     <Compile Include="Diff.fs"                      />
     <Compile Include="DiffRenderer.fs"              />
     <Compile Include="Output.fs"                    />
