@@ -31,7 +31,7 @@
     <cursor shape="underline" color="#00f"/>
 
     <block title="PTML System Dashboard">
-        <column gap="1">
+        <column >
             <escape sequence="break" />
             <text foreground="lightgray">Interactive demonstration of PTML capabilities.</text>
 

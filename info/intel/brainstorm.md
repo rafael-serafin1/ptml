@@ -32,7 +32,6 @@ Sendo assim, atualmente os concretos são:
 ---> Em desenvolvimento
 <tree>
 <toast>
-<option>
 <input>
 <entity>
 <bind>
@@ -51,9 +50,7 @@ Agora, os abstratos são:
 <cursor>
 ---> Em desenvolvimento
 <timeline>
-<radio>
-<checkbox>
-<carousel>
+<carousel>  
 <slide>
 <code>
 <function>
@@ -1099,6 +1096,59 @@ Exemplo .3:
 └────────────────┴────────────────┘
 ```
 
+> OBS: Como toda célula, a divisão é feita de forma proporcional, ou seja, nunca se divide por números ímpares.
+
+Exemplo 1:
+- Input
+```ptml
+<box>
+    <cell></cell>
+</box>
+```
+
+- Output
+```
+┌┬┐
+││|
+└┴┘
+```
+
+Exemplo 2:
+- Input
+```ptml
+<box>
+    <cell></cell>
+    <cell></cell>
+</box>
+```
+
+- Output
+```
+┌┬┐
+││|
+└┴┘
+```
+> Sim, o mesmo output do anterior
+
+Exemplo 2:
+- Input
+```ptml
+<box>
+    <cell></cell>
+    <cell></cell>
+    <cell></cell>
+</box>
+```
+
+- Output
+```
+┌┬┐
+│││
+├┼┤         
+│││
+└┴┘
+```
+
 ---
 ## Elemento `<spinner>`
 
@@ -1239,17 +1289,17 @@ Elemento usado para descrever listas.
 
 ### **Atributos**:
 
-***oftype***:
+***ofstyle***:
 Define como a lista será escrita.
 ```
-unorder             (não ordernada -, -, -)
-order               (ordenada ○, ○, ○)
-enum                (enumerada ex: 1,2,3)
-alphabet            (ex: a, b, c)
-Alphabet            (ex: A, B, C)
+unorder                     (não ordernada -, -, -)
+order                       (ordenada ○, ○, ○)
+enum                        (enumerada ex: 1,2,3)
+lower-alphabet              (ex: a, b, c)
+upper-alphabet              (ex: A, B, C)
 ```
 
-***items-behavior***:
+***oftype***:
 Define o comportamento dos items da lista. Valores possíveis:
 ```
 text                        (valor padrão, apenas texto)
@@ -1358,6 +1408,7 @@ Define a função que será executada ao detectar que o evento foi chamado. A fu
 Coloca um texto explícito em formatação DIM dentro do input. Tem como valor default, um caractere escondido.
 
 ---
+### IGNORE POR ENQUANTO!
 ## Elemento `<entity>`
 
 `<entity></entity>` ou `<entity />`
@@ -1397,7 +1448,7 @@ Descreve a relação entre as duas entidades.
 ### IGNORE POR ENQUANTO!
 ## Elemento `<tree>`
 
-`<tree></tree>`
+`<tree />`  
 Elemento que desenha uma árvore de diretórios no terminal.
 
 ### **Atributos**:
@@ -1751,32 +1802,10 @@ Exemplo:
 Home | - About - | Contact
 ```
 
---- 
-### IGNORE POR ENQUANTO!!
-## Elemento `<radio>`
-
-`<radio></radio>`
-Elemento abstrato que define uma lista de opções com escolha única.
-
 ---
-### IGNORE POR ENQUANTO!!
-## Elemento `<checkbox>`
+### IGNORE POR ENQUANTO!
+## Elemento `<modal>`
 
-`<checkbox></checkbox>`
-Elemento abstrato que define uma lista de opções com múltipla escolha.
-
----
-### IGNORE POR ENQUANTO!!
-## Elemento `<option>`
-
-`<option></option>`
-Elemento concreto que desenha a opção com a regra definida pelo pai.
-
----
-## Elementos Banidos
-
-Elementos que foram cogitados sua adição, mas foram descartados.
-```
-<>          -->         ...
-```
+`<modal></modal>`
+Elemento abstrato que define um modal popup.
 

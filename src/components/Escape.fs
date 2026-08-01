@@ -2,6 +2,7 @@ namespace PTML
 
 module Escape =
     type EscapeSequence =
+    | NewLine
     | Break
     | HorizontalTab
     | VerticalTab
@@ -12,7 +13,7 @@ module Escape =
 
     let chars(seq: EscapeSequence): string =
         match seq with
-        | Break -> "\n"
+        | NewLine | Break -> "\n"
         | HorizontalTab -> "\t"
         | VerticalTab -> "\v"
         | BackSpace -> "\b"

@@ -115,6 +115,7 @@ module Layout =
 
     let private resolveEscapeMetrics(sequence: EscapeSequence, multiplier: int) =
         match sequence with
+        | EscapeSequence.NewLine
         | EscapeSequence.Break
         | EscapeSequence.VerticalTab
         | EscapeSequence.FormFeed -> (0, max 1 multiplier)
@@ -270,6 +271,7 @@ module Layout =
         match widget with
         | PositionedEscapeWidget(_, seq, multi, _) ->
             match seq with
+            | EscapeSequence.NewLine
             | EscapeSequence.Break
             | EscapeSequence.VerticalTab
             | EscapeSequence.FormFeed -> (0, max 1 multi)
@@ -489,31 +491,20 @@ module Layout =
 
             let positionedChildren = children |> List.map (fun child -> layoutWidget child (Some cmd.SafeWidth) (Some cmd.SafeHeight))
 
-            let childWidths = positionedChildren |> List.map totalWidth
-            let childHeights = positionedChildren |> List.map flowHeight
-
-            let contentWidth = if List.isEmpty childWidths then 0 else List.max childWidths
-            let contentHeight = if List.isEmpty childHeights then 0 else List.sum childHeights
-
             let resolvedWidth = resolveDimension width (Some cmd.SafeWidth) cmd.SafeWidth
             let resolvedHeight = resolveDimension height (Some cmd.SafeHeight) cmd.SafeHeight
 
-            let baseX = alignOffset cmd.SafeWidth resolvedWidth alignX
-            let baseY = alignOffset cmd.SafeHeight resolvedHeight alignY
-
+            // não possui direção de fluxo própria: filhos diretos (sem <row>/<column>)
+            // são posicionados na mesma origem e se sobrepõem, como um <layer>/<cell>.
             let positionedChildren =
-                let rec place children yOffset acc =
-                    match children with
-                    | [] -> List.rev acc
-                    | child :: rest ->
-                        let childTotalWidth = totalWidth child
-                        let childFlowHeight = flowHeight child
-                        let xOffset = alignOffset resolvedWidth childTotalWidth alignX
-                        let positioned = shiftWidget xOffset yOffset child
-                        let nextY = yOffset + childFlowHeight
-                        place rest nextY (positioned :: acc)
-                place positionedChildren 0 []
-            let positionedChildren = positionedChildren |> List.map (shiftWidget baseX baseY)
+                positionedChildren
+                |> List.map (fun child ->
+                    let childTotalWidth = totalWidth child
+                    let childTotalHeight = totalHeight child
+                    let xOffset = alignOffset resolvedWidth childTotalWidth alignX
+                    let yOffset = alignOffset resolvedHeight childTotalHeight alignY
+                    shiftWidget xOffset yOffset child)
+
             PositionedTerminalWidget(width, height, alignX, alignY, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren) 
 
         | FrameWidget(tp, fc,  width, height, align, paddingV: int, paddingH: int, children) -> 

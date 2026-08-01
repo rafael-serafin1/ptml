@@ -117,6 +117,7 @@ export const boolean = [
 ]
 
 export const escapesSequence = [
+    "new-line",
     "break",
     "horizontal-tab",
     "vertical-tab",

@@ -31,6 +31,12 @@ module Watch =
     let mutable previousBuffer = 
         createBuffer (getOutputViewport().SafeWidth) (getOutputViewport().SafeHeight)
     let mutable firstRender = true
+
+    // fica 'true' enquanto o console tiver conteúdo que não está refletido em
+    // 'previousBuffer' (ex: uma mensagem de erro escrita direto na tela por
+    // ErrorHandle.renderError). Nesse estado, um diff contra 'previousBuffer'
+    // não é confiável, pois pode concluir "nada mudou" e deixar lixo na tela.
+    let mutable needsFullRender = true
     let asyncSetting(terminal: Terminal, path) = 
         async {
             let input: string = readWhenReady path 10
@@ -50,15 +56,17 @@ module Watch =
                 Console.WindowWidth <- 219
                 Console.WindowHeight <- 55
 
-            if firstRender then
+            if firstRender || needsFullRender then
                 Console.Clear()
                 DiffRenderer.renderBuffer buffer
                 firstRender <- false
+                needsFullRender <- false
             else
                 DiffRenderer.renderBufferDiffs previousBuffer buffer
             
             let bufferHeight = buffer.GetLength(0)
             let bufferWidth = buffer.GetLength(1)
+            
             for y = 0 to bufferHeight - 1 do
                 for x = 0 to bufferWidth - 1 do
                     let cell = buffer[y, x]
@@ -80,11 +88,21 @@ module Watch =
     let runRender(terminal: Terminal, path: string) =
         lock renderLock (fun () ->
             try
+                // limpa a mensagem de erro anterior (se houver) ANTES de desenhar o
+                // novo conteúdo. Fazer isso depois do render sobrescreveria o conteúdo
+                // recém-desenhado com espaços em branco do tamanho de 'msn'.
+                if msn <> "" then
+                    ErrorHandle.clearError msn
+                    msn <- ""
+
                 asyncSetting(terminal, path) |> Async.RunSynchronously
-                ErrorHandle.clearError msn      // clear previous error message from 'with'
             with ex ->
                 ErrorHandle.renderError (ex.Message)
                 msn <- ex.Message
+                // a mensagem de erro foi escrita direto no console e não está
+                // refletida em 'previousBuffer'; força um render completo na
+                // próxima tentativa bem-sucedida para não deixar resíduo na tela
+                needsFullRender <- true
         )
 
     let setWatcher(path: string) =
@@ -140,6 +158,7 @@ module Watch =
         // isso falha silenciosamente sem esse handler
         watcher.Error.Add(fun e ->
             ErrorHandle.renderError (e.GetException().Message)
+            needsFullRender <- true
         )
 
         watcher.EnableRaisingEvents <- true
@@ -149,4 +168,3 @@ module Watch =
         Console.CursorVisible <- false
         setWatcher(path) 
         Status.Success
-

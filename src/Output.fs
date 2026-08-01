@@ -269,12 +269,6 @@ module Output =
         threads |> Array.iter (fun t -> t.Start())
         threads |> Array.iter (fun t -> t.Join())
 
-    (* ===================== BUFFER STATE ===================== *)
-    // A Output é quem de fato escreve no terminal físico, então é o lugar
-    // certo pra saber "o terminal mudou de tamanho desde a última vez que
-    // eu escrevi nele?" e reagir sozinha — sem depender de quem chama
-    // lembrar de checar isso a cada frame.
-
     // O que a Output acredita estar na tela agora (último frame desenhado).
     let mutable private terminalState: State.BufferState option = None
 
