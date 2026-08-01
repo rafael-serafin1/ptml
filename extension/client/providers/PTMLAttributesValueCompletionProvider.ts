@@ -87,7 +87,8 @@ export const spinners = [
     "square",
     "arrow",
     "bounce",
-    "moon"
+    "moon",
+    "fill"
 ]
 
 export const completed = [

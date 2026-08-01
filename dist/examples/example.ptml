@@ -30,7 +30,7 @@
 <terminal x-align="center">
     <cursor shape="underline" color="#00f"/>
 
-    <block title="PTML System Dashboard">
+    <block title="PTML System Dashboard" border-color="#ec8d8d">
         <column >
             <escape sequence="break" />
             <text foreground="lightgray">Interactive demonstration of PTML capabilities.</text>
@@ -100,33 +100,24 @@
                 </text>
 
                 <column gap="1">
-
                     <row gap="1">
-
                         <text>
                             Compiling PTML parser...
                         </text>
-
                     </row>
 
                     <row gap="1">
-
                         <text>
                             Generating renderer...
                         </text>
-
                     </row>
 
                     <row gap="1">
-
                         <text>
                             Waiting for terminal...
                         </text>
-
                     </row>
-
                 </column>
-
             </box>
 
             <hr width="100%"/>

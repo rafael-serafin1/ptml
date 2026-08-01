@@ -87,7 +87,6 @@ module Layout =
             | Some parent -> max 0 (parent * p / 100)
             | None -> 0
 
-
     let private tabSize = 4
 
     let private calculateTextMetrics (text: string) =

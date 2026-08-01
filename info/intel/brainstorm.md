@@ -1179,6 +1179,7 @@ square          (◰ ◳ ◲ ◱)
 moon            (◜ ◝ ◞ ◟)
 arrow           (← ↖ ↑ ↗ → ↘ ↓ ↙)
 bounce          (⠁ ⠂ ⠄ ⠂)
+fill            (▁ ▂ ▃ ▄ ▅ ▆ ▇ █)
 ```
 
 ***interval***:

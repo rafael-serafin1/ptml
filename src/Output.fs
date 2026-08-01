@@ -31,7 +31,12 @@ module Output =
         | Some "crystal" -> Some "1;36"
         | Some "gray" -> Some "1;30"
         | Some "lightgray" -> Some "1;37"
-        | _ -> None
+        | s ->              //hexadecimal support for foreground
+            match s with
+            | Some hex -> 
+                Some (Utils.hexadecimal(hex, Utils.Foreground))
+            | None -> None
+
 
     let private backgroundCode = function
         | Some "black" -> Some "40"
@@ -42,7 +47,11 @@ module Output =
         | Some "purple" -> Some "45"
         | Some "cyan" -> Some "46"
         | Some "white" -> Some "47"
-        | _ -> None
+        | s ->             // hexadecimal support for background
+            match s with 
+            | Some hex ->
+                Some (Utils.hexadecimal(hex, Utils.Background))
+            | None -> None
 
     let private fontCode = function
         | Some "bold" -> Some "1"

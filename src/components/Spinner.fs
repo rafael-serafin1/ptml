@@ -17,6 +17,7 @@ module Spinner =
     | Square
     | Arrow
     | Bounce
+    | Fill
 
     let private consoleLock = obj()
 
@@ -81,6 +82,7 @@ module Spinner =
         | Moon -> [| "◜"; "◝"; "◞"; "◟" |]
         | Arrow -> [| "←"; "↖"; "↑"; "↗"; "→"; "↘"; "↓"; "↙" |]
         | Bounce -> [| "⠁"; "⠂"; "⠄"; "⠂" |]
+        | Fill -> [| "▁"; "▂"; "▃"; "▄"; "▅"; "▆"; "▇"; "█" |]
 
     let firstFrame tp =
         let fm = framesOfType tp

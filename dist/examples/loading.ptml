@@ -1,0 +1,7 @@
+<?ptml encoding="UTF-8" terminal-resize="static"?>
+<terminal x-align="center">
+    <row gap="1">
+        <text foreground="#430257" background="#fdfafa">Loading</text>
+        <spinner type="fill" interval="200ms" duration="2000ms" completed="check" />
+    </row>
+</terminal>

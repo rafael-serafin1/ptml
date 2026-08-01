@@ -23,7 +23,11 @@ module DiffRenderer =
         | Some "crystal" -> Some "1;36"
         | Some "gray" -> Some "1;30"
         | Some "lightgray" -> Some "1;37"
-        | _ -> None
+        | s -> 
+            match s with
+            | Some hex -> 
+                Some (Utils.hexadecimal(hex, Utils.Foreground))
+            | None -> None
 
     let private backgroundCode = function
         | Some "black" -> Some "40"
