@@ -66,6 +66,7 @@ module Layout =
     let private charWidth = 1
     let private lineHeight = 1
 
+    (* DIMENSION RESOLVE HELPER *)
     let resolveDimension dimension parentSize fallback =
         match dimension with
         | Auto -> fallback
@@ -87,42 +88,7 @@ module Layout =
             | Some parent -> max 0 (parent * p / 100)
             | None -> 0
 
-    let private tabSize = 4
-
-    let private calculateTextMetrics (text: string) =
-        let mutable maxWidth = 0
-        let mutable currentWidth = 0
-        let mutable lines = 0
-        let updateLine () =
-            if currentWidth > maxWidth then maxWidth <- currentWidth
-            currentWidth <- 0
-        for ch in text do
-            match ch with
-            | '\n'
-            | '\v'
-            | '\f' ->
-                updateLine ()
-                lines <- lines + 1
-            | '\r' -> currentWidth <- 0
-            | '\t' ->
-                let spaces = tabSize - (currentWidth % tabSize)
-                currentWidth <- currentWidth + spaces
-            | '\b' -> currentWidth <- max 0 (currentWidth - 1)
-            | _ -> currentWidth <- currentWidth + 1
-        updateLine ()
-        (maxWidth, lines)
-
-    let private resolveEscapeMetrics(sequence: EscapeSequence, multiplier: int) =
-        match sequence with
-        | EscapeSequence.NewLine
-        | EscapeSequence.Break
-        | EscapeSequence.VerticalTab
-        | EscapeSequence.FormFeed -> (0, max 1 multiplier)
-        | EscapeSequence.HorizontalTab -> (tabSize * multiplier, 0)
-        | EscapeSequence.CarriageReturn
-        | EscapeSequence.BackSpace
-        | EscapeSequence.AudibleBell -> (0, 0)
-
+    (* SHIFTING WIDGETS METRICS *)
     let rec private shiftWidget dx dy widget =
         let shiftMetrics metrics = { metrics with x = metrics.x + dx; y = metrics.y + dy }
         match widget with
@@ -266,6 +232,7 @@ module Layout =
         | PositionedDepthWidget(_, _, _, m, _) -> m.h
         | _ -> metrics.h
 
+    (*ESCAPE ELEMENT MESS*)
     let flowAdvance (widget: PositionedWidget) =
         match widget with
         | PositionedEscapeWidget(_, seq, multi, _) ->
@@ -274,7 +241,7 @@ module Layout =
             | EscapeSequence.Break
             | EscapeSequence.VerticalTab
             | EscapeSequence.FormFeed -> (0, max 1 multi)
-            | EscapeSequence.HorizontalTab -> (tabSize * multi, 0)
+            | EscapeSequence.HorizontalTab -> (4 * multi, 0)
             | EscapeSequence.CarriageReturn
             | EscapeSequence.BackSpace
             | EscapeSequence.AudibleBell -> (0, 0)
@@ -283,6 +250,7 @@ module Layout =
     let flowWidth (widget: PositionedWidget) = fst (flowAdvance widget)
     let flowHeight (widget: PositionedWidget) = snd (flowAdvance widget)
 
+    (* RECURSIVE LAYOUT WIDGET MAIN RESOLVER *)
     let rec private layoutWidget widget parentWidth parentHeight =
         match widget with
         (* Layout logic for each widget type                   *)
@@ -614,5 +582,6 @@ module Layout =
         let layout = { cols = cols; rows = List.length rowHeights; cells = gridCells; separators = separators }
         Some (PositionedGridWidget(border, borderColor, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, [ layout ]))
 
+    (* MAIN CALLER *)
     let layoutTree widgets =
         widgets |> List.map (fun widget -> layoutWidget widget None None)

@@ -114,7 +114,7 @@ Atributo que define o comportamento do container em caso de overflow de conteúd
 ``` 
 break                               (quebra em qualquer caractere)
 wrap                                (quebra respeitando palavras)
-cut                                 (corta texto bruto)
+cut                                 (corta texto bruto) 
 clip                                (recorta área renderizada final)
 ```
 
@@ -231,7 +231,7 @@ O fundo desse texto está na cor ciano.
 Ambos foreground e background estão coloridos nesse.
 ```
 
-#### *Valores possíveis para o atributo `foreground` (o mesmo vale para `background`):*
+#### *Valores possíveis para o atributo `foreground` (o mesmo vale para `background`, ambas tem suporte a cores hexadecimais):*
 ```
 none -- [0m
 black -- [30m
@@ -294,7 +294,7 @@ Exemplo:
 
 ### **Atributos**:
 
-#### *Valores possíveis para o atributo `foreground` (o mesmo vale para `background`):*
+#### *Valores possíveis para o atributo `foreground` (o mesmo vale para `background`, ambas tem suporte a cores hexadecimais):*
 ```
 none -- [0m
 black -- [30m
@@ -1382,7 +1382,7 @@ Elemento que recebe valores em formato de string.
 Exemplo:
 - Input
 ```ptml
-<input type="button" event="single-click" handler="handleClick()" placeholder="Click here!" />
+<input type="button" event="single-click" placeholder="Click here!" width="28" />
 ```
 
 - Output
@@ -1401,9 +1401,6 @@ double-click
 hold-click
 ...
 ```
-
-***handler***:
-Define a função que será executada ao detectar que o evento foi chamado. A função deve ser declarada dentro do escopo do PTML através do elemento `<code></code>`.
 
 ***placeholder***:
 Coloca um texto explícito em formatação DIM dentro do input. Tem como valor default, um caractere escondido.
@@ -1702,6 +1699,13 @@ Elemento que renderiza o conteúdo de um arquivo PTML alvo.
 
 ***src***:
 Define a fonte do conteúdo.
+
+***implement-rule***:
+Define oque será incluído ao arquivo. Valores possíveis:
+```
+snippet-only
+...
+```
 
 ---
 ### IGNORE POR ENQUANTO!!
