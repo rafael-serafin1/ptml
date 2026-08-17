@@ -17,7 +17,7 @@
         font="bold"
     </snippet>
 
-    <block title="Git Dashboard" border="rounded">
+    <block title=" Git Dashboard " border="rounded">
         <column gap="1">
             <row>
                 <cell>
@@ -45,21 +45,26 @@
                 <cell>
                     <block title="CI/CD">
                         <column>
-                            <text>
-                                Build:
-                                <frag foreground="limegreen">SUCCESS</frag>
-                            </text>
+                            <row gap="1">
+                                <text>
+                                    Build:
+                                    <frag foreground="limegreen">SUCCESS</frag>
+                                </text>
+                            </row>
 
-                            <text>
-                                Tests:
-                                <frag foreground="limegreen">128/128</frag>
-                            </text>
-
-                            <text>
-                                Coverage:
-                                <frag foreground="yellow">82%</frag>
-                            </text>
-
+                            <row gap="1">
+                                <text>
+                                    Tests:
+                                    <frag foreground="limegreen">128/128</frag>
+                                </text>
+                            </row>
+                            
+                            <row gap="1">
+                                <text>
+                                    Coverage:
+                                    <frag foreground="yellow">82%</frag>
+                                </text>
+                            </row>
                         </column>
                     </block>
                 </cell>
@@ -93,7 +98,7 @@
                                 4f7a1d2 Fix overflow clipping
                             </text>
                             <text>
-                                c8a9ff0 Add depth renderer
+                                c8a9ff0 Add layer renderer
                             </text>
                             <text>
                                 a77de11 Optimize cell splitting

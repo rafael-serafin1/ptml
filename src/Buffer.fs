@@ -1,6 +1,7 @@
 namespace PTML
 open PTML.Render
 open PTML.Spinner
+open PTML.Drawers
 
 module Buffer =
     (* BUFFER *)
@@ -106,13 +107,13 @@ module Buffer =
     let renderToBuffer buffer renderOps =
         renderOps |> List.iter (fun op ->
             match op with
-            | Render.CursorStyle(sp, x, y, blk, clr, v) ->
+            | Drawers.CursorStyle(sp, x, y, blk, clr, v) ->
                 setCursorStyle (buffer, x, y, sp, blk, clr, v)
-            | Render.DrawChar(text, x, y, fg, bg, font, url) ->
+            | Drawers.DrawChar(text, x, y, fg, bg, font, url) ->
                 text
                 |> Seq.iteri (fun offset ch ->
                     setCell buffer (x + offset) y (char ch) fg bg font url)
-            | Render.DrawSpinner(tp: Types, x, y, inter, dur, complete, fg, bg) -> 
+            | Drawers.DrawSpinner(tp: Types, x, y, inter, dur, complete, fg, bg) -> 
                 tp 
                 |> firstFrame
                 |> Seq.iteri (fun offset ch -> 

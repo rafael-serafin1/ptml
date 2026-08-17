@@ -87,7 +87,8 @@ export const spinners = [
     "square",
     "arrow",
     "bounce",
-    "moon"
+    "moon",
+    "fill"
 ]
 
 export const completed = [
@@ -117,6 +118,7 @@ export const boolean = [
 ]
 
 export const escapesSequence = [
+    "new-line",
     "break",
     "horizontal-tab",
     "vertical-tab",

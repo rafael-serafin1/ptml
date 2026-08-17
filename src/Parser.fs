@@ -3,8 +3,10 @@ open PTML.Lexer
 open PTML.Token
 
 module Parser =
-    let validTags = Set.ofList ["frag"; "text"; "row"; "column"; "layer"; "box"; "block"; "terminal"; "cell"; "snippet"; "spinner"; "hr"; "progress"; "escape"; "frame"; "cursor"]
-    let colorValues = Set.ofList ["none"; "black"; "red"; "green"; "gold"; "blue"; "purple"; "cyan"; "fire"; "limegreen"; "yellow"; "lightblue"; "lilac"; "crystal"; "gray"; "lightgray"; "white"]
+    let validTags = 
+        Set.ofList ["frag"; "text"; "row"; "column"; "layer"; "box"; "block"; "terminal"; "cell"; "snippet"; "spinner"; "hr"; "progress"; "escape"; "frame"; "cursor"]
+    let colorValues = 
+        Set.ofList ["none"; "black"; "red"; "green"; "gold"; "blue"; "purple"; "cyan"; "fire"; "limegreen"; "yellow"; "lightblue"; "lilac"; "crystal"; "gray"; "lightgray"; "white"]
     let fontValues = Set.ofList ["none"; "bold"; "dim"; "italic"; "underline"; "slow-blink"; "rapid-blink"; "reverse"; "conceal"; "strike-through"; "double-underline"; "overline"]
     let overflowValues = Set.ofList ["break"; "wrap"; "cut"; "clip"]
     let alignValues = Set.ofList ["start"; "center"; "end"]
@@ -30,14 +32,14 @@ module Parser =
             "height", Set.empty
         ]
         "frag", Map.ofList [
-            "foreground", colorValues
-            "background", colorValues
+            "foreground", Set.empty
+            "background", Set.empty
             "font", fontValues
             "url", Set.empty
         ]   
         "text", Map.ofList [
-            "foreground", colorValues
-            "background", colorValues
+            "foreground", Set.empty
+            "background", Set.empty
             "font", fontValues
             "url", Set.empty
         ]
@@ -62,7 +64,7 @@ module Parser =
             "border", borderValues
             "width", Set.empty
             "height", Set.empty
-            "border-color", colorValues
+            "border-color", Set.empty
             "align", alignValues
             "padding", Set.empty
         ]
@@ -72,7 +74,7 @@ module Parser =
             "border", borderValues
             "width", Set.empty
             "height", Set.empty
-            "border-color", colorValues
+            "border-color", Set.empty
             "align", alignValues
             "padding", Set.empty
         ]
@@ -82,20 +84,20 @@ module Parser =
         ]
         "cell", Map.ofList [];      // no attrs for now
         "spinner", Map.ofList [
-            "type", Set.ofList ["braille"; "dots"; "waiting"; "burger"; "beam"; "ascii"; "circle"; "square"; "moon"; "arrow"; "bounce"]
+            "type", Set.ofList ["braille"; "dots"; "waiting"; "burger"; "beam"; "ascii"; "circle"; "square"; "moon"; "arrow"; "bounce"; "fill"]
             "interval", Set.empty
             "duration", Set.empty
             "completed", Set.empty
-            "foreground", colorValues
-            "background", colorValues
+            "foreground", Set.empty
+            "background", Set.empty
         ]
         "escape", Map.ofList [
-            "sequence", Set.ofList ["break"; "horizontal-tab"; "vertical-tab"; "audible-bell"; "backspace"; "form-feed"; "carriage-return"]
+            "sequence", Set.ofList ["new-line"; "break"; "horizontal-tab"; "vertical-tab"; "audible-bell"; "backspace"; "form-feed"; "carriage-return"]
             "multiplier", Set.empty
         ]
         "frame", Map.ofList [
             "framework", frameworks
-            "frame-color", colorValues
+            "frame-color", Set.empty
             "overflow", overflowValues
             "width", Set.empty
             "height", Set.empty

@@ -1,0 +1,7 @@
+<?ptml encoding="UTF-8" terminal-resize="static"?>
+<terminal x-align="start">
+    <column>
+        <text>hello</text>
+        <text>world</text>
+    </column>
+</terminal>

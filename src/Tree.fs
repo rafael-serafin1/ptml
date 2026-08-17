@@ -451,6 +451,7 @@ module Tree =
         | "moon" -> Moon
         | "arrow" -> Arrow
         | "bounce" -> Bounce
+        | "fill" -> Fill
         | value -> failwith $"Invalid spinner type: {value}"
 
     let private parseProgressType = function
@@ -474,7 +475,7 @@ module Tree =
         | _ -> value
         
     let private parseEscapeSequence = function
-        | "break" -> EscapeSequence.Break
+        | "new-line" | "break" -> EscapeSequence.Break
         | "horizontal-tab" -> HorizontalTab
         | "vertical-tab" -> VerticalTab
         | "audible-bell" -> AudibleBell

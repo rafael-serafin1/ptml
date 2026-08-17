@@ -28,13 +28,13 @@ export class PTMLCompletionProvider
         const tags: PTMLTag[] = [
             {
                 name: "text",
-                snippet: 'text>$0</text>',
-                documentation: '<text>|</text'
+                snippet: 'text>$0</text',
+                documentation: '<text>|</text>'
             },
             {
                 name: "cell",
-                snippet: 'cell>$0</cell>',
-                documentation: '<cell>|</cell'
+                snippet: 'cell>$0</cell',
+                documentation: '<cell>|</cell>'
             },
             {
                 name: "box",
@@ -74,12 +74,12 @@ export class PTMLCompletionProvider
             {
                 name: "spinner",
                 snippet: 'spinner type="$1" interval="$2" duration="$3" completed="$4"/',
-                documentation: '<spinner type="..." interval="..." duration="..." completed="..."/>'
+                documentation: '<spinner type="..." interval="..." duration="..." completed="..." />'
             },
             {
                 name: "hr",
                 snippet: 'hr orientation="$1"/',
-                documentation: '<hr orientation="..."/>'
+                documentation: '<hr orientation="..." />'
             },
             {
                 name: "progress",
@@ -93,8 +93,8 @@ export class PTMLCompletionProvider
             },
             {
                 name: "frame",
-                snippet: 'frame',
-                documentation: '<frame></frame>'
+                snippet: 'frame>$1</frame',
+                documentation: '<frame>|</frame>'
             }, 
             {
                 name: "cursor",

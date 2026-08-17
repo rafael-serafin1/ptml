@@ -1,0 +1,23 @@
+<?ptml encoding="UTF-8" terminal-resize="static"?>
+<terminal x-align="start">
+    <layer index="0">
+        <box>
+            <text>Hello World!</text>
+        </box>
+    </layer>
+    <layer index="-1">
+        <box>
+            <text>Goodbye World!</text>
+        </box>
+    </layer>
+</terminal>
+<!-- Expected Output
+┌────────────┐┐
+│Hello World!││
+└────────────┘┘
+-->
+<!-- Actual Output
+┌────────────┐─┐
+│HelloyWorld!│!│
+└────────────┘─┘
+-->

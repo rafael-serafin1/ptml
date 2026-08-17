@@ -1,4 +1,4 @@
-<?ptml encoding="UTF-8"?>
+<?ptml encoding="UTF-8" terminal-resize="reflow"?>
 
 <snippet id="title">
     foreground="cyan"
@@ -27,12 +27,12 @@
     font="underline"
 </snippet>
 
-<terminal y-align="center">
+<terminal x-align="center">
     <cursor shape="underline" color="#00f"/>
 
-    <block title="source">
-        <column gap="1">
-            <text snippet="title">PTML System Dashboard</text>
+    <block title="PTML System Dashboard" border-color="#ec8d8d">
+        <column >
+            <escape sequence="break" />
             <text foreground="lightgray">Interactive demonstration of PTML capabilities.</text>
 
             <hr width="100%" />
@@ -43,13 +43,13 @@
 
                     <column gap="1">
                         <row>
-                            <text>Operating System:</text>
+                            <text>Operating System: </text>
                             <text snippet="ok">
                                 Windows
                             </text>
                         </row>
                         <row>
-                            <text>Architecture:</text>
+                            <text>Architecture: </text>
                             <text>x86_64</text>
                         </row>
                         <row>
@@ -100,40 +100,31 @@
                 </text>
 
                 <column gap="1">
-
                     <row gap="1">
-
                         <text>
                             Compiling PTML parser...
                         </text>
-
                     </row>
 
                     <row gap="1">
-
                         <text>
                             Generating renderer...
                         </text>
-
                     </row>
 
                     <row gap="1">
-
                         <text>
                             Waiting for terminal...
                         </text>
-
                     </row>
-
                 </column>
-
             </box>
 
             <hr width="100%"/>
 
             <block title="Project">
                 <column gap="1">
-                    <row>
+                    <row gap="1">
                         <text>Repository:</text>
 
                         <text snippet="link" url="https://github.com/rafael-serafin1/ptml">
@@ -141,16 +132,16 @@
                         </text>
                     </row>
 
-                    <row>
+                    <row gap="1">
                         <text>Documentation:</text>
                         <text snippet="link" url="https://ptml.dev/docs">ptml.dev/docs</text>
                     </row>
                 </column>
             </block>
-
+            
             <hr orientation="horizontal" width="100%"/>
-
-            <row gap="1">
+            
+            <row gap="5">
                 <text snippet="ok">● ONLINE</text>
                 <text foreground="lightgray">PTML v1.0 Preview</text>
             </row>
