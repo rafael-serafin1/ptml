@@ -82,8 +82,8 @@ module Output =
                     match cell.spinner, cell.cursor with
                     | Some c, cc -> ()
                     | None, Some cc ->
-                        sb.Append(cursorTo x y) |> ignore
-                        sb.Append(ansiCursorStyle cc) |> ignore
+                        let bytes = Encoding.UTF8.GetBytes(ansiCursorStyle cc)
+                        System.Console.OpenStandardOutput().Write(bytes, 0, bytes.Length)
                     | None, None ->
                         sb.Append(cursorTo x y) |> ignore
                         match ansiStyle cell with

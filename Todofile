@@ -6,3 +6,4 @@
 6. [X] Bom, o hiperlink atraves do atributo 'url' funciona, so que cada caracter da string fica com o hiperlink ao inves da string inteira. Nao acho que isso seja um problema, mas vou deixar aqui como lembraca
 7. [ ] Adicionar um sistema de observação do arquivo PTML que simule o funcionamento de uma web aplicacao, com hotload em tempo real e consistente
 8. [X] Suporte para hexadecimais nos atributos foreground e background de <text>
+9. [X] O elemento <cursor> parou de fazer efeito por algum motivo

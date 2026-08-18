@@ -21,7 +21,7 @@
     <Compile Include="components/Toast.fs"          />
     <Compile Include="attrs/Overflow.fs"            />
     <Compile Include="attrs/FontCode.fs"            />
-    <Compile Include="PiAttrs.fs"                   />
+    <Compile Include="attrs/PiAttrs.fs"             />
     <Compile Include="Token.fs"                     />
     <Compile Include="Lexer.fs"                     />
     <Compile Include="Parser.fs"                    />

@@ -1,12 +1,13 @@
 <?ptml encoding="UTF-8" terminal-resize="static"?>
 <terminal x-align="start">
-    <column>
-        <row gap="1">
-            <text>hello</text>
-            <text>world</text>            
-        </row>
-        <row>
-            <cursor shape="underline" />
-        </row>
-    </column>
+    <row gap="1">
+        <column>
+            <row gap="1">
+                <text>hello</text>
+                <text>world</text>            
+            </row>
+        </column>
+        <cursor shape="underline" /> 
+        <text>Hello World!</text>
+    </row>
 </terminal>

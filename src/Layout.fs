@@ -256,7 +256,7 @@ module Layout =
         (* Layout logic for each widget type                   *)
         (* Chamada recursiva até calcular a ultima geração     *)
         | CursorWidget(sh, blk, clr, v) ->
-            PositionedCursorWidget(sh, blk, clr, v, { x = -1; y = -1; w = 0; h = 0 })
+            PositionedCursorWidget(sh, blk, clr, v, { x = 0; y = 0; w = 0; h = 0 })
         | ProgressWidget(tp, value, maxi, width, height, show: string option) ->
             let resolvedWidth = resolveDimension width parentWidth maxi
             let resolvedHeight = max 1 lineHeight
