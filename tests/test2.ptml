@@ -1,7 +1,13 @@
 <?ptml encoding="UTF-8" terminal-resize="static"?>
 <terminal x-align="start">
-    <column>
-        <text>hello</text>
-        <text>world</text>
-    </column>
+    <box padding="1x1">
+        <row gap="1">
+            <box padding="1x1">
+                <text>Hello World!</text>
+            </box>
+            <box padding="1x1">
+                <text url="https://github.com/rafael-serafin1">Hello World!</text>
+            </box>
+        </row>
+    </box>
 </terminal>

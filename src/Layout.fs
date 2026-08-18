@@ -256,10 +256,7 @@ module Layout =
         (* Layout logic for each widget type                   *)
         (* Chamada recursiva até calcular a ultima geração     *)
         | CursorWidget(sh, blk, clr, v) ->
-            let cursorPos = Console.GetCursorPosition()
-            match cursorPos with
-            | x, y ->
-                PositionedCursorWidget(sh, blk, clr, v, { x = x; y = y; w = 0; h = 0 })
+            PositionedCursorWidget(sh, blk, clr, v, { x = -1; y = -1; w = 0; h = 0 })
         | ProgressWidget(tp, value, maxi, width, height, show: string option) ->
             let resolvedWidth = resolveDimension width parentWidth maxi
             let resolvedHeight = max 1 lineHeight

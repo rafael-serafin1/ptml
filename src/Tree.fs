@@ -138,7 +138,7 @@ module Tree =
                     let trimmed = normalized.Trim()
                     if trimmed = "" then None else Some trimmed
                 else
-                    Some text
+                    Some (text.Trim())
 
     let private emptyGlobalAttributes = { Id = None; Snippet = None }
 
