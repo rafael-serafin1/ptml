@@ -56,6 +56,7 @@ module Parser =
         ]
         "layer", Map.ofList [
             "index", Set.empty
+            "overflow", overflowValues
             "z-align", alignValues
             "gap", Set.empty
         ]
@@ -103,7 +104,6 @@ module Parser =
             "height", Set.empty
             "align", alignValues
             "padding", Set.empty
-            "overflow", overflowValues
         ]
         "cursor", Map.ofList [
             "shape", Set.ofList ["block"; "bar"; "underline"]

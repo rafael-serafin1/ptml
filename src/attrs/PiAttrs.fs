@@ -56,7 +56,7 @@ module PiAttrs =
         | ASCII -> Encoding.ASCII
 
     let private updateConsoleEncoding mode =
-        let enc = applyEncodingMode mode
+        let enc: Encoding = applyEncodingMode mode
         Console.OutputEncoding <- enc
         Console.InputEncoding <- enc
 
@@ -74,7 +74,7 @@ module PiAttrs =
             match name with
             | "encoding" -> { settings with encoding = parseEncodingMode value }
             | "terminal-resize" -> { settings with terminalResize = parseTerminalResizeMode value }
-            | invalid -> failwith $"Invalid pi attribute: {invalid}"
+            | (invalid: string) -> failwith $"Invalid pi attribute for procedural instruction: {invalid}"
         ) currentSettings
 
     let applySettings settings =

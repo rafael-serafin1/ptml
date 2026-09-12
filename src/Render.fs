@@ -1,8 +1,11 @@
 namespace PTML
+open System
 open PTML.Tree
 open PTML.Layout
 open PTML.Spinner
 open PTML.Drawers
+open PTML.Overflow
+open PTML.OverflowFunctions
 
 module Render =
     let rec private renderWidget offsetX offsetY widget =
@@ -42,18 +45,18 @@ module Render =
         | PositionedSpinnerWidget(tp, inter, dur, comp, fg, bg, metrics) ->
             [ DrawSpinner(tp, offsetX + metrics.x, offsetY + metrics.y, inter, dur, comp, fg, bg) ]
 
-        | PositionedRowWidget(_, _, _, _, metrics, children)
-        | PositionedColumnWidget(_, _, _, _, metrics, children) ->
+        | PositionedRowWidget(_, overflow, _, _, _, metrics, children)
+        | PositionedColumnWidget(_, overflow, _, _, _, metrics, children) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
-            children |> List.collect (renderWidget baseX baseY)
+            children |> List.collect (renderWidget baseX baseY) |> applyContainerOverflow overflow Auto Auto { metrics with x = baseX; y = baseY } children
 
         | PositionedCellWidget(metrics, children) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
             children |> List.collect (renderWidget baseX baseY)
 
-        | PositionedBoxWidget(_, _, border, borderColor, _, _, _, metrics, children) ->
+        | PositionedBoxWidget(width, height, overflow, border, borderColor, _, _, _, metrics, children) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
 
@@ -62,16 +65,16 @@ module Render =
             let childBaseX = if border <> NoBorder then baseX + 1 else baseX
             let childBaseY = if border <> NoBorder then baseY + 1 else baseY
 
-            let childOps = children |> List.collect (renderWidget childBaseX childBaseY)
+            let childOps = children |> List.collect (renderWidget childBaseX childBaseY) |> applyContainerOverflow overflow width height { metrics with x = childBaseX; y = childBaseY } children
             borderOps @ childOps
 
-        | PositionedBlockWidget(_, _, border, borderColor, name, align, _, _, metrics, children) ->
+        | PositionedBlockWidget(width, height, overflow, border, borderColor, name, align, _, _, metrics, children) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
             let borderOps = drawBorderWithTitle baseX baseY metrics.w metrics.h border borderColor name
             let childBaseX = if border <> NoBorder then baseX + 1 else baseX
             let childBaseY = if border <> NoBorder then baseY + 1 else baseY
-            let childOps = children |> List.collect (renderWidget childBaseX childBaseY)
+            let childOps = children |> List.collect (renderWidget childBaseX childBaseY) |> applyContainerOverflow overflow width height { metrics with x = childBaseX; y = childBaseY } children
             borderOps @ childOps
 
         | PositionedGridWidget(border, borderColor, metrics, children: List<GridLayout>) ->
@@ -158,7 +161,7 @@ module Render =
             let baseY = offsetY + metrics.y
             children |> List.collect (renderWidget baseX baseY)
 
-        | PositionedFrameWidget(fw, fc, w, h, align, paddingV, paddingH, metrics, children) ->
+        | PositionedFrameWidget(fw, fc, w, h, overflow, align, paddingV, paddingH, metrics, children) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
 
@@ -167,10 +170,10 @@ module Render =
             let childBaseX = baseX + 1
             let childBaseY = baseY + 1
             
-            let childOps = children |> List.collect (renderWidget childBaseX childBaseY)
+            let childOps = children |> List.collect (renderWidget childBaseX childBaseY) |> applyContainerOverflow overflow w h { metrics with x = childBaseX; y = childBaseY } children
             borderOps @ childOps
 
-        | PositionedDepthWidget(_, _, _, _, _) -> []
+        | PositionedDepthWidget(_, _, _, _, _, _) -> []
 
     let renderTree(widgets: PositionedWidget list): RenderOperation list =
         widgets |> List.collect (renderWidget 0 0)

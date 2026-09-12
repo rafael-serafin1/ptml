@@ -7,7 +7,7 @@
                 <text>world</text>            
             </row>
         </column>
-        <cursor shape="underline" /> 
+        <cursor shape="underline" color="#837878" /> 
         <text>Hello World!</text>
     </row>
 </terminal>

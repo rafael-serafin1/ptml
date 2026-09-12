@@ -1,0 +1,6 @@
+<box width="5" overflow="break">
+    <row>
+        <text>hello!</text>
+        <text>world!</text>
+    </row>
+</box>
