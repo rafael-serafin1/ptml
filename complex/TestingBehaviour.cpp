@@ -5,32 +5,14 @@
 #include <stdio.h>
 
 int main(int argc, char **argv) {
+    Input *inpt = new Input();
     Button *btn = new Button();
     btn->SetPosition(0, 0);
 
-    btn->SetButton([]() {
-        Terminal T = Terminal();
-        T.ClearAll();
-        T.ToggleCursorVisibility();
-        register int op = 0;
+    inpt->SetInput([](){});
 
-        do {
-            std::cout << "===== MENU =====\n";
-            std::cout << "1. Comprar\n";
-            std::cout << "2. Vender\n";
-            std::cout << "3. Perecer\n";
-            std::cout << "================\n";
-            scanf("%i", &op);
-            switch (op) {
-
-            }
-        } while (op != 4);
-    }, "[ abrir menu ]");
-
-    btn->SetPosition(1, 1);
-
-    btn->SetButton([]() {
-        return;
+    btn->SetButton([&inpt](){   
+        printf("%s");
     }, "[ sair ]");
 
     delete btn;

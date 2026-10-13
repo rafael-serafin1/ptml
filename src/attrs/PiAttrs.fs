@@ -15,16 +15,22 @@ module PiAttrs =
         | Clip
         | Static
 
+    type Instance =
+        | Default
+        | Clear
+
     type PiAttr =
         | Encoding of EncodingMode
         | TerminalResize of TerminalResizeMode
 
     type PiSettings = {
+        instance: Instance
         encoding: EncodingMode
         terminalResize: TerminalResizeMode
     }
 
     let private defaultSettings = {
+        instance = Default
         encoding = UTF8
         terminalResize = Reflow
     }
@@ -33,6 +39,12 @@ module PiAttrs =
     let mutable private savedViewport : (int * int) option = None
 
     let private normalizeAttrValue (value: string) = value.Trim()
+
+    let private parseInstance(value: string): Instance =
+        match normalizeAttrValue(value).ToLowerInvariant() with
+        | "default" -> Default
+        | "clear" -> Clear
+        | invalid -> failwith $"Invalid instance: {invalid}. Supported values are default, clear."
 
     let private parseEncodingMode (value: string) =
         match normalizeAttrValue(value).ToUpperInvariant() with
@@ -56,9 +68,15 @@ module PiAttrs =
         | ASCII -> Encoding.ASCII
 
     let private updateConsoleEncoding mode =
-        let enc = applyEncodingMode mode
+        let enc: Encoding = applyEncodingMode mode
         Console.OutputEncoding <- enc
         Console.InputEncoding <- enc
+
+    let private handleInstance(instance: Instance) = 
+        match instance with
+        | Instance.Clear ->
+            Console.Clear()
+        | _ -> ()
 
     let private ensureSavedViewport width height =
         match savedViewport with
@@ -72,18 +90,20 @@ module PiAttrs =
         attrs
         |> List.fold (fun settings (name, value) ->
             match name with
+            | "console-instance" -> { settings with instance = parseInstance value }
             | "encoding" -> { settings with encoding = parseEncodingMode value }
             | "terminal-resize" -> { settings with terminalResize = parseTerminalResizeMode value }
-            | invalid -> failwith $"Invalid pi attribute: {invalid}"
+            | (invalid: string) -> failwith $"Invalid pi attribute for procedural instruction: {invalid}"
         ) currentSettings
 
     let applySettings settings =
         currentSettings <- settings
+        handleInstance settings.instance
         updateConsoleEncoding settings.encoding
 
     let parseAndApplyPiAttrs attrs =
         let settings = parseSettings attrs
-        applySettings settings
+        applySettings(settings)
 
     let getTerminalResizeMode() = currentSettings.terminalResize
 

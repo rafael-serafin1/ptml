@@ -1,7 +1,13 @@
 <?ptml encoding="UTF-8" terminal-resize="static"?>
 <terminal x-align="start">
-    <row>
-        <text>hello</text>
-        <text>world</text>
+    <row gap="1">
+        <column>
+            <row gap="1">
+                <text>hello</text>
+                <text>world</text>            
+            </row>
+        </column>
+        <cursor shape="underline" color="#837878" /> 
+        <text>Hello World!</text>
     </row>
 </terminal>

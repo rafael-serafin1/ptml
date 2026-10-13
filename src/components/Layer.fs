@@ -64,7 +64,7 @@ module Depth =
         match widget with
         | PositionedCursorWidget(s, b, c, v, m) ->
             (Some (PositionedCursorWidget(s, b, c, v, m)), [])
-        | PositionedDepthWidget(index, zAlign, gap, metrics, children) ->
+        | PositionedDepthWidget(index, overflow, zAlign, gap, metrics, children) ->
             let absoluteX = offsetX + metrics.x
             let absoluteY = offsetY + metrics.y
             let childResults = children |> List.map (extractWidget absoluteX absoluteY)
@@ -83,17 +83,17 @@ module Depth =
             }
             (None, layer :: nestedLayers)
 
-        | PositionedRowWidget(width, border, gap, align, metrics, children) ->
+        | PositionedRowWidget(width, overflow, border, gap, align, metrics, children) ->
             let childResults = children |> List.map (extractWidget (offsetX + metrics.x) (offsetY + metrics.y))
             let filteredChildren = childResults |> List.choose fst
             let nestedLayers = childResults |> List.collect snd
-            (Some (PositionedRowWidget(width, border, gap, align, metrics, filteredChildren)), nestedLayers)
+            (Some (PositionedRowWidget(width, overflow, border, gap, align, metrics, filteredChildren)), nestedLayers)
 
-        | PositionedColumnWidget(width, border, gap, yAlign, metrics, children) ->
+        | PositionedColumnWidget(width, overflow, border, gap, yAlign, metrics, children) ->
             let childResults = children |> List.map (extractWidget (offsetX + metrics.x) (offsetY + metrics.y))
             let filteredChildren = childResults |> List.choose fst
             let nestedLayers = childResults |> List.collect snd
-            (Some (PositionedColumnWidget(width, border, gap, yAlign, metrics, filteredChildren)), nestedLayers)
+            (Some (PositionedColumnWidget(width, overflow, border, gap, yAlign, metrics, filteredChildren)), nestedLayers)
 
         | PositionedCellWidget(metrics, children) ->
             let childResults = children |> List.map (extractWidget (offsetX + metrics.x) (offsetY + metrics.y))
@@ -101,17 +101,17 @@ module Depth =
             let nestedLayers = childResults |> List.collect snd
             (Some (PositionedCellWidget(metrics, filteredChildren)), nestedLayers)
 
-        | PositionedBoxWidget(width, height, border, borderColor, align, paddingV, paddingH, metrics, children) ->
+        | PositionedBoxWidget(width, height, overflow, border, borderColor, align, paddingV, paddingH, metrics, children) ->
             let childResults = children |> List.map (extractWidget (offsetX + metrics.x) (offsetY + metrics.y))
             let filteredChildren = childResults |> List.choose fst
             let nestedLayers = childResults |> List.collect snd
-            (Some (PositionedBoxWidget(width, height, border, borderColor, align, paddingV, paddingH, metrics, filteredChildren)), nestedLayers)
+            (Some (PositionedBoxWidget(width, height, overflow, border, borderColor, align, paddingV, paddingH, metrics, filteredChildren)), nestedLayers)
 
-        | PositionedBlockWidget(width, height, border, borderColor, name, align, paddingV, paddingH, metrics, children) ->
+        | PositionedBlockWidget(width, height, overflow, border, borderColor, name, align, paddingV, paddingH, metrics, children) ->
             let childResults = children |> List.map (extractWidget (offsetX + metrics.x) (offsetY + metrics.y))
             let filteredChildren = childResults |> List.choose fst
             let nestedLayers = childResults |> List.collect snd
-            (Some (PositionedBlockWidget(width, height, border, borderColor, name, align, paddingV, paddingH, metrics, filteredChildren)), nestedLayers)
+            (Some (PositionedBlockWidget(width, height, overflow, border, borderColor, name, align, paddingV, paddingH, metrics, filteredChildren)), nestedLayers)
 
         | PositionedGridWidget(border, borderColor, metrics, grids) ->
             let processedGrids, nestedLayers =
@@ -154,11 +154,11 @@ module Depth =
             (Some (PositionedProgressWidget(tp, value, maxi, w, h, str, metrics)), [])
         | PositionedEscapeWidget(str, seq, multi, metrics) ->
             (Some (PositionedEscapeWidget(str, seq, multi, metrics)), [])
-        | PositionedFrameWidget(fw, fc, w, h, align, pv, ph, metrics, children) ->
+        | PositionedFrameWidget(fw, fc, w, h, overflow, align, pv, ph, metrics, children) ->
             let childResults = children |> List.map (extractWidget (offsetX + metrics.x) (offsetY + metrics.y))
             let filteredChildren = childResults |> List.choose fst
             let nestedLayers = childResults |> List.collect snd
-            (Some (PositionedFrameWidget(fw, fc, w, h, align, pv, ph, metrics, filteredChildren)), nestedLayers)
+            (Some (PositionedFrameWidget(fw, fc, w, h, overflow, align, pv, ph, metrics, filteredChildren)), nestedLayers)
         
 
     let extractDepthLayers widgets =

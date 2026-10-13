@@ -1,12 +1,17 @@
 ## Procedural Instruction
 
-`<?ptml encoding="UTF-8" terminal-resize="reflow"?>` <br />
+`<?ptml encoding="UTF-8" terminal-resize="reflow" console-instance="default"?>` <br />
 Serve como Instrução Procedural, além de garantir que ao terminal resize o retained-mode rendering vai ser corretamente aplicado. <br />
 Valores possíveis para atributo ***terminal-resize***:  
 ```
 reflow              (valor padrão)
 clip
 static
+```
+Valores possível para atributo ***console-instance***:
+```
+default             (valor padrão)
+clear               (limpa o terminal antes de mostrar o conteúdo)
 ```
 
 >> Elementos com título `IGNORE POR ENQUANTO` significa que sua lógica ainda estão sendo desenvolvida corretamente.
@@ -111,7 +116,7 @@ Compartilhado entre os elementos
 ```
 
 Atributo que define o comportamento do container em caso de overflow de conteúdo. Caso não seja explicitado o resoluto em caso de overflow, o valor por padrão é o `break` (quebra o conteudo em uma nova linha). Valores possíveis:
-``` 
+```                                 
 break                               (quebra em qualquer caractere)
 wrap                                (quebra respeitando palavras)
 cut                                 (corta texto bruto) 
@@ -128,6 +133,13 @@ Exemplo:
 </row>
 ```
 
+> Obs: O uso do `overflow` é diretamente ligado ao `width/height`. Casos:
+```
+se `width` = 'auto' e `height` != 'auto' --> overflow vai ser considerado apenas para o `height`
+se `width` != 'auto' e `height` = 'auto' --> overflow vai ser considerado apenas para o `width`
+se `width` = 'auto' e `height` = 'auto' --> overflow vai ser considerado apenas para ambos
+se `width` != 'auto' e `height` != 'auto' --> overflow é totalmente desconsiderado
+```
 
 ### Atributo ***padding***:
 Atributo que define o espaço entre a borda e o conteúdo, sendo seu valor padrão 0. Compartilhado entre os elementos
@@ -1317,9 +1329,11 @@ Exemplo:
 <column>
     <text>How to use `HTML`: </text>
     <list oftype="enum" before="Step " after=" " items-behaviour="text">
-        <item>Create a HTML file.</item>
-        <item>Configure DOM.</item>
-        <item>Open file on browser.</item>
+        <column>
+            <item>Create a HTML file.</item>
+            <item>Configure DOM.</item>
+            <item>Open file on browser.</item>
+        </column>
     </list>
 </column>
 ```

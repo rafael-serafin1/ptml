@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { align, boolean, borders, colors, completed, cursorColor, encoding, escapesSequence, fonts, frameworks, NaNValuesInNumericAttrs, nums, ori, overflow, progressType, shape, spinners } from "./PTMLAttributesValueCompletionProvider";
+import { align, boolean, borders, colors, completed, consoleInstance, cursorColor, encoding, escapesSequence, fonts, frameworks, NaNValuesInNumericAttrs, nums, ori, overflow, progressType, shape, spinners } from "./PTMLAttributesValueCompletionProvider";
 
 interface AttributeDefinition {
     name: string;
@@ -25,6 +25,10 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         {
             name: "encoding",
             values: encoding
+        },
+        {
+            name: "console-instance",
+            values: consoleInstance
         }
     ],
     "ptml": [

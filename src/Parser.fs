@@ -56,6 +56,7 @@ module Parser =
         ]
         "layer", Map.ofList [
             "index", Set.empty
+            "overflow", overflowValues
             "z-align", alignValues
             "gap", Set.empty
         ]
@@ -103,7 +104,6 @@ module Parser =
             "height", Set.empty
             "align", alignValues
             "padding", Set.empty
-            "overflow", overflowValues
         ]
         "cursor", Map.ofList [
             "shape", Set.ofList ["block"; "bar"; "underline"]
@@ -219,8 +219,8 @@ module Parser =
         match tokens with
         | [] -> if stack <> [] then failwith "Unclosed tags" else ()
         | ProcInst pi :: rest ->
-            let piAttrs = parsePiAttrs pi
-            PiAttrs.parseAndApplyPiAttrs piAttrs
+            let piAttrs = parsePiAttrs(pi)
+            PiAttrs.parseAndApplyPiAttrs(piAttrs)
             parser(rest, stack)
         | Comment _ :: rest -> parser(rest, stack)
         | Text _ :: rest -> parser(rest, stack)
