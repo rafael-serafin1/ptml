@@ -20,6 +20,24 @@ module Spinner =
     | Fill
 
     let private consoleLock = obj()
+    let private lifecycleLock = obj()
+    let private activeSpinners = ConcurrentDictionary<int, Thread * CancellationTokenSource>()
+    let mutable private nextSpinnerId = 0
+    let mutable private activeDraws = 0
+    let mutable private previousCursorVisibility = true
+
+    let private beginDrawing () =
+        lock consoleLock (fun () ->
+            if activeDraws = 0 then
+                previousCursorVisibility <- Console.CursorVisible
+            activeDraws <- activeDraws + 1
+            Console.CursorVisible <- false)
+
+    let private endDrawing () =
+        lock consoleLock (fun () ->
+            activeDraws <- activeDraws - 1
+            if activeDraws = 0 then
+                Console.CursorVisible <- previousCursorVisibility)
 
     let private writeAt x y (text: string) =
         lock consoleLock (fun () ->
@@ -132,81 +150,105 @@ module Spinner =
             clearAt index y
             index <- index + 1
 
-    let drawSpinner(tp: Types, x, y, inter: string, dur: string, complete: string) =
+    let private drawSpinnerWithCancellation
+        (cancellationToken: CancellationToken)
+        (tp: Types, x, y, inter: string, dur: string, complete: string) =
         let frames = framesOfType tp
         let duration = ParseDuration(dur, inter, frames)
         let intervalMs = ParseInterval(inter)
-        let cursorPos = Console.GetCursorPosition()
 
-        lock consoleLock (fun () -> Console.CursorVisible <- false)
+        beginDrawing ()
         let stopwatch = Stopwatch.StartNew()
 
         let mutable frameIndex = 0
         let mutable helpIndex = 0
         let mutable laps = 0
         let mutable running = true
-        if tp = Types.Waiting then
-            while running do
-                writeAt x y frames[frameIndex]
+        try
+            if tp = Types.Waiting then
+                while running && not cancellationToken.IsCancellationRequested do
+                    writeAt x y frames[frameIndex]
 
-                Thread.Sleep(intervalMs)
+                    cancellationToken.WaitHandle.WaitOne(intervalMs) |> ignore
 
-                frameIndex <- frameIndex + 1
-                helpIndex <- helpIndex + 1
-                if frameIndex >= frames.Length then
-                    let mutable helpX: int = x
-                    while helpIndex <> 0 do
-                        clearAt helpX y
-                        helpIndex <- helpIndex - 1
-                        helpX <- helpX + 1
-                    frameIndex <- 0
-                    laps <- laps + 1
-                match duration.tp with
-                | "s" ->
-                    if stopwatch.ElapsedMilliseconds >= int64(duration.value * 1000) then
+                    frameIndex <- frameIndex + 1
+                    helpIndex <- helpIndex + 1
+                    if frameIndex >= frames.Length then
+                        let mutable helpX: int = x
+                        while helpIndex <> 0 do
+                            clearAt helpX y
+                            helpIndex <- helpIndex - 1
+                            helpX <- helpX + 1
+                        frameIndex <- 0
+                        laps <- laps + 1
+                    match duration.tp with
+                    | "s" ->
+                        if stopwatch.ElapsedMilliseconds >= int64(duration.value * 1000) then
+                            CleanSpinner(frames.Length, x, y)
+                            running <- false
+                    | "ms" ->
+                        if stopwatch.ElapsedMilliseconds >= int64 duration.value then
+                            CleanSpinner(frames.Length, x, y)
+                            running <- false
+                    | "laps" ->
+                        if laps >= duration.value then
+                            CleanSpinner(frames.Length, x, y)
+                            running <- false
+                    | _ ->
                         CleanSpinner(frames.Length, x, y)
-                        running <- false
-                | "ms" ->
-                    if stopwatch.ElapsedMilliseconds >= int64 duration.value then
-                        CleanSpinner(frames.Length, x, y)
-                        running <- false
-                | "laps" ->
-                    if laps >= duration.value then
-                        CleanSpinner(frames.Length, x, y)
-                        running <- false
-                | _ -> 
-                    CleanSpinner(frames.Length, x, y)
-                    ()
-        else
-            while running do
-                writeAt x y frames[frameIndex]
+            else
+                while running && not cancellationToken.IsCancellationRequested do
+                    writeAt x y frames[frameIndex]
 
-                Thread.Sleep(intervalMs)
+                    cancellationToken.WaitHandle.WaitOne(intervalMs) |> ignore
 
-                frameIndex <- frameIndex + 1
-                if frameIndex >= frames.Length then
-                    frameIndex <- 0
-                    laps <- laps + 1
-                match duration.tp with
-                | "s" ->
-                    if stopwatch.ElapsedMilliseconds >= int64(duration.value * 1000) then
-                        running <- false
-                | "ms" ->
-                    if stopwatch.ElapsedMilliseconds >= int64 duration.value then
-                        running <- false
-                | "laps" ->
-                    if laps >= duration.value then
-                        running <- false
-                | _ -> ()
-        stopwatch.Stop()
+                    frameIndex <- frameIndex + 1
+                    if frameIndex >= frames.Length then
+                        frameIndex <- 0
+                        laps <- laps + 1
+                    match duration.tp with
+                    | "s" ->
+                        if stopwatch.ElapsedMilliseconds >= int64(duration.value * 1000) then
+                            running <- false
+                    | "ms" ->
+                        if stopwatch.ElapsedMilliseconds >= int64 duration.value then
+                            running <- false
+                    | "laps" ->
+                        if laps >= duration.value then
+                            running <- false
+                    | _ -> ()
+            stopwatch.Stop()
 
-        if frames[frames.Length - 1].Length > 1 then
-            writeAt (x + 1) y complete
-        else    
-            writeAt x y complete
-        lock consoleLock (fun () -> Console.CursorVisible <- true)
-        ()                                                      // return
+            if not cancellationToken.IsCancellationRequested then
+                if frames[frames.Length - 1].Length > 1 then
+                    writeAt (x + 1) y complete
+                else
+                    writeAt x y complete
+        finally
+            endDrawing ()
+
+    let drawSpinner(tp: Types, x, y, inter: string, dur: string, complete: string) =
+        drawSpinnerWithCancellation CancellationToken.None (tp, x, y, inter, dur, complete)
 
     let threadDraw(tp: Types, x, y, inter: string, dur: string, complete: string) =
-        let T = Thread(ThreadStart(fun () -> drawSpinner(tp, x, y, inter, dur, complete)))
-        T.Start()
+        lock lifecycleLock (fun () ->
+            let spinnerId = Interlocked.Increment(&nextSpinnerId)
+            let cancellation = new CancellationTokenSource()
+            let worker =
+                Thread(ThreadStart(fun () ->
+                    drawSpinnerWithCancellation cancellation.Token (tp, x, y, inter, dur, complete)))
+            worker.IsBackground <- true
+            activeSpinners[spinnerId] <- (worker, cancellation)
+            worker.Start())
+
+    let stopAll () =
+        lock lifecycleLock (fun () ->
+            let running = activeSpinners.Values |> Seq.toArray
+            for _, cancellation in running do
+                cancellation.Cancel()
+            for worker, _ in running do
+                worker.Join()
+            for spinnerId in activeSpinners.Keys do
+                match activeSpinners.TryRemove(spinnerId) with
+                | true, (_, cancellation) -> cancellation.Dispose()
+                | _ -> ())

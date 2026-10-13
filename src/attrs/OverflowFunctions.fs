@@ -75,7 +75,21 @@ module OverflowFunctions =
             result |> Seq.toList |> cellsToOperations
 
     let applyOverflow overflow width height metrics operations =
-        if width = Auto && height = Auto then 
+        let cells = textCells operations
+        let exceedsWidth =
+            cells
+            |> List.exists (fun (_, x, _, _, _, _, _) -> x < metrics.x || x >= metrics.x + metrics.w)
+        let exceedsHeight =
+            cells
+            |> List.exists (fun (_, _, y, _, _, _, _) -> y < metrics.y || y >= metrics.y + metrics.h)
+        let hasOverflow =
+            match width, height with
+            | Auto, Auto -> exceedsWidth || exceedsHeight
+            | Auto, _ -> exceedsHeight
+            | _, Auto -> exceedsWidth
+            | _ -> false
+
+        if not hasOverflow then
             operations
         else 
             constrainChildren overflow metrics operations
