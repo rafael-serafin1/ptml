@@ -1,12 +1,17 @@
 ## Procedural Instruction
 
-`<?ptml encoding="UTF-8" terminal-resize="reflow"?>` <br />
+`<?ptml encoding="UTF-8" terminal-resize="reflow" console-instance="default"?>` <br />
 Serve como Instrução Procedural, além de garantir que ao terminal resize o retained-mode rendering vai ser corretamente aplicado. <br />
 Valores possíveis para atributo ***terminal-resize***:  
 ```
 reflow              (valor padrão)
 clip
 static
+```
+Valores possível para atributo ***console-instance***:
+```
+default             (valor padrão)
+clear               (limpa o terminal antes de mostrar o conteúdo)
 ```
 
 >> Elementos com título `IGNORE POR ENQUANTO` significa que sua lógica ainda estão sendo desenvolvida corretamente.

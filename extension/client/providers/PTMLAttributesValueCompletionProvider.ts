@@ -160,6 +160,11 @@ export const cursorColor = [
     "teal"
 ]
 
+export const consoleInstance = [
+    "default",
+    "clear"
+]
+
 export class PTMLAttributeValueCompletionProvider
     implements vscode.CompletionItemProvider {
 
@@ -169,6 +174,8 @@ export class PTMLAttributeValueCompletionProvider
             "static",
             "clip"
         ],
+        "console-instance": consoleInstance,
+
         encoding: encoding,
         border: borders,
         font: fonts,

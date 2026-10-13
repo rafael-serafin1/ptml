@@ -1,3 +1,4 @@
+<?ptml encoding="UTF-8" terminal-resize="reflow" console-instance="clear"?>
 <box width="5" overflow="break">
     <row>
         <text>hello!</text>

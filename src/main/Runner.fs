@@ -14,11 +14,6 @@ open PTML.Depth
 module Runner =
     let run(path: string): Status =
         let mutable terminal: Terminal option = None
-        let T = getViewport()
-        if Utils.shouldWindow then
-            terminal <- Some (basicTerminal)
-        else
-            terminal <- Some (getViewport())
 
         let input: string = File.ReadAllText(path)
         if input = "" || input = String.Empty then  
@@ -34,6 +29,13 @@ module Runner =
         let layout = layoutTree semantic
         let filteredLayout, depthLayers = Depth.extractDepthLayers layout
         let renderOps = renderTree filteredLayout
+
+        let T = getViewport()
+        if Utils.shouldWindow then
+            terminal <- Some (basicTerminal)
+        else
+            terminal <- Some (getViewport())
+            
         match terminal with 
         | None -> 
             Status.Error

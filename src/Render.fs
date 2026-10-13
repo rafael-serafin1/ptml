@@ -173,7 +173,8 @@ module Render =
             let childOps = children |> List.collect (renderWidget childBaseX childBaseY) |> applyContainerOverflow overflow w h { metrics with x = childBaseX; y = childBaseY } children
             borderOps @ childOps
 
-        | PositionedDepthWidget(_, _, _, _, _, _) -> []
+        | PositionedDepthWidget(_, _, _, _, _, _) ->    
+            []
 
     let renderTree(widgets: PositionedWidget list): RenderOperation list =
         widgets |> List.collect (renderWidget 0 0)

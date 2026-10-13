@@ -219,8 +219,8 @@ module Parser =
         match tokens with
         | [] -> if stack <> [] then failwith "Unclosed tags" else ()
         | ProcInst pi :: rest ->
-            let piAttrs = parsePiAttrs pi
-            PiAttrs.parseAndApplyPiAttrs piAttrs
+            let piAttrs = parsePiAttrs(pi)
+            PiAttrs.parseAndApplyPiAttrs(piAttrs)
             parser(rest, stack)
         | Comment _ :: rest -> parser(rest, stack)
         | Text _ :: rest -> parser(rest, stack)
