@@ -289,24 +289,33 @@ module Layout =
             let totalChildWidth = if List.isEmpty childWidths then 0 else List.sum childWidths + gap * (List.length childWidths - 1)
             let maxChildHeight = if List.isEmpty childHeights then 0 else List.max childHeights
 
-            let resolvedWidth = resolveDimension width parentWidth totalChildWidth
-            let resolvedHeight = max maxChildHeight lineHeight
+            let availableWidth =
+                match align, parentWidth with
+                | Some Center, Some width
+                | Some End, Some width -> width
+                | _ -> totalChildWidth
+            let resolvedWidth = resolveDimension width parentWidth availableWidth
+            let overflowHeight =
+                match overflow with
+                | OverflowValues.Break
+                | OverflowValues.Wrap when resolvedWidth > 0 && totalChildWidth > resolvedWidth ->
+                    (totalChildWidth + resolvedWidth - 1) / resolvedWidth
+                | _ -> maxChildHeight
+            let resolvedHeight = max lineHeight (max maxChildHeight overflowHeight)
 
             let positionedChildren =
+                let groupOffset = max 0 (alignOffset resolvedWidth totalChildWidth align)
                 let rec place children xOffset acc =
                     match children with
                     | [] -> List.rev acc
                     | child :: rest ->
-                        let childTotalWidth = totalWidth child
-                        let childTotalHeight = totalHeight child
-                        let yOffset = alignOffset resolvedHeight childTotalHeight align
-                        let positioned = shiftWidget xOffset yOffset child
+                        let positioned = shiftWidget (groupOffset + xOffset) 0 child
                         let nextX = xOffset + totalWidth child + gap
                         place rest nextX (positioned :: acc)
                 place positionedChildren 0 []
             PositionedRowWidget(width, overflow, border, gap, align, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren)
         | ColumnWidget(width, overflow, border, gap, yAlign, children) ->
-            let measuredChildren = children |> List.map (fun child -> layoutWidget child parentWidth None)
+            let measuredChildren = children |> List.map (fun child -> layoutWidget child None None)
 
             let childWidths = measuredChildren |> List.map totalWidth
             let childHeights = measuredChildren |> List.map flowHeight
@@ -321,24 +330,21 @@ module Layout =
                     List.sum childHeights + gap * (List.length childHeights - 1)
 
             let resolvedWidth = resolveDimension width parentWidth maxChildWidth
-            let resolvedHeight = resolveDimension (Fixed totalChildHeight) parentHeight totalChildHeight
+            let resolvedHeight = max totalChildHeight (defaultArg parentHeight totalChildHeight)
 
             let positionedChildren =
                 children
                 |> List.map (fun child ->
-                    layoutWidget child (Some resolvedWidth) None)
+                    layoutWidget child (Some resolvedWidth) parentHeight)
 
             let positionedChildren =
+                let groupOffset = alignOffset resolvedHeight totalChildHeight yAlign
                 let rec place children yOffset acc =
                     match children with
                     | [] -> List.rev acc
                     | child :: rest ->
-                        let childTotalWidth = totalWidth child
                         let childFlowHeight = flowHeight child
-                        let xOffset = alignOffset resolvedWidth childTotalWidth yAlign
-
-                        let positioned =
-                            shiftWidget xOffset yOffset child
+                        let positioned = shiftWidget 0 (groupOffset + yOffset) child
 
                         place rest (yOffset + childFlowHeight + gap) (positioned :: acc)
 
@@ -405,7 +411,7 @@ module Layout =
                 let positionedChildren =
                     children
                     |> List.map (fun child ->
-                        layoutWidget child (Some resolvedContentWidth) None)
+                        layoutWidget child (Some resolvedContentWidth) (Some resolvedContentHeight))
 
                 let positionedChildren =
                     positionedChildren
@@ -440,9 +446,9 @@ module Layout =
                     let gridChild = shiftWidget (paddingH + alignOffset resolvedContentWidth gridContentWidth align) paddingV positionedGrid
                     PositionedBlockWidget(width, height, overflow, border, borderColor, name, align, paddingV, paddingH, { x = 0; y = 0; w = resolvedContentWidth + paddingH * 2; h = resolvedContentHeight + paddingV * 2 }, [ gridChild ])
                 | None ->
-                    let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
-                    let childWidths = positionedChildren |> List.map totalWidth
-                    let childHeights = positionedChildren |> List.map totalHeight
+                    let measuredChildren = children |> List.map (fun child -> layoutWidget child parentWidth None)
+                    let childWidths = measuredChildren |> List.map totalWidth
+                    let childHeights = measuredChildren |> List.map totalHeight
                     let maxChildWidth = if List.isEmpty childWidths then 0 else List.max childWidths
                     let contentWidth = max maxChildWidth titleWidth
                     let totalChildHeight = if List.isEmpty childHeights then 0 else List.max childHeights
@@ -450,7 +456,9 @@ module Layout =
                     let resolvedContentHeight = resolveDimension height parentHeight totalChildHeight
                     let availableWidth = max 0 (resolvedContentWidth - paddingH * 2)
                     let positionedChildren =
-                        positionedChildren
+                        children
+                        |> List.map (fun child ->
+                            layoutWidget child (Some resolvedContentWidth) (Some resolvedContentHeight))
                         |> List.map (fun child ->
                             let childTotalWidth = totalWidth child
                             let xOffset = paddingH + alignOffset availableWidth childTotalWidth align
@@ -478,10 +486,10 @@ module Layout =
             PositionedTerminalWidget(width, height, alignX, alignY, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren) 
 
         | FrameWidget(tp, fc,  width, height, overflow, align, paddingV: int, paddingH: int, children) ->
-            let positionedChildren = children |> List.map (fun child -> layoutWidget child None None)
+            let measuredChildren = children |> List.map (fun child -> layoutWidget child None None)
 
-            let childWidths = positionedChildren |> List.map totalWidth
-            let childHeights = positionedChildren |> List.map totalHeight
+            let childWidths = measuredChildren |> List.map totalWidth
+            let childHeights = measuredChildren |> List.map totalHeight
 
             let maxChildWidth = if List.isEmpty childWidths then 0 else List.max childWidths
             let totalChildHeight = if List.isEmpty childHeights then 0 else List.max childHeights
@@ -492,7 +500,9 @@ module Layout =
             let availableWidth = max 0 (resolvedContentWidth - paddingH * 2)
 
             let positionedChildren =
-                positionedChildren
+                children
+                |> List.map (fun child ->
+                    layoutWidget child (Some resolvedContentWidth) (Some resolvedContentHeight))
                 |> List.map (fun child ->
                     let childTotalWidth = totalWidth child
                     let xOffset = paddingH + alignOffset availableWidth childTotalWidth align
