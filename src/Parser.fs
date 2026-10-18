@@ -4,7 +4,7 @@ open PTML.Token
 
 module Parser =
     let validTags = 
-        Set.ofList ["frag"; "text"; "row"; "column"; "layer"; "box"; "block"; "terminal"; "cell"; "snippet"; "spinner"; "hr"; "progress"; "escape"; "frame"; "cursor"]
+        Set.ofList ["frag"; "text"; "row"; "column"; "layer"; "box"; "block"; "terminal"; "cell"; "snippet"; "spinner"; "hr"; "progress"; "escape"; "frame"; "cursor"; "tree"]
     let colorValues = 
         Set.ofList ["none"; "black"; "red"; "green"; "gold"; "blue"; "purple"; "cyan"; "fire"; "limegreen"; "yellow"; "lightblue"; "lilac"; "crystal"; "gray"; "lightgray"; "white"]
     let fontValues = Set.ofList ["none"; "bold"; "dim"; "italic"; "underline"; "slow-blink"; "rapid-blink"; "reverse"; "conceal"; "strike-through"; "double-underline"; "overline"]
@@ -111,6 +111,10 @@ module Parser =
             "visible", boolean
             "color", Set.empty
         ]
+        "tree", Map.ofList [
+            "path", Set.empty
+            "root-limit", Set.empty
+        ]
     ]
 
     let globalAttributes = Set.ofList ["id"; "snippet"]
@@ -153,6 +157,12 @@ module Parser =
                             let mutable i = 0
                             if System.Int32.TryParse(value, &i) then Valid
                             else InvalidValue $"Invalid value for {name}: {value}"
+                        | "root-limit" ->
+                            let mutable i = 0
+                            if System.Int32.TryParse(value, &i) && i >= 0 then Valid
+                            else InvalidValue $"Invalid root-limit: {value}"
+                        | "path" when value = "" ->
+                            InvalidValue "The path attribute for <tree> cannot be empty."
                         | "width" | "height" ->
                             if value <> "auto" && not (value.EndsWith "%") then
                                 let mutable i = 0
@@ -237,6 +247,8 @@ module Parser =
                     failwith "Missing required attribute for block: title"
                 if tag = "layer" && not (List.exists (fun (name, _) -> name = "index") attrs) then
                     failwith "Missing required attribute for layer: index"
+                if tag = "tree" && not (List.exists (fun (name, _) -> name = "path") attrs) then
+                    failwith "Missing required attribute for tree: path"
             if selfClosing then
                 parser(rest, stack)
             else

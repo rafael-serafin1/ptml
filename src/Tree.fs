@@ -531,6 +531,17 @@ module Tree =
         | TextNode contents -> buildTextNodeWidgets contents
         | Element(tag, _, attrs, children) ->
             match tag with
+            | "tree" ->
+                if not (List.isEmpty children) then
+                    failwith "Element <tree> cannot contain child elements or text."
+                let path =
+                    tryGetAttr "path" attrs
+                    |> Option.defaultWith (fun () -> failwith "Missing required attribute for tree: path")
+                let rootLimit = parseIntAttr "root-limit" 5 attrs
+                let children =
+                    DirTree.render path rootLimit
+                    |> List.map (fun line -> TextWidget(line, None, None, None, None))
+                [ ColumnWidget(Auto, OverflowValues.Break, NoBorder, 0, None, children) ]
             | "hr" -> 
                 let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
                 let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto

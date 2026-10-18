@@ -91,6 +91,38 @@ module Buffer =
                 url = None
             }
 
+    let requiredSize (minimumWidth: int) (minimumHeight: int) renderOps =
+        let mutable requiredWidth = minimumWidth
+        let mutable requiredHeight = minimumHeight
+
+        let includeCell x y =
+            requiredWidth <- max requiredWidth (x + 1)
+            requiredHeight <- max requiredHeight (y + 1)
+
+        renderOps
+        |> List.iter (function
+            | Drawers.DrawChar(text, x, y, _, _, _, _) ->
+                let mutable currentX = x
+                let mutable currentY = y
+                for ch in text do
+                    match ch with
+                    | '\n' | '\v' | '\f' ->
+                        requiredHeight <- max requiredHeight (currentY + 2)
+                        currentX <- x
+                        currentY <- currentY + 1
+                    | '\r' -> currentX <- x
+                    | '\b' -> currentX <- max x (currentX - 1)
+                    | _ ->
+                        includeCell currentX currentY
+                        currentX <- currentX + 1
+            | Drawers.DrawSpinner(typ, x, y, _, _, _, _, _) ->
+                let frameWidth = max 1 (firstFrame typ).Length
+                requiredWidth <- max requiredWidth (x + frameWidth)
+                requiredHeight <- max requiredHeight (y + 1)
+            | Drawers.CursorStyle(_, x, y, _, _, _) -> includeCell x y)
+
+        max 1 requiredWidth, max 1 requiredHeight
+
     (* STEP 1: CLEAR BUFFER *)
     (* Limpa todas as células do buffer, preenchendo-as com células vazias *)
     let clearBuffer buffer =
@@ -110,9 +142,18 @@ module Buffer =
             | Drawers.CursorStyle(sp, x, y, blk, clr, v) ->
                 setCursorStyle (buffer, x, y, sp, blk, clr, v)
             | Drawers.DrawChar(text, x, y, fg, bg, font, url) ->
-                text
-                |> Seq.iteri (fun offset ch ->
-                    setCell buffer (x + offset) y (char ch) fg bg font url)
+                let mutable currentX = x
+                let mutable currentY = y
+                for ch in text do
+                    match ch with
+                    | '\n' | '\v' | '\f' ->
+                        currentX <- x
+                        currentY <- currentY + 1
+                    | '\r' -> currentX <- x
+                    | '\b' -> currentX <- max x (currentX - 1)
+                    | _ ->
+                        setCell buffer currentX currentY (char ch) fg bg font url
+                        currentX <- currentX + 1
             | Drawers.DrawSpinner(tp: Types, x, y, inter, dur, complete, fg, bg) -> 
                 tp 
                 |> firstFrame

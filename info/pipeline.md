@@ -49,3 +49,5 @@ Diff Engine
 
 ANSI Output
 “escreve no terminal”
+
+No comando `run`, quando as operações renderizadas excedem o viewport, o buffer virtual cresce para preservar o conteúdo e as linhas são escritas em fluxo normal, permitindo que o terminal quebre linhas largas e role verticalmente. Quando o conteúdo cabe no viewport, a renderização em tela cheia existente é mantida.

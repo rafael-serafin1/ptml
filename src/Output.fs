@@ -201,6 +201,90 @@ module Output =
         threads |> Array.iter (fun t -> t.Start())
         threads |> Array.iter (fun t -> t.Join())
 
+    let writeScrollingBuffer (lineWidth: int) (buffer: Cell[,]) =
+        let width = Array2D.length2 buffer
+        let height = Array2D.length1 buffer
+        let lineWidth = max 1 lineWidth
+        let mutable currentStyle = ""
+        let mutable column = 0
+        let lastVisibleColumns = Array.zeroCreate height
+        let rowOffsets = Array.zeroCreate height
+        let spinnerPositions = ResizeArray<int * int * Spinner>()
+        let mutable outputLineCount = 0
+
+        for y in 0 .. height - 1 do
+            let mutable lastVisibleColumn = -1
+            for x in 0 .. width - 1 do
+                let cell = buffer.[y, x]
+                if shouldRenderCell cell || Option.isSome cell.cursor then
+                    lastVisibleColumn <- x
+
+                match cell.spinner with
+                | Some spinner ->
+                    let frameWidth = max 1 (Spinner.firstFrame spinner.tp).Length
+                    let mutable runStart = x
+                    while runStart > 0 && buffer.[y, runStart - 1].spinner = Some spinner do
+                        runStart <- runStart - 1
+                    if (x - runStart) % frameWidth = 0 then
+                        spinnerPositions.Add((x, y, spinner))
+                | None -> ()
+
+            lastVisibleColumns.[y] <- lastVisibleColumn
+            rowOffsets.[y] <- outputLineCount
+            outputLineCount <- outputLineCount + max 1 ((lastVisibleColumn + lineWidth) / lineWidth)
+
+        for y in 0 .. height - 1 do
+            for x in 0 .. lastVisibleColumns.[y] do
+                if column = lineWidth then
+                    Console.Out.Write("\r\n")
+                    column <- 0
+
+                let cell = buffer.[y, x]
+                match cell.cursor with
+                | Some cursor -> Console.Out.Write(ansiCursorStyle cursor)
+                | None ->
+                    match ansiStyle cell with
+                    | Some style when style <> currentStyle ->
+                        if currentStyle <> "" then
+                            Console.Out.Write(resetCode)
+                        Console.Out.Write(style)
+                        currentStyle <- style
+                    | None when currentStyle <> "" ->
+                        Console.Out.Write(resetCode)
+                        currentStyle <- ""
+                    | _ -> ()
+                    match urlCode cell.url with
+                    | Some openCode ->
+                        Console.Out.Write(openCode)
+                        Console.Out.Write(cell.char)
+                        Console.Out.Write(urlCloseCode)
+                    | None -> Console.Out.Write(cell.char)
+                column <- column + 1
+
+            if currentStyle <> "" then
+                Console.Out.Write(resetCode)
+                currentStyle <- ""
+            Console.Out.Write("\r\n")
+            column <- 0
+
+        let struct (_, finalCursorY) = Console.GetCursorPosition()
+        let windowHeight = Console.WindowHeight
+        for x, y, spinner in spinnerPositions do
+            let screenX = x % lineWidth
+            let screenY = finalCursorY - outputLineCount + rowOffsets.[y] + x / lineWidth
+            if screenX < lineWidth && screenY >= 0 && screenY < windowHeight then
+                let thread =
+                    Thread(ThreadStart(fun () ->
+                        Spinner.drawSpinner(
+                            spinner.tp,
+                            screenX,
+                            screenY,
+                            spinner.interval,
+                            spinner.dur,
+                            spinner.complete
+                        )))
+                thread.Start()
+
     // O que a Output acredita estar na tela agora (último frame desenhado).
     let mutable private terminalState: State.BufferState option = None
 
