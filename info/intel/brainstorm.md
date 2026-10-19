@@ -1457,7 +1457,6 @@ relationship            (e1 --<...>-- e2)
 Descreve a relação entre as duas entidades.
 
 ---
-### IGNORE POR ENQUANTO!
 ## Elemento `<tree>`
 
 `<tree />`  
@@ -1469,7 +1468,9 @@ Elemento que desenha uma árvore de diretórios no terminal.
 Caminho relativo ou absoluto da raiz.
 
 ***root-limit***:
-Limite de ramificações totais da árvore final.
+Limite de filhos exibidos em cada diretório. Quando omitido, o padrão é `5`. Itens com atributo oculto ou de sistema não são exibidos e não entram na contagem do limite.
+
+O caminho relativo é resolvido a partir do diretório de trabalho atual do processo. O caminho é obrigatório, e o nome da raiz é exibido na primeira linha. A árvore lista diretórios antes de arquivos e ordena os nomes alfabeticamente, usando conectores Unicode. Links para diretórios são listados, mas seus destinos não são percorridos. Quando um diretório tem mais filhos que o limite, uma linha informa quantos itens foram omitidos.
 
 ---
 ### IGNORE POR ENQUANTO!
@@ -1827,4 +1828,3 @@ Home | - About - | Contact
 
 `<modal></modal>`
 Elemento abstrato que define um modal popup.
-

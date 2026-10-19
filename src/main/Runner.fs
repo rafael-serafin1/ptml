@@ -40,21 +40,31 @@ module Runner =
         | None -> 
             Status.Error
         | Some t ->
-        let baseBuffer = processRenderTree renderOps (t.ViewWidth) (t.ViewHeight)
+        let requiredWidth, requiredHeight = Buffer.requiredSize 0 0 renderOps
+        let overflowsViewport =
+            requiredWidth > t.SafeWidth || requiredHeight > t.SafeHeight
+        let bufferWidth =
+            if overflowsViewport then max 1 requiredWidth else t.ViewWidth
+        let bufferHeight =
+            if overflowsViewport then max 1 requiredHeight else t.ViewHeight
+        let baseBuffer = processRenderTree renderOps bufferWidth bufferHeight
         let buffer: Cell array2d = Depth.composeDepthLayers baseBuffer depthLayers
 
-        if Utils.shouldWindow = false then
-            Console.WindowWidth <- T.SafeWidth
-            Console.WindowHeight <- T.SafeHeight
+        if overflowsViewport then
+            Output.writeScrollingBuffer t.SafeWidth buffer
+        else
+            if Utils.shouldWindow = false then
+                Console.WindowWidth <- T.SafeWidth
+                Console.WindowHeight <- T.SafeHeight
 
-        Console.Write("\x1b[2J\x1b[H")
-        Output.writeAnsiBuffer(buffer)
-        for y = 0 to buffer.GetLength(0) - 1 do
-            for x = 0 to buffer.GetLength(0) - 1 do
-                let cell = buffer[y, x]
-                match cell.spinner with
-                | Some c -> 
-                    Spinner.threadDraw(c.tp, x, y, c.interval, c.dur, c.complete)
-                | None -> ()
-        printfn ""
+            Console.Write("\x1b[2J\x1b[H")
+            Output.writeAnsiBuffer(buffer)
+            for y = 0 to buffer.GetLength(0) - 1 do
+                for x = 0 to buffer.GetLength(1) - 1 do
+                    let cell = buffer[y, x]
+                    match cell.spinner with
+                    | Some c ->
+                        Spinner.threadDraw(c.tp, x, y, c.interval, c.dur, c.complete)
+                    | None -> ()
+            printfn ""
         Status.Success
