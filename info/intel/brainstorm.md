@@ -39,6 +39,7 @@ Sendo assim, atualmente os concretos são:
 <hyper>
 <toast>
 <input>
+<signal>
 <entity>
 <bind>
 <graphs>
@@ -972,6 +973,9 @@ center
 end
 ```
 
+***title***:
+Atributo NOVO que permite alterar o texto da barra de título da janela.
+
 ---
 ## Elemento `<cell>`
 
@@ -1344,23 +1348,15 @@ lower-alphabet              (ex: a, b, c)
 upper-alphabet              (ex: A, B, C)
 ```
 
-***oftype***:
-Define o comportamento dos items da lista. Valores possíveis:
-```
-text                        (valor padrão, apenas texto)
-radio-collection            (os itens se comportam como itens de escolha única)
-checklist                   (os itens se comportam como itens de múltipla escolha)
-```
-
 ***before/after***:
-Descreve o que deve vir antes ou depois do caractere de lista.
+Descreve o que deve vir antes ou depois do caractere de lista. `before` indica qual texto virá antes da estilização, ja o `after` indica qual texto virá depois da estilização.
 
 Exemplo:
 - Input
 ```ptml
 <column>
     <text>How to use `HTML`: </text>
-    <list oftype="enum" before="Step " after=" " items-behaviour="text">
+    <list ofstyle="enum" before="Step " after=" ">
         <column>
             <item>Create a HTML file.</item>
             <item>Configure DOM.</item>
@@ -1383,7 +1379,7 @@ Step 3. Open file on browser.
 ## Elemento `<code>`
 
 `<code></code>`
-Elemento usado para inferir ou referenciar scripts executáveis na linguagem F#.
+Elemento usado para inferir ou referenciar scripts executáveis na linguagem Lua, via interpretador MoonSharp.
 
 ### **Atributos**:
 
@@ -1399,23 +1395,25 @@ async               (de forma assíncrona)
 
 ---
 ### IGNORE POR ENQUANTO!
-## Elemento `<button>`
+## Elemento `<signal>`
 
-`<button />`
-Elemento com handling de evento para clique.
+`<signal />`
+Elemento com handling de eventos relacionados ao cursor do mouse.
 
 Exemplo:
 - Input
 ```ptml
-<button handler="" />
+<signal handler="doSmth()" />
 ```
 
 ### **Atributos**:
 
 ***type***:
-Define o tipo de botão. Valores possíveis:
+Define a maneira como o sinal vai ser enviado. Valores possíveis:
 ```
-
+button              (valor padrão)
+switch              (interruptor liga/desliga)
+detector            (quando o mouse passar por cima)
 ```
 
 --- 
@@ -1428,7 +1426,7 @@ Elemento que recebe valores em formato de string.
 Exemplo:
 - Input
 ```ptml
-<input type="button" event="single-click" placeholder="Click here!" width="28" />
+<input event="single-click" placeholder="Click here!" width="28" />
 ```
 
 - Output
@@ -1445,7 +1443,6 @@ clicks                          (aceita qualquer tipo de clique, podendo ser tra
 single-click
 double-click
 hold-click
-...
 ```
 
 ***placeholder***:

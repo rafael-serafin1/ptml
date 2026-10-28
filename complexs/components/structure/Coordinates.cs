@@ -1,4 +1,3 @@
-namespace complexs.components;
 public struct Coordinates
 {
     private int left;

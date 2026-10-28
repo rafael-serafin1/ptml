@@ -1,17 +1,10 @@
 using System.Globalization;
-
-namespace complexs.components;
-
-public class Input
+using complexs.components;
+public class Input: Component
 {
     private readonly int _maxLength;
 
-    public Input(
-        Coordinates position,
-        int width,
-        int height,
-        string placeholder,
-        int maxLength = 100)
+    public Input(Coordinates position, int width, int height, string placeholder, int maxLength = 100): base(position, width, height, placeholder)
     {
         if (width <= 0)
             throw new ArgumentOutOfRangeException(nameof(width), "Width must be greater than zero.");
@@ -20,30 +13,18 @@ public class Input
         if (maxLength <= 0)
             throw new ArgumentOutOfRangeException(nameof(maxLength), "Maximum length must be greater than zero.");
 
-        Position = position;
-        Width = width;
-        Height = height;
-        Placeholder = placeholder ?? throw new ArgumentNullException(nameof(placeholder));
         _maxLength = maxLength;
     }
-
-    public Coordinates Position { get; }
-
-    public int Width { get; }
-
-    public int Height { get; }
-
-    public string Placeholder { get; }
 
     public string Value { get; private set; } = string.Empty;
 
     public bool IsFocused { get; private set; }
 
     public bool Contains(int x, int y) =>
-        x >= Position.Left &&
-        y >= Position.Top &&
-        (long)x < (long)Position.Left + Width &&
-        (long)y < (long)Position.Top + Height;
+        x >= _position.Left &&
+        y >= _position.Top &&
+        (long)x < (long)_position.Left + _width &&
+        (long)y < (long)_position.Top + _height;
 
     public bool HandleClick(int x, int y)
     {
