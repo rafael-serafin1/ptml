@@ -32,13 +32,7 @@ module Utils =
     let regrade3(cem: int, num: int): float =
         (float) (num * 100 / cem)
 
-    let hexadecimal(hex: string, ground: Grounds): string = 
-        if hex.Length <> 7 || hex[0] <> '#' then
-            failwith $"Invalid hexadecimal format: {hex}" 
-        let r = Convert.ToInt32(hex.Substring(1, 2), 16)
-        let g = Convert.ToInt32(hex.Substring(3, 2), 16)
-        let b = Convert.ToInt32(hex.Substring(5, 2), 16)
-        
+    let private finalHexa(r: int, g: int, b: int, ground: Grounds): string =
         let mutable status = 0
         match ground with
         | Foreground -> 
@@ -48,3 +42,24 @@ module Utils =
             
         let result = sprintf "%d;2;%d;%d;%d" status r g b
         result
+
+    let rec countArray(array: 'a array) = 
+        if Array.isEmpty array then
+            0
+        else
+            1 + countArray array.[1..]
+
+    let hexadecimal(hex: string, ground: Grounds): string = 
+        if (hex.Length <> 7 && hex.Length <> 4) || hex[0] <> '#' then
+            failwith $"Invalid hexadecimal format: {hex}" 
+        
+        if hex.Length = 7 then
+            let r = Convert.ToInt32(hex.Substring(1, 2), 16)
+            let g = Convert.ToInt32(hex.Substring(3, 2), 16)
+            let b = Convert.ToInt32(hex.Substring(5, 2), 16)
+            finalHexa(r, g, b, ground)
+        else 
+            let r = Convert.ToInt32(hex.Substring(1, 1), 16)
+            let g = Convert.ToInt32(hex.Substring(2, 1), 16)
+            let b = Convert.ToInt32(hex.Substring(3, 1), 16)
+            finalHexa(r, g, b, ground)

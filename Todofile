@@ -7,3 +7,4 @@
 7. [ ] Adicionar um sistema de observação do arquivo PTML que simule o funcionamento de uma web aplicacao, com hotload em tempo real e consistente
 8. [X] Suporte para hexadecimais nos atributos foreground e background de <text>
 9. [X] O elemento <cursor> parou de fazer efeito por algum motivo
+10. [ ] Novo elemento '<title>' para titulos em terminal, com inspiração em FIGlet

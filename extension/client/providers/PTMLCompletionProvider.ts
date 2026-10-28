@@ -100,6 +100,11 @@ export class PTMLCompletionProvider
                 name: "cursor",
                 snippet: 'cursor',
                 documentation: '<cursor shape="$0" />'
+            },
+            {
+                name: "tree",
+                snippet: 'tree src="$0" />',
+                documentation: '<tree src="$0" root-limit="$1" />'
             }
         ];
 
