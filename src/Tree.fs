@@ -655,7 +655,7 @@ module Tree =
                 [ FrameWidget(fw, fc, width, height, overflow, align, paddingV, paddingH, childrenWidgets) ]
             | "cursor" ->
                 let shape = tryGetAttr "shape" attrs |> Option.map Cursor.parseShape |> Option.defaultValue Cursor.Shape.Underline
-                let color = tryGetAttr "color" attrs |> Option.map Cursor.parseCursorColor |> Option.defaultValue "#fff"
+                let color = tryGetAttr "color" attrs |> Option.map Cursor.parseCursorColor |> Option.defaultValue "#ffffff"
                 let blink = tryGetAttr "blink" attrs |> Option.defaultValue "false"
                 let visible = tryGetAttr "visible" attrs |> Option.defaultValue "true"
                 [ CursorWidget(shape, Some blink, Some color, Some visible) ]

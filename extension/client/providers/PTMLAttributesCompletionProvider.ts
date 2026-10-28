@@ -342,17 +342,21 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
             name: "color",
             values: cursorColor
         }
+    ],
+    tree: [
+        {
+            name: "src",
+        },
+        {
+            name: "root-limit",
+        }
     ]
 };
 
 export class PTMLAttributeCompletionProvider
     implements vscode.CompletionItemProvider {
 
-    provideCompletionItems(
-        document: vscode.TextDocument,
-        position: vscode.Position
-    ): vscode.CompletionItem[] {
-
+    provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {
         const line = document.lineAt(position.line).text;
         const beforeCursor = line.substring(0, position.character);
 

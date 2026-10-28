@@ -19,6 +19,7 @@
     <Compile Include="components/Frame.fs"          />
     <Compile Include="components/Cursor.fs"         />
     <Compile Include="components/DirTree.fs"        />
+    <Compile Include="components/Title.fs"          />
     <Compile Include="attrs/FontCode.fs"            />
     <Compile Include="attrs/PiAttrs.fs"             />
     <Compile Include="attrs/Overflow.fs"            />

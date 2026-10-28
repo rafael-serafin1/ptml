@@ -68,7 +68,7 @@ module DirTree =
                     appendChildren childPrefix (DirectoryInfo(entry.FullPath))
 
             if omittedCount > 0 then
-                let omittedLabel = if omittedCount = 1 then "item omitido" else "itens omitidos"
+                let omittedLabel = if omittedCount = 1 then "hidden item" else "hidden items"
                 lines.Add(prefix + $"└── … ({omittedCount} {omittedLabel})")
 
         appendChildren "" root
