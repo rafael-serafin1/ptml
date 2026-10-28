@@ -73,19 +73,26 @@
                         </text>
     
                         <column gap="1">
+                            <row>     
+                                <column>
+                                    <text>CPU</text>
+                                    <progress style="blocks" value="37" max="100"/>
+                                </column>
+                            </row>
     
-                            <text>CPU</text>
-    
-                            <progress style="blocks" value="37" max="100"/>
-    
-                            <text>Memory</text>
-    
-                            <progress value="64" max="100"/>
-    
-                            <text>Disk</text>
-    
-                            <progress value="81" max="100"/>
-    
+                            <row>
+                                <column>
+                                    <text>Memory</text>
+                                    <progress value="64" max="100"/>
+                                </column>
+                            </row>
+                            
+                            <row>
+                                <column>
+                                    <text>Disk</text>
+                                    <progress value="81" max="100"/>
+                                </column>
+                            </row>
                         </column>
                     </column>
 
@@ -94,31 +101,37 @@
 
             <hr orientation="horizontal" width="100%"/>
 
-            <box>
-                <text snippet="header">
-                    BUILD PIPELINE
-                </text>
+            <row gap="1">
+                <box>
+                    <column>
+                        <text snippet="header">BUILD PIPELINE</text>
+                        <hr orientation="horizontal" width="100%" />
+                        <column>
+                            <row gap="1">
+                                <text>
+                                    Compiling PTML parser...
+                                </text>
+                            </row>
+        
+                            <row gap="1">
+                                <text>
+                                    Generating renderer...
+                                </text>
+                            </row>
+        
+                            <row gap="1">
+                                <text>
+                                    Waiting for terminal...
+                                </text>
+                            </row>
+                        </column>
+                    </column>
+                </box>
 
-                <column gap="1">
-                    <row gap="1">
-                        <text>
-                            Compiling PTML parser...
-                        </text>
-                    </row>
-
-                    <row gap="1">
-                        <text>
-                            Generating renderer...
-                        </text>
-                    </row>
-
-                    <row gap="1">
-                        <text>
-                            Waiting for terminal...
-                        </text>
-                    </row>
-                </column>
-            </box>
+                <box>
+                    <tree path="./src" root-limit="1" />
+                </box>
+            </row>
 
             <hr width="100%"/>
 
@@ -126,10 +139,7 @@
                 <column gap="1">
                     <row gap="1">
                         <text>Repository:</text>
-
-                        <text snippet="link" url="https://github.com/rafael-serafin1/ptml">
-                            github.com/rafael-serafin1/ptml
-                        </text>
+                        <text snippet="link" url="https://github.com/rafael-serafin1/ptml">github.com/rafael-serafin1/ptml</text>
                     </row>
 
                     <row gap="1">
@@ -145,9 +155,6 @@
                 <text snippet="ok">● ONLINE</text>
                 <text foreground="lightgray">PTML v1.0 Preview</text>
             </row>
-
         </column>
-
     </block>
-
 </terminal>

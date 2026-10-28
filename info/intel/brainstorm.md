@@ -34,8 +34,9 @@ Sendo assim, atualmente os concretos são:
 <hr>
 <progress>
 <frame>
----> Em desenvolvimento
 <tree>
+---> Em desenvolvimento
+<hyper>
 <toast>
 <input>
 <entity>
@@ -1292,6 +1293,37 @@ Exemplo:
 ***snippet***:
 Atributo que todos os elementos possuem e que faz a adição dos atributos resumidos no elemento `<snippet>`.
 > OBS.1: Se o `<snippet>` tiver atributos que o elemento não possui, exemplo `padding` para `<text>`, a execução não será interrompida, mas um aviso será gerado no terminal para deixar claro que aquele atributo não existe para tal elemento.
+
+---
+### IGNORE POR ENQUANTO!
+## Elemento `<hyper>`
+
+`<hyper></hyper>`
+Elemento com o objetivo de gerar letras grandes, visualmente marcantes, usando caracteres do terminal.
+
+Exemplo:
+- Input
+```ptml
+<hyper>ELS</hyper>
+```
+
+- Output
+```cmd
+##### #      ####
+#     #     #    
+####  #      ### 
+#     #         #
+##### ##### ####
+```
+
+### **Atributos**:
+
+***type***:
+Declara o tipo de hipertexto (basicamente a orientação das letras, se é horizontal ou vertical). Valores possíveis:
+```
+outdoor             (horizontal & valor padrão)
+banner              (vertical)
+```
 
 ---
 ### IGNORE POR ENQUANTO!
