@@ -6,37 +6,37 @@ open PTML.Drawers
 module Buffer =
     (* BUFFER *)
     type Spinner = {
-        tp: Types
-        interval: string
-        dur: string
-        complete: string
+        tp:         Types
+        interval:   string
+        dur:        string
+        complete:   string
     }
     type Cursor = {
-        sh: Cursor.Shape
-        blk: string option
-        clr: string option
-        v: string option
+        sh:     Cursor.Shape
+        blk:    string option
+        clr:    string option
+        v:  string option
     }
 
     type Cell = {
         char: char
-        spinner: Spinner option
-        cursor: Cursor option
+        spinner:    Spinner option
+        cursor:     Cursor option
         foreground: string option
         background: string option
-        font: string option
-        url: string option
+        font:       string option
+        url:        string option
     }
 
     (* EMPTY CELL *)
     let emptyCell: Cell = {
-        char = ' '
-        spinner = None
-        cursor = None
-        foreground = None
-        background = None
-        font = None
-        url = None
+        char        = ' '
+        spinner     = None
+        cursor      = None
+        foreground  = None
+        background  = None
+        font        = None
+        url         = None
     }
 
     (* BUFFER INITIALIZATION *)
@@ -47,48 +47,48 @@ module Buffer =
     let setCursorStyle (buffer, x: int, y: int, shape: Cursor.Shape, blink: string option, color: string option, visible: string option) =
         if x >= 0 && x < Array2D.length2 buffer && y >= 0 && y < Array2D.length1 buffer then
             buffer.[y, x] <- {
-                char = ' ' 
+                char    = ' '
                 spinner = None
-                cursor = Some {
-                    sh = shape
+                cursor  = Some {
+                    sh  = shape
                     blk = blink
                     clr = color
-                    v = visible
+                    v   = visible
                 }
                 foreground = color
                 background = None
-                font = None
-                url = None
+                font       = None
+                url        = None
             }
 
     let setCell buffer x y char foreground background font url =
         if x >= 0 && x < Array2D.length2 buffer && y >= 0 && y < Array2D.length1 buffer then
             buffer.[y, x] <- {
-                char = char
-                spinner = None
-                cursor = None
+                char       = char
+                spinner    = None
+                cursor     = None
                 foreground = foreground
                 background = background
-                font = font
-                url = url
+                font       = font
+                url        = url
             }
     
     let setSpinnerCell(buffer, typ, x, y, inter, dur, complete, fg, bg)=
         if x >= 0 && x < Array2D.length2 buffer && y >= 0 && y < Array2D.length1 buffer then
             let char = (char)(firstFrame typ)
             buffer.[y, x] <- {
-                char = char
+                char    = char
                 spinner = Some {
-                    tp = typ
+                    tp       = typ
                     interval = inter
-                    dur = dur
+                    dur      = dur
                     complete = complete
                 }
-                cursor = None
+                cursor     = None
                 foreground = fg
                 background = bg
-                font = None
-                url = None
+                font       = None
+                url        = None
             }
 
     let requiredSize (minimumWidth: int) (minimumHeight: int) renderOps =
@@ -104,9 +104,12 @@ module Buffer =
             | Drawers.DrawChar(text, x, y, _, _, _, _) ->
                 let mutable currentX = x
                 let mutable currentY = y
+
                 for ch in text do
                     match ch with
-                    | '\n' | '\v' | '\f' ->
+                    | '\n' 
+                    | '\v' 
+                    | '\f' ->
                         requiredHeight <- max requiredHeight (currentY + 2)
                         currentX <- x
                         currentY <- currentY + 1
@@ -117,8 +120,8 @@ module Buffer =
                         currentX <- currentX + 1
             | Drawers.DrawSpinner(typ, x, y, _, _, _, _, _) ->
                 let frameWidth = max 1 (firstFrame typ).Length
-                requiredWidth <- max requiredWidth (x + frameWidth)
-                requiredHeight <- max requiredHeight (y + 1)
+                requiredWidth       <- max requiredWidth (x + frameWidth)
+                requiredHeight      <- max requiredHeight (y + 1)
             | Drawers.CursorStyle(_, x, y, _, _, _) -> includeCell x y)
 
         max 1 requiredWidth, max 1 requiredHeight

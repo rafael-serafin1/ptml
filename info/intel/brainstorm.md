@@ -37,7 +37,6 @@ Sendo assim, atualmente os concretos são:
 <tree>
 ---> Em desenvolvimento
 <hyper>
-<toast>
 <input>
 <signal>
 <entity>
@@ -55,8 +54,9 @@ Agora, os abstratos são:
 <snippet>
 <escape>
 <cursor>
+<list>
 ---> Em desenvolvimento
-<timeline>
+<toast>
 <carousel>  
 <slide>
 <code>
@@ -1317,12 +1317,12 @@ Exemplo:
 #     #     #    
 ####  #      ### 
 #     #         #
-##### ##### ####
+##### ##### #### 
 ```
 
 ### **Atributos**:
 
-***type***:
+***format***:
 Declara o tipo de hipertexto (basicamente a orientação das letras, se é horizontal ou vertical). Valores possíveis:
 ```
 outdoor             (horizontal & valor padrão)
@@ -1330,7 +1330,6 @@ banner              (vertical)
 ```
 
 ---
-### IGNORE POR ENQUANTO!
 ## Elemento `<list>`
 
 `<list></list>`
@@ -1341,29 +1340,32 @@ Elemento usado para descrever listas.
 ***ofstyle***:
 Define como a lista será escrita.
 ```
-unorder                     (não ordernada -, -, -)
-order                       (ordenada ○, ○, ○)
-enum                        (enumerada ex: 1,2,3)
-lower-alphabet              (ex: a, b, c)
-upper-alphabet              (ex: A, B, C)
+unorder                     (não ordenada: -, -, -)
+bullet                      (○, ○, ○; valor padrão)
+enum                        (1., 2., 3.)
+lower-alphabet              (a., b., c.; continua como aa. após z.)
+upper-alphabet              (A., B., C.; continua como AA. após Z.)
 ```
 
 ***before/after***:
-Descreve o que deve vir antes ou depois do caractere de lista. `before` indica qual texto virá antes da estilização, ja o `after` indica qual texto virá depois da estilização.
+Descreve o que deve vir antes ou depois do caractere de estilização (*ofstyle*) da lista. `before` indica qual texto virá antes da estilização, ja o `after` indica qual texto virá depois. 
+
+Cada filho direto de um `<row>` ou `<column>` dentro de `<list>` representa um item; o container define a disposição dos itens. Sem `<row>` ou `<column>`, os filhos diretos da lista são dispostos horizontalmente.
 
 Exemplo:
 - Input
 ```ptml
 <column>
-    <text>How to use `HTML`: </text>
+    <text>How to use `HTML`:</text>
     <list ofstyle="enum" before="Step " after=" ">
         <column>
-            <item>Create a HTML file.</item>
-            <item>Configure DOM.</item>
-            <item>Open file on browser.</item>
+            <text>Create a HTML file.   </text>
+            <text>Configure DOM.        </text>
+            <text>Open file on browser. </text>
         </column>
     </list>
 </column>
+<!-- Nesse caso, <list> está descrevendo uma lista, onde <column> ordena os itens em coluna e <text> representa cada item separadamente -->
 ```
 
 - Output
@@ -1374,6 +1376,8 @@ Step 2. Configure DOM.
 Step 3. Open file on browser.
 ```
 
+> Expected behaviour: before + marcador + after + conteúdo
+
 ---
 ### IGNORE POR ENQUANTO!
 ## Elemento `<code>`
@@ -1381,16 +1385,29 @@ Step 3. Open file on browser.
 `<code></code>`
 Elemento usado para inferir ou referenciar scripts executáveis na linguagem Lua, via interpretador MoonSharp.
 
+Exemplo:
+- Input
+```ptml
+<code>
+    print("hello world")
+</code>
+```
+
+- Output
+```cmd
+hello world
+```
+
 ### **Atributos**:
 
 ***src***:
-Define o caminho para um arquivo de script externo.
+Define o caminho para um arquivo de script externo. Se não houver, executar o script escrito dentro do elemento.
 
-***execute***:
+***execute-method***:
 Define como o script externo deve ser carregado e executado. Valores possíveis:
 ```
+async               (de forma assíncrona, valor padrão)
 defer               (em paralelo, mas apenas se o PTML ja foi totalmente processado)
-async               (de forma assíncrona)
 ```
 
 ---
@@ -1403,7 +1420,12 @@ Elemento com handling de eventos relacionados ao cursor do mouse.
 Exemplo:
 - Input
 ```ptml
-<signal handler="doSmth()" />
+<signal type="button" handler="doSmth()" alt="Click here!" />
+```
+
+- Output
+```cmd
+[Click here!]
 ```
 
 ### **Atributos**:
@@ -1415,6 +1437,12 @@ button              (valor padrão)
 switch              (interruptor liga/desliga)
 detector            (quando o mouse passar por cima)
 ```
+
+***alt***:
+Define o texto dentro do componente.
+
+***handler***:
+Define a função que vai ser executada assim que o sinal for interpretado.
 
 --- 
 ### IGNORE POR ENQUANTO!
@@ -1787,36 +1815,23 @@ Elemento que define o comportamento dos filhos como sendo de um slide. Desenha a
 
 ---
 ### IGNORE POR ENQUANTO!!
-## Elemento `<timeline>`
+## Elemento `<toast>`
 
-`<timeline></timeline>`
-Elemento abstrato que define uma linha temporal entre seus elementos filhos.
+`<toast></toast>`
+Elemento abstrato que renderiza temporariamente os componentes definidos dentro da sua estrutura.
 
 Exemplo:
 - Input
 ```ptml
-<timeline>
-    <text>Starte</text>
-    <text>Downloading</text>
-    <text>Completed</text>
-</timeline>
+<toast duration="3s">
+    <text>Esse texto vai ficar aparecendo por apenas 3 segundos.</text>
+</toast>
 ```
 
 - Output
 ```cmd
-● Started
-│
-● Downloading
-│
-● Completed
+Esse texto vai ficar aparecendo por apenas 3 segundos.
 ```
-
----
-### IGNORE POR ENQUANTO!!
-## Elemento `<toast>`
-
-`<toast></toast>`
-Elemento concreto que cria um texto temporário na tela.
 
 ### **Atributos**:
 

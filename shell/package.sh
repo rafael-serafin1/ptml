@@ -1,7 +1,7 @@
 #!/bin/bash
 #! MARCADO PARA REMOÇÃO. Use 'package.py'.
 
-cd ./syntax-highlighter
+cd ./extension
 arg="$1"
 
 if [ "$arg" = "pub" ]; then

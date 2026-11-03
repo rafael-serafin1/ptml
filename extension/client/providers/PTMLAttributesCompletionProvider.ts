@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { align, boolean, borders, colors, completed, consoleInstance, cursorColor, encoding, escapesSequence, fonts, frameworks, NaNValuesInNumericAttrs, nums, ori, overflow, progressType, shape, spinners } from "./PTMLAttributesValueCompletionProvider";
+import { align, boolean, borders, colors, completed, consoleInstance, cursorColor, encoding, escapesSequence, fonts, frameworks, NaNValuesInNumericAttrs, nums, ofstyles, ori, overflow, progressType, shape, spinners } from "./PTMLAttributesValueCompletionProvider";
 
 interface AttributeDefinition {
     name: string;
@@ -349,6 +349,18 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         },
         {
             name: "root-limit",
+        }
+    ],
+    list: [
+        {
+            name: "ofstyle",
+            values: ofstyles
+        },
+        {
+            name: "before"
+        },
+        {
+            name: "after"
         }
     ]
 };

@@ -4,25 +4,26 @@ public struct Coordinates
     private int top;
 
     public int Left { 
-        get; 
+        get => left; 
         set
         {
-            if (validate(value))
+            if (Validate(value))
                 left = value;
             else 
                 throw new ArgumentOutOfRangeException("Left coordinate must be non-negative.");
         } 
     }
     public int Top  { 
-        get; 
+        get => top; 
         set
         {
-            if (validate(value))
+            if (Validate(value))
                 top = value;
             else 
                 throw new ArgumentOutOfRangeException("Top coordinate must be non-negative.");
         } 
     }
 
-    private bool validate(int value) => value >= 0;
+    private bool Validate(int value) => 
+        value >= 0;
 }

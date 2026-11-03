@@ -34,20 +34,20 @@ module Layout =
 
     /// GRID TYPES
     and GridCell = {
-        col: int
-        row: int
+        col    : int
+        row    : int
         metrics: Metrics
-        widget: PositionedWidget
+        widget : PositionedWidget
     }
 
     and GridSeparator =
-        | HorizontalSeparator of y:int
-        | VerticalSeparator of x:int
+        | HorizontalSeparator   of y: int
+        | VerticalSeparator     of x: int
 
     and GridLayout = {
-        cols: int
-        rows: int
-        cells: GridCell list
+        cols      : int
+        rows      : int
+        cells     : GridCell list
         separators: GridSeparator list
     }
 
@@ -511,6 +511,7 @@ module Layout =
 
         // failsafe for unimplemented widget types
         | _ -> failwith $"Layout for widget type '{widget.GetType().Name}' is not implemented."
+        
     and private layoutCellGrid children width parentWidth height parentHeight border borderColor =
         let rows = collectCellRowsFromChildren children
         if List.isEmpty rows then None else

@@ -3,16 +3,16 @@ namespace PTML
 open System
 open PTML.Utils
 
-module Title =
-    type TitleFormat =
+module Hyper =
+    type HyperFormat =
     | Outdoor
     | Banner
 
-    type TitleFont =
+    type HyperFont =
     | Common
     | Block
 
-    type TitleOutput = {
+    type HyperOutput = {
         output:         string array
         totalWidth:     int
         totalHeight:    int
@@ -71,19 +71,19 @@ module Title =
             '.', [| "     "; "     "; "     "; "     "; "  #  " |]
         ]
 
-    let matchHyperFont(str: string): TitleFont =
+    let matchHyperFont(str: string): HyperFont =
         match str.ToUpper() with
         | "COMMON"  -> Common
         | "BLOCK"   -> Block 
         | _         -> failwith $"Unknown font for hyper text: {str}" 
 
-    let matchHyperType(str: string): TitleFormat =
+    let matchHyperType(str: string): HyperFormat =
         match str.ToUpper() with
         | "OUTDOOR" -> Outdoor
         | "BANNER"  -> Banner
         | _         -> failwith $"Unknown type of hyper text: {str}"
 
-    let private replaceBaseFont(font: TitleFont): Map<char, string array> =
+    let private replaceBaseFont(font: HyperFont): Map<char, string array> =
         let baseFont = getBaseFont()
 
         match font with
@@ -95,7 +95,7 @@ module Title =
                     |> Array.map ( fun str -> str.Replace('#', '█') )
                 )
 
-    let private handleHyperType(glyphs: string array array) (spacing: int) (t: TitleFormat): string array =
+    let private handleHyperType(glyphs: string array array) (spacing: int) (t: HyperFormat): string array =
         match t with
         | Outdoor ->
             let gap = String.replicate spacing " "
@@ -111,11 +111,11 @@ module Title =
             |> Array.collect (fun glyph ->
                 Array.append glyph gap)
 
-    let titleRender(text: string) (spacing: int) (format: string) (fontStyle: string): TitleOutput = 
+    let HyperRender(text: string) (spacing: int) (format: string) (fontStyle: string): HyperOutput = 
         if spacing < 0 then
             failwith $"Espaçamento estava negativo: '{spacing}'"
 
-        let orient: TitleFormat = matchHyperType format
+        let orient: HyperFormat = matchHyperType format
 
         let font: Map<char, string array> = 
             matchHyperFont fontStyle 
@@ -131,7 +131,7 @@ module Title =
 
         let output = handleHyperType glyphs spacing orient
 
-        let format: TitleOutput = {
+        let format: HyperOutput = {
             output      = output
             totalWidth  = 
                 output
@@ -143,8 +143,8 @@ module Title =
         format
 
     [<Obsolete("Do not use. This is for debugging porpouses only.")>]
-    let printTitle(text: string) =
-        let format = titleRender text 1 "outdoor" "block"
+    let printHyper(text: string) =
+        let format = HyperRender text 1 "outdoor" "block"
         
         for f in format.output do
             for c in f do

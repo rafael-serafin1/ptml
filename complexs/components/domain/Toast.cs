@@ -1,3 +1,5 @@
+using complexs.components;
+namespace complexs.components.domain;
 
 public class Toast : Component {
     private string _message = string.Empty;
