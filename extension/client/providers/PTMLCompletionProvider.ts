@@ -105,9 +105,13 @@ export class PTMLCompletionProvider
                 name: "tree",
                 snippet: 'tree src="$0" />',
                 documentation: '<tree src="$0" root-limit="$1" />'
-            }
+            },
+            {
+                name: "list",
+                snippet: 'list ofstyle="$0"></list',
+                documentation: '<list ofstyle="$0" before="" after="">|</list>'
+            },
         ];
-
         const filtered = tags.filter(t => t.name.startsWith(partial));
 
         return filtered.map(tag => {

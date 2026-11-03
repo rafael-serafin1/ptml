@@ -6,18 +6,22 @@ open PTML.Spinner
 open PTML.Progress
 open PTML.Escape
 open PTML.Overflow
+open PTML.Code
+open PTML.Hyper
+open System.Threading
+
 
 module Tree =
     type GlobalAttributes = {
-        Id : string option
-        Snippet : string option
+        Id     : string option
+        Snippet: string option
     }
 
     type SnippetDefinition = {
-        Id : string
-        Extends : string option
-        GlobalAttributes : GlobalAttributes
-        Attributes : list<string * string>
+        Id              : string
+        Extends         : string option
+        GlobalAttributes: GlobalAttributes
+        Attributes      : list<string * string>
     }
 
     type SnippetRegistry = Map<string, SnippetDefinition>
@@ -31,12 +35,12 @@ module Tree =
     }
 
     type FragmentNode = {
-            Url: string option
-            Foreground : string option
-            Background : string option
-            Font : string option
-            Content : string
-        }
+        Url       : string option
+        Foreground: string option
+        Background: string option
+        Font      : string option
+        Content   : string
+    }
 
     type TextContent =
         | RawText of string
@@ -97,26 +101,40 @@ module Tree =
         | DoubleUnderLine = 11
 
     type Orientation =
-    | Vertical
-    | Horizontal
+        | Vertical
+        | Horizontal
 
     // discriminated union for semantic tree
     type Widget =
-        | HrWidget of orientation: Orientation * width: Dimension * height: Dimension
-        | TextWidget of text:string * foreground:string option * background:string option * font:string option * url: string option
-        | FragWidget of text:string * foreground:string option * background:string option * font:string option * url: string option
-        | RowWidget of width:Dimension * overflow:OverflowValues * border:Border * gap:int * align:Align option * children:Widget list
-        | ColumnWidget of width:Dimension * overflow:OverflowValues * border:Border * gap:int * yAlign:Align option * children:Widget list
-        | DepthWidget of index:int * overflow:OverflowValues * zAlign: Align option * gap: int * children: Widget list
-        | BoxWidget of width:Dimension * height:Dimension * overflow:OverflowValues * border:Border * borderColor:string option * align:Align option * padding:int * int * children:Widget list
-        | BlockWidget of width:Dimension * height:Dimension * overflow:OverflowValues * border:Border * borderColor:string option * name:string option * align:Align option * padding:int * int * children:Widget list
-        | CellWidget of children: Widget list
-        | TerminalWidget of width: Dimension * height: Dimension * alignX: Align option * alignY: Align option * children: Widget list
-        | SpinnerWidget of text:Types * interval: string * duration: string * completed: string * foreground:string option * background:string option
-        | ProgressWidget of tp: ProgressType * value: int * max: int * width: Dimension * height: Dimension * show: string option
-        | EscapeWidget of sequence: Escape.EscapeSequence * multiplier: int
-        | CursorWidget of shape: Cursor.Shape * blink: string option * color: string option * visible: string option
-        | FrameWidget of tp: Frames.FrameWorks * color: string option * width: Dimension * heigth: Dimension * overflow:OverflowValues * align:Align option * padding: int * int * children:Widget list
+        | HrWidget          of orientation: Orientation * width: Dimension * height: Dimension
+        | TextWidget        of text:string * foreground:string option * background:string option * font:string option * url: string option
+        | FragWidget        of text:string * foreground:string option * background:string option * font:string option * url: string option
+        | RowWidget         of width:Dimension * overflow:OverflowValues * border:Border * gap:int * align:Align option * children:Widget list
+        | ColumnWidget      of width:Dimension * overflow:OverflowValues * border:Border * gap:int * yAlign:Align option * children:Widget list
+        | DepthWidget       of index:int * overflow:OverflowValues * zAlign: Align option * gap: int * children: Widget list
+        | BoxWidget         of width:Dimension * height:Dimension * overflow:OverflowValues * border:Border * borderColor:string option * align:Align option * padding:int * int * children:Widget list
+        | BlockWidget       of width:Dimension * height:Dimension * overflow:OverflowValues * border:Border * borderColor:string option * name:string option * align:Align option * padding:int * int * children:Widget list
+        | CellWidget        of children: Widget list
+        | TerminalWidget    of width: Dimension * height: Dimension * alignX: Align option * alignY: Align option * children: Widget list
+        | SpinnerWidget     of text:Types * interval: string * duration: string * completed: string * foreground:string option * background:string option
+        | ProgressWidget    of tp: ProgressType * value: int * max: int * width: Dimension * height: Dimension * show: string option
+        | EscapeWidget      of sequence: Escape.EscapeSequence * multiplier: int
+        | CursorWidget      of shape: Cursor.Shape * blink: string option * color: string option * visible: string option
+        | FrameWidget       of tp: Frames.FrameWorks * color: string option * width: Dimension * heigth: Dimension * overflow:OverflowValues * align:Align option * padding: int * int * children:Widget list
+
+    /// 
+    let getRawText(ast: AstNode): string =
+        match ast with 
+        | TextNode content -> 
+            content 
+            |> List.map (fun (c: TextContent) -> 
+                match c with
+                | RawText raw -> raw
+                | Fragment (f: FragmentNode) -> f.Content
+            )
+            |> String.concat "\n"
+        | Element (name, globalAttributes, attributes, children) ->
+            "" 
 
     ///
     /// AST BUILDING
@@ -542,6 +560,29 @@ module Tree =
                     DirTree.render path rootLimit
                     |> List.map (fun line -> TextWidget(line, None, None, None, None))
                 [ ColumnWidget(Auto, OverflowValues.Break, NoBorder, 0, None, children) ]
+            | "list" ->
+                let style =
+                    tryGetAttr "ofstyle" attrs
+                    |> Option.defaultValue "bullet"
+                    |> PTML.List.parseStyle
+                let before = tryGetAttr "before" attrs |> Option.defaultValue ""
+                let after = tryGetAttr "after" attrs |> Option.defaultValue ""
+                let childrenWidgets = children |> List.collect buildWidget
+
+                let decorateItems items =
+                    items
+                    |> List.mapi (fun index item ->
+                        let prefix = PTML.List.formatItem style before after (index + 1)
+                        RowWidget(Auto, OverflowValues.Break, NoBorder, 0, None,
+                            [ TextWidget(prefix, None, None, None, None); item ]))
+
+                match childrenWidgets with
+                | [ ColumnWidget(width, overflow, border, gap, yAlign, items) ] ->
+                    [ ColumnWidget(width, overflow, border, gap, yAlign, decorateItems items) ]
+                | [ RowWidget(width, overflow, border, gap, align, items) ] ->
+                    [ RowWidget(width, overflow, border, gap, align, decorateItems items) ]
+                | items ->
+                    [ RowWidget(Auto, OverflowValues.Break, NoBorder, 0, None, decorateItems items) ]
             | "hr" -> 
                 let width = tryGetAttr "width" attrs |> Option.map parseDimension |> Option.defaultValue Auto
                 let height = tryGetAttr "height" attrs |> Option.map parseDimension |> Option.defaultValue Auto
@@ -659,6 +700,11 @@ module Tree =
                 let blink = tryGetAttr "blink" attrs |> Option.defaultValue "false"
                 let visible = tryGetAttr "visible" attrs |> Option.defaultValue "true"
                 [ CursorWidget(shape, Some blink, Some color, Some visible) ]
+            | "code" ->
+                let src: string option = tryGetAttr "src" attrs
+                let executeMethod = tryGetAttr "execute-method" attrs |> Option.defaultValue "async" |> getExecutionMethod
+                let content = children
+                [ ]
             | _ ->
                 failwith $"Unsupported semantic tag: {tag}"
 

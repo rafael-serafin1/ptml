@@ -2,7 +2,7 @@
     "name": "ptml-language",
     "displayName": "PTML Language Support",
     "description": "Language support for PTML (Portable Terminal Markup Language).",
-    "version": "2.0.5",
+    "version": "2.0.7",
     "publisher": "Skrom",
     "repository": {
         "type": "git",

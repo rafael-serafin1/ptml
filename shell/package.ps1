@@ -3,7 +3,7 @@
 
 param([string]$Command)
 
-Set-Location ./syntax-highlighter
+Set-Location ./extension
 
 if ($Command -eq "pub") {
     Write-Host "Executando publish..."

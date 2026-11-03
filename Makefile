@@ -1,5 +1,18 @@
 #!/bin/bash
 
+pack:
+	ifeq ($(arg), PACK)
+		echo "Building package..."
+		npm run compile
+		vsce package
+	else ifeq ($(arg), PUB)
+		echo "Building package..."
+		npm run compile
+		vsce package
+		vsce publish
+	endif
+
+
 # Receitas para build
 all: 
 	dotnet build

@@ -165,6 +165,14 @@ export const consoleInstance = [
     "clear"
 ]
 
+export const ofstyles = [
+    "bullet",
+    "enum",
+    "unorder",
+    "lower-alphabet",
+    "upper-alphabet"
+]
+
 export class PTMLAttributeValueCompletionProvider
     implements vscode.CompletionItemProvider {
 
@@ -219,6 +227,10 @@ export class PTMLAttributeValueCompletionProvider
         url: [""],
         src: [""],
         'root-limit': [""],
+        
+        ofstyle: ofstyles,
+        before: [],
+        after: [],
     };
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {

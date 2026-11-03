@@ -16,9 +16,9 @@ module Messager =
     let PTMLMessage(message: string, status: MessageStatus): unit =
         let prefix: string = 
             match status with
-            | MessageStatus.Success -> "[SUCCESS]"
-            | MessageStatus.Warning -> "[WARNING]"
-            | MessageStatus.Error -> "[ERROR]"
-            | _ -> "[INFO]"
+            | MessageStatus.Success ->  "[SUCCESS]"
+            | MessageStatus.Warning ->  "[WARNING]"
+            | MessageStatus.Error ->    "[ERROR]"
+            | _ ->                      "[INFO]"
         
         printfn "%s %s" prefix message
