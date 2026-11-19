@@ -211,6 +211,15 @@ Seu uso é simples:
 Github  
 ```
 
+***content***:
+Atributo que faz referência ao conteúdo do elemento. Compartilhado para todos os elementos. Valores possíveis:
+```
+clipboard       =>      Copia o texto para a área de transferência Crtl-C Crtl-V
+primary         =>      Copia o conteúdo selecionado e envia para a área de transferência primária
+secondary       =>      Copia o conteúdo selecionado e envia para a área de transferência secundária
+```
+
+
 ---
 ### Elemento `<text>`
 
@@ -973,8 +982,11 @@ center
 end
 ```
 
-***title***:
-Atributo NOVO que permite alterar o texto da barra de título da janela.
+***window-title***:
+Atributo que permite alterar o texto da barra de título da janela do terminal.
+
+***icon-name***:
+Atributo que permite alterar o texto da aba/ícone do terminal.
 
 ---
 ## Elemento `<cell>`
@@ -1327,6 +1339,44 @@ Declara o tipo de hipertexto (basicamente a orientação das letras, se é horiz
 ```
 outdoor             (horizontal & valor padrão)
 banner              (vertical)
+```
+
+---
+## Elemento `<char>`
+
+`<char />`
+Elemento usado para prerenderização de caracteres especiais.
+
+Exemplo:
+- Input
+```ptml
+<text>Copyright <char codename="copyright"/> - All rights reserved</text>
+```
+
+- Output
+```cmd
+Copyright © - All rights reserved
+```
+
+***codename***:
+Define qual caractere especial vai ser renderizado. Valores possíveis:
+```
+copyright           (© Alt + 0169)
+rights-reserved     (® Alt + 0174)
+trade-mark          (™ Alt + 0153)
+service-mark        (℠)
+phonogram           (℗)
+celsius             (℃)
+fahrenheit          (℉)
+number              (№)
+section             (§)
+nul                 (␀)
+esc                 (␛)
+del                 (␡)
+infinite            (∞)
+integral            (∫)
+empty               (∅)
+object              (￼)
 ```
 
 ---

@@ -1,16 +1,11 @@
 #!/bin/bash
 
 pack:
-	ifeq ($(arg), PACK)
-		echo "Building package..."
-		npm run compile
-		vsce package
-	else ifeq ($(arg), PUB)
-		echo "Building package..."
-		npm run compile
-		vsce package
-		vsce publish
-	endif
+ifeq ($(arg), PACK)
+	py package.py pack
+else ifeq ($(arg), PUB)
+	py package.py pub
+endif
 
 
 # Receitas para build

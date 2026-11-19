@@ -111,6 +111,11 @@ export class PTMLCompletionProvider
                 snippet: 'list ofstyle="$0"></list',
                 documentation: '<list ofstyle="$0" before="" after="">|</list>'
             },
+            {
+                name: "char",
+                snippet: 'char codename="$0" /',
+                documentation: '<char codename="$0" />'
+            },
         ];
         const filtered = tags.filter(t => t.name.startsWith(partial));
 

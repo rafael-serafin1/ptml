@@ -5,7 +5,7 @@ open PTML.Spinner
 
 module Drawers = 
     type RenderOperation =
-        | DrawChar of string * int * int * string option * string option * string option * string option
+        | DrawChar    of string * int * int * string option * string option * string option * string option
         | DrawSpinner of Types * int * int * string * string * string * string option * string option
         | CursorStyle of Cursor.Shape * int * int * string option * string option * string option
 

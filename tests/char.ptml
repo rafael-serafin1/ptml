@@ -1,0 +1,8 @@
+<?ptml encoding="UTF-8" terminal-resize="static"?>
+<terminal x-align="start">
+    <row gap="1">
+        <text>Copyright</text>
+        <char codename="copyright" />
+        <text>- All rights reserved.</text>
+    </row>
+</terminal>

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { align, boolean, borders, colors, completed, consoleInstance, cursorColor, encoding, escapesSequence, fonts, frameworks, NaNValuesInNumericAttrs, nums, ofstyles, ori, overflow, progressType, shape, spinners } from "./PTMLAttributesValueCompletionProvider";
+import { align, boolean, borders, charcodiname, colors, completed, consoleInstance, contentHandlers, cursorColor, encoding, escapesSequence, fonts, frameworks, NaNValuesInNumericAttrs, nums, ofstyles, ori, overflow, progressType, shape, spinners } from "./PTMLAttributesValueCompletionProvider";
 
 interface AttributeDefinition {
     name: string;
@@ -14,6 +14,11 @@ const globalAttributes = {
 const globalAttributes2 = {
     name: "snippet",
     values: []
+}
+
+const globalAttributes3 = {
+    name: "content",
+    values: contentHandlers
 }
 
 const widgetAttributes: Record<string, AttributeDefinition[]> = {
@@ -51,8 +56,17 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
             name: "y-align",
             values: align
         },
+        {
+            name: "window-title",
+            values: []
+        },
+        {
+            name: "icon-name",
+            values: []
+        },
         globalAttributes,   
-        globalAttributes2
+        globalAttributes2,
+        globalAttributes3
     ],
 
     box: [
@@ -83,7 +97,8 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
             values: NaNValuesInNumericAttrs
         },
         globalAttributes,   
-        globalAttributes2
+        globalAttributes2,
+        globalAttributes3
     ],
 
     block: [
@@ -117,7 +132,8 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
             values: NaNValuesInNumericAttrs
         },
         globalAttributes,   
-        globalAttributes2
+        globalAttributes2,
+        globalAttributes3
     ],
 
     column: [
@@ -134,7 +150,8 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
             values: align
         },
         globalAttributes,   
-        globalAttributes2
+        globalAttributes2,
+        globalAttributes3
     ],
 
     row: [
@@ -151,7 +168,8 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
             values: align
         },
         globalAttributes,   
-        globalAttributes2
+        globalAttributes2,
+        globalAttributes3
     ],
 
     layer: [
@@ -172,7 +190,8 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
             values: align
         },
         globalAttributes,   
-        globalAttributes2
+        globalAttributes2,
+        globalAttributes3
     ],
 
     text: [
@@ -193,7 +212,8 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
             values: [""]
         },
         globalAttributes,   
-        globalAttributes2
+        globalAttributes2,
+        globalAttributes3
     ],
 
     frag: [
@@ -214,7 +234,8 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
             values: [""]
         },
         globalAttributes,   
-        globalAttributes2
+        globalAttributes2,
+        globalAttributes3
     ],
 
     snippet: [
@@ -223,7 +244,8 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
             values: []
         },
         globalAttributes,   
-        globalAttributes2
+        globalAttributes2,
+        globalAttributes3
     ],
 
     spinner: [
@@ -258,7 +280,8 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
             name: "height"
         },
         globalAttributes,   
-        globalAttributes2
+        globalAttributes2,
+        globalAttributes3
     ],
     progress: [
         {
@@ -282,7 +305,8 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
             values: boolean
         },
         globalAttributes,   
-        globalAttributes2
+        globalAttributes2,
+        globalAttributes3
     ],
     escape: [
         {
@@ -361,6 +385,12 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         },
         {
             name: "after"
+        }
+    ],
+    char: [
+        {
+            name: "codename",
+            values: charcodiname
         }
     ]
 };

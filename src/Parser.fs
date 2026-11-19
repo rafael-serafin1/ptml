@@ -111,7 +111,7 @@ module Parser =
                 failwith "Elemento <frag> só pode existir dentro de <text>."
             if isInsideTag "frag" stack then
                 failwith "Elemento <frag> não pode conter outro <frag>."
-        elif isInsideTag "text" stack && tag <> "frag" && tag <> "escape" then
+        elif isInsideTag "text" stack && tag <> "frag" && tag <> "escape" && tag <> "char" then
             failwith $"Elemento <{tag}> não é permitido dentro de <text>."
 
     let rec parser(tokens, stack ) =
@@ -142,6 +142,8 @@ module Parser =
                     failwith "Missing required attribute for layer: index"
                 if tag = "tree" && not (List.exists (fun (name, _) -> name = "path") attrs) then
                     failwith "Missing required attribute for tree: path"
+                if tag = "char" && not (List.exists (fun (name, _) -> name = "codename") attrs) then
+                    failwith "Missing required attribute for char: codename"
                     
             if selfClosing then
                 parser(rest, stack)
