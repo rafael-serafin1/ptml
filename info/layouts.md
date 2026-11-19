@@ -133,7 +133,9 @@ Troque Nº por qualquer um destes:
 2   =>  p' esperado: texto  =   Altera apenas o título da janela do terminal
 
 ### HYPERLINK
-8   => p' esperado: params; url     =   Híperlink clicável
+- Código: 8
+- Sintaxe esperada:
+    `ESC ]8 ; <texto> ; <url> BEL`
 
 ### POP-UP MERDA
 9 (não sei)  =>  p' esperado: msg    =   Envia uma mensagem em um pop-up de terminal
@@ -168,10 +170,15 @@ Campos com suas funções e valores
 ### NOTIFICAÇÃO
 - Código: 777 
 - Sintaxe esperada:
-    `ESC ]777;notify; <título>; <mensagem> BEL`
+    `ESC ]777;notify; <título>; <mensagem> BEL\\`
 
-### CURSOR COLOR
-12  => p' esperado: cor     =   Altera a cor do cursor do texto
+### CORES
+- Códigos:
+    + 10 -> Cor do texto do Terminal
+    + 11 -> Cor de fundo do Terminal
+    + 12 -> Cursor
+- Sintaxe esperada:
+    `ESC ] <numero> ; <hexadecimal> BEL`
 
 ### OSC 52
 - Sintaxe esperada:

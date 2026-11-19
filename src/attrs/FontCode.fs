@@ -5,6 +5,19 @@ module FontCode =
     let private resetCode = sprintf "%s[0m" escape
     let private bell = "\x07"
 
+    let matchColorAlias = function
+        |  "red"      -> "#ff0000"
+        |  "yellow"   -> "#f0f000"
+        |  "green"    -> "#00ff00"
+        |  "white"    -> "#ffffff"
+        |  "black"    -> "#000000"
+        |  "teal"     -> "#00f0f0"
+        |  "blue"     -> "#0000ff"
+        |  "pink"     -> "#f000f0"
+        |  "purple"   -> "#5500ff"
+        |  "orange"   -> "#ff8800"
+        | (s: string) -> s
+
     (* CHAR ANSI ESCAPE MESS *)
     let foregroundCode = function
         | Some "black" -> Some "30"
@@ -26,7 +39,7 @@ module FontCode =
         | s -> 
             match s with
             | Some hex -> 
-                Some (Utils.hexadecimal(hex, Utils.Foreground))
+                Some (Utils.hexadecimal(hex, Utils.Foreground, true))
             | None -> None
 
     let backgroundCode = function
@@ -41,7 +54,7 @@ module FontCode =
         | s ->            
             match s with 
             | Some hex ->
-                Some (Utils.hexadecimal(hex, Utils.Background))
+                Some (Utils.hexadecimal(hex, Utils.Background, true))
             | None -> None
 
     let fontCode = function

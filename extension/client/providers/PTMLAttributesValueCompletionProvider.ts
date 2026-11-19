@@ -37,6 +37,19 @@ export const colors = [
     "lightblue"
 ];
 
+export const basicColors = [
+    "white",
+    "black",
+    "teal",
+    "pink",
+    "purple",
+    "green",
+    "red",
+    "yellow",
+    "blue",
+    "orange"
+]
+
 export const fonts = [
     "none",
     "bold",

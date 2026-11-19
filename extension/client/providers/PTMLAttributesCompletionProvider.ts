@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { align, boolean, borders, charcodiname, colors, completed, consoleInstance, contentHandlers, cursorColor, encoding, escapesSequence, fonts, frameworks, NaNValuesInNumericAttrs, nums, ofstyles, ori, overflow, progressType, shape, spinners } from "./PTMLAttributesValueCompletionProvider";
+import { align, basicColors, boolean, borders, charcodiname, colors, completed, consoleInstance, contentHandlers, cursorColor, encoding, escapesSequence, fonts, frameworks, NaNValuesInNumericAttrs, nums, ofstyles, ori, overflow, progressType, shape, spinners } from "./PTMLAttributesValueCompletionProvider";
 
 interface AttributeDefinition {
     name: string;
@@ -63,6 +63,14 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         {
             name: "icon-name",
             values: []
+        },
+        {
+            name: "foreground",
+            values: basicColors
+        },
+        {
+            name: "background",
+            values: basicColors
         },
         globalAttributes,   
         globalAttributes2,

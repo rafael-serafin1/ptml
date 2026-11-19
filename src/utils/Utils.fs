@@ -49,7 +49,7 @@ module Utils =
         else
             1 + countArray array.[1..]
 
-    let hexadecimal(hex: string, ground: Grounds): string = 
+    let hexadecimal(hex: string, ground: Grounds, finalize: bool): string = 
         if (hex.Length <> 7 && hex.Length <> 4) || hex[0] <> '#' then
             failwith $"Invalid hexadecimal format: {hex}" 
         

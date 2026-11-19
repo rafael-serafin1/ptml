@@ -17,6 +17,11 @@ copyToClipboard "TEXTO COPIADO PARA ÁREA DE TRANSFERÊNCIA"
 pop_up "VAI SE FUDER VAI"
 notification "EU" "VOU ME MATAR"
 
+let background(color: string) =
+    printf "\x1b]11;%s\x07" color
+
+background("#ff0000")
+
 
 type NotificationUrgency =
 | Low = 0
@@ -207,14 +212,14 @@ let private buildNotification (mold: BUILD_NOTIFICATION): string list =
 
 let NOTIF: BUILD_NOTIFICATION = {
     id = "1"
-    parent = "PTML"
+    parent = "PTML Execution Process"
 
-    urgency = NotificationUrgency.High
+    urgency = NotificationUrgency.Medium
 
     payload = [
         Title "PTML"
         Body "Operação concluída com sucesso!"
-        Buttons ["Ok"; "Ignorar"]
+        Buttons ["Ok"; "Ignore";]
     ]
 
     encoded = true
@@ -224,7 +229,7 @@ let NOTIF: BUILD_NOTIFICATION = {
         Report
     ]
 
-    sound = Warn
+    sound = Info
 }
 
 let commands = buildNotification NOTIF

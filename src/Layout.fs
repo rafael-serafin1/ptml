@@ -29,7 +29,7 @@ module Layout =
         | PositionedBoxWidget of width:Dimension * height:Dimension * overflow:OverflowValues * border:Border * borderColor:string option * align:Align option * padding:int * int * metrics:Metrics * children:PositionedWidget list
         | PositionedBlockWidget of width:Dimension * height:Dimension * overflow:OverflowValues * border:Border * borderColor:string option * name:string option * align:Align option * padding:int * int * metrics:Metrics * children:PositionedWidget list
         | PositionedGridWidget of border:Border * borderColor:string option * metrics: Metrics * children: GridLayout list
-        | PositionedTerminalWidget of width:Dimension * height:Dimension * xAlign:Align option * yAlign:Align option * windowT: string * tabT: string * metrics:Metrics * children:PositionedWidget list
+        | PositionedTerminalWidget of width:Dimension * height:Dimension * foreground: string option * background: string option * xAlign:Align option * yAlign:Align option * windowT: string * tabT: string * metrics:Metrics * children:PositionedWidget list
         | PositionedProgressWidget of tp: Progress.ProgressType * value: int * max: int * width: Dimension * height: Dimension * show: string option * metrics: Metrics
         | PositionedEscapeWidget of escseq: string *sequence: EscapeSequence * multiplier: int * metrics: Metrics
         | PositionedFrameWidget of frame: Frames.FrameWorks * fc: string option * width:Dimension * height:Dimension * overflow:OverflowValues * align: Align option * padding: int * int * metrics:Metrics * children:PositionedWidget list
@@ -63,7 +63,7 @@ module Layout =
             | DepthWidget(_, _, _, _, children)
             | BoxWidget(_, _, _, _, _, _, _, _, children)
             | BlockWidget(_, _, _, _, _, _, _, _, _, children)
-            | TerminalWidget(_, _, _, _, _, _, children) -> containsCell children
+            | TerminalWidget(_, _, _, _, _, _, _, _, children) -> containsCell children
             | _ -> false)
 
     let private charWidth = 1
@@ -130,8 +130,8 @@ module Layout =
                 PositionedBoxWidget(width, height, overflow, border, borderColor, align, paddingV, paddingH, shiftMetrics metrics, children)
             | PositionedBlockWidget(width, height, overflow, border, borderColor, name, align, paddingV, paddingH, metrics, children) ->
                 PositionedBlockWidget(width, height, overflow, border, borderColor, name, align, paddingV, paddingH, shiftMetrics metrics, children)
-            | PositionedTerminalWidget(width, height, xAlign, yAlign, win, tab, metrics, children) ->
-                PositionedTerminalWidget(width, height, xAlign, yAlign, win, tab, shiftMetrics metrics, children)
+            | PositionedTerminalWidget(width, height, foreground, background, xAlign, yAlign, win, tab, metrics, children) ->
+                PositionedTerminalWidget(width, height, foreground, background, xAlign, yAlign, win, tab, shiftMetrics metrics, children)
             | PositionedProgressWidget(tp, v, m, w, h, str, metrics) ->
                 PositionedProgressWidget(tp, v, m, w, h, str, shiftMetrics metrics)
             | PositionedEscapeWidget(esc, seq, multi, metrics) ->
@@ -166,7 +166,7 @@ module Layout =
         | DepthWidget(_, _, _, _, children)
         | BoxWidget(_, _, _, _, _, _, _, _, children)
         | BlockWidget(_, _, _, _, _, _, _, _, _, children)
-        | TerminalWidget(_, _, _, _, _, _, children) ->
+        | TerminalWidget(_, _, _, _, _, _, _, _, children) ->
             children |> List.collect collectCellRows
         | _ -> []
 
@@ -198,7 +198,7 @@ module Layout =
         | PositionedGridWidget(_, _, m, _)
         | PositionedBoxWidget(_, _, _, _, _, _, _, _, m, _)
         | PositionedBlockWidget(_, _, _, _, _, _, _, _, _, m, _)
-        | PositionedTerminalWidget(_, _, _, _, _, _, m, _)
+        | PositionedTerminalWidget(_, _, _, _, _, _, _, _, m, _)
         | PositionedProgressWidget(_, _, _, _, _, _, m)
         | PositionedEscapeWidget(_, _, _, m)
         | PositionedDepthWidget(_, _, _, _, m, _)
@@ -469,7 +469,7 @@ module Layout =
                             let xOffset = paddingH + alignOffset availableWidth childTotalWidth align
                             shiftWidget xOffset paddingV child)
                     PositionedBlockWidget(width, height, overflow, border, borderColor, name, align, paddingV, paddingH, { x = 0; y = 0; w = resolvedContentWidth + paddingH * 2; h = resolvedContentHeight + paddingV * 2 }, positionedChildren)
-        | TerminalWidget(width, height, alignX, alignY, windowT, tabT, children) -> 
+        | TerminalWidget(width, height, foreground, background, alignX, alignY, windowT, tabT, children) -> 
             let cmd = getLayoutViewport()
 
             let positionedChildren = children |> List.map (fun child -> layoutWidget child (Some cmd.SafeWidth) (Some cmd.SafeHeight))
@@ -488,7 +488,7 @@ module Layout =
                     let yOffset = alignOffset resolvedHeight childTotalHeight alignY
                     shiftWidget xOffset yOffset child)
 
-            PositionedTerminalWidget(width, height, alignX, alignY, windowT, tabT, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren) 
+            PositionedTerminalWidget(width, height, foreground, background, alignX, alignY, windowT, tabT, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren) 
 
         | FrameWidget(tp, fc,  width, height, overflow, align, paddingV: int, paddingH: int, children) ->
             let measuredChildren = children |> List.map (fun child -> layoutWidget child None None)

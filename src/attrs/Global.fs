@@ -82,6 +82,8 @@ module Global =
             "y-align", alignValues
             "window-title", Set.empty
             "icon-name", Set.empty
+            "foreground", Set.empty
+            "background", Set.empty
         ]
         "cell", Map.ofList [];      // no attrs for now
         "spinner", Map.ofList [

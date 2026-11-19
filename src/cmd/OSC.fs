@@ -2,6 +2,7 @@ namespace PTML
 open System
 open System.Text
 open PTML.Global
+open PTML.Utils
 
 module OSC =
     let ESC_escape = "\x1b"
@@ -78,5 +79,27 @@ module OSC =
         | Clipboard -> copyToClipboard text
         | Primary   -> copyToPrimary   text
         | Secondary -> copyToSecondary text
+
+//#endregion
+
+//#region TERMINAL FORE/BACKGROUND
+
+    let private terminalForeground (color: string) = 
+        $"{ESC_escape}]10;{color}{OSC_escape}"
+
+    let private terminalBackground (color: string)  = 
+        $"{ESC_escape}]11;{color}{OSC_escape}"
+
+    let terminalColorChange(color: string)(ground: Grounds) = 
+        let curPos = Console.GetCursorPosition()
+
+        match ground with
+        | Foreground -> 
+            Console.Write(terminalForeground color)
+        | Background ->
+            Console.Write(terminalBackground color)
+
+        match curPos with
+        | l, t -> Console.SetCursorPosition(l, t)
 
 //#endregion

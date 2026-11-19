@@ -56,6 +56,7 @@ Agora, os abstratos são:
 <cursor>
 <list>
 ---> Em desenvolvimento
+<notification>
 <toast>
 <carousel>  
 <slide>
@@ -988,6 +989,20 @@ Atributo que permite alterar o texto da barra de título da janela do terminal.
 ***icon-name***:
 Atributo que permite alterar o texto da aba/ícone do terminal.
 
+***foreground/background***:
+Define uma nova cor padrão para o terminal, com suporte a hexadecimal. Valores legíveis:
+```
+red       (traduz para #ff0000)
+yellow    (traduz para #f0f000)
+white     (traduz para #ffffff)
+black     (traduz para #000000)
+teal      (traduz para #00f0f0)
+blue      (traduz para #0000ff)
+pink      (traduz para #f000f0)
+green     (traduz para #00ff00)
+purple    (traduz para #5500ff)
+```
+
 ---
 ## Elemento `<cell>`
 
@@ -1427,6 +1442,56 @@ Step 3. Open file on browser.
 ```
 
 > Expected behaviour: before + marcador + after + conteúdo
+
+---
+### IGNORE POR ENQUANTO!
+## Elemento `<notification>`
+
+`<notification></notification>`
+Elemento usado para gerar notificações no terminal.
+
+Exemplo:
+- Input
+```ptml
+<notification>
+    Check out my Github! `https://github.com/rafael-serafin1`
+</notification>
+```
+
+### **Atributos**:
+
+***from***:
+Define de quem veio a notificação.
+
+***urgency***:
+Define a urgência da notificação. Valores possíveis:
+```
+low
+medium
+high
+```
+
+***title***:
+Descreve um título para a notificação.
+
+***focus***:
+Define se deve ou não focar no terminal que gerou a notificação. Use `true/false`
+
+***sound***:
+Define qual som vai ser produzido assim que gerada a notificação. Valores possíveis:
+```
+system
+silent
+error
+warn
+warning
+info
+question
+custom
+```
+
+> Tenha em mente que talvez alguns desses atributos não funcionem ou funcionem de forma de maneiras inesperadas devido ao ambiente em que o PTML estiver sendo executado. Como exemplo mesmo, no Visual Studio Code, a notificação de urgência descrita como `low` não aparece, enquanto que as outras geram notificações normalmente. 
+> Também deves saber que o sistema de notificações usado nesse elemento é o OSC 99, o qual não é implementado por todos os terminais.
 
 ---
 ### IGNORE POR ENQUANTO!

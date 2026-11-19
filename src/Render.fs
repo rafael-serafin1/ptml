@@ -8,6 +8,8 @@ open PTML.Overflow
 open PTML.OverflowFunctions
 open PTML.Char
 open PTML.OSC
+open PTML.Utils
+open PTML.FontCode
 
 module Render =
     let rec private renderWidget offsetX offsetY widget =
@@ -168,12 +170,20 @@ module Render =
 
             separatorOps @ childOps
 
-        | PositionedTerminalWidget(_, _, _, _, windowT, tabT, metrics, children) ->
+        | PositionedTerminalWidget(_, _, foreground, background, _, _, windowT, tabT, metrics, children) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
 
             changeWindowTitle windowT
             changeIconName    tabT
+
+            match foreground with
+            | Some f -> terminalColorChange (matchColorAlias f) Foreground
+            | None -> ()
+
+            match background with
+            | Some b -> terminalColorChange (matchColorAlias b) Background
+            | None -> ()
 
             children |> List.collect (renderWidget baseX baseY)
 

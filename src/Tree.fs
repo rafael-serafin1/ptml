@@ -112,93 +112,94 @@ module Tree =
         | CharWidget of codename: CharCodename
         | HrWidget of orientation: Orientation * width: Dimension * height: Dimension
         | TextWidget of
-            text: string *
+            text      : string *
             foreground: string option *
             background: string option *
-            font: string option *
-            url: string option
+            font      : string option *
+            url       : string option
         | FragWidget of
-            text: string *
+            text      : string *
             foreground: string option *
             background: string option *
-            font: string option *
-            url: string option
+            font      : string option *
+            url       : string option
         | RowWidget of
-            width: Dimension *
+            width   : Dimension *
             overflow: OverflowValues *
-            border: Border *
-            gap: int *
-            align: Align option *
+            border  : Border *
+            gap     : int *
+            align   : Align option *
             children: Widget list
         | ColumnWidget of
-            width: Dimension *
+            width   : Dimension *
             overflow: OverflowValues *
-            border: Border *
-            gap: int *
-            yAlign: Align option *
+            border  : Border *
+            gap     : int *
+            yAlign  : Align option *
             children: Widget list
         | DepthWidget of 
-            index: int * 
-            overflow: OverflowValues * 
-            zAlign: Align option * 
-            gap: int * 
+            index   : int *
+            overflow: OverflowValues *
+            zAlign  : Align option *
+            gap     : int *
             children: Widget list
         | BoxWidget of
-            width: Dimension *
-            height: Dimension *
-            overflow: OverflowValues *
-            border: Border *
+            width      : Dimension *
+            height     : Dimension *
+            overflow   : OverflowValues *
+            border     : Border *
             borderColor: string option *
-            align: Align option *
-            padding: int *
-            int *
+            align      : Align option *
+            padding    : int * int *
             children: Widget list
         | BlockWidget of
-            width: Dimension *
-            height: Dimension *
-            overflow: OverflowValues *
-            border: Border *
+            width      : Dimension *
+            height     : Dimension *
+            overflow   : OverflowValues *
+            border     : Border *
             borderColor: string option *
-            name: string option *
-            align: Align option *
-            padding: int *
-            int *
+            name       : string option *
+            align      : Align option *
+            padding    : int * int *
             children: Widget list
         | CellWidget of 
             children: Widget list
         | TerminalWidget of
-            width: Dimension *
-            height: Dimension *
-            alignX: Align option *
-            alignY: Align option *
-            windowT: string *
-            tabT: string *
-            children: Widget list
+            width     : Dimension *
+            height    : Dimension *
+            foreground: string option *
+            background: string option *
+            alignX    : Align option *
+            alignY    : Align option *
+            windowT   : string *
+            tabT      : string *
+            children  : Widget list
         | SpinnerWidget of
-            text: Types *
-            interval: string *
-            duration: string *
-            completed: string *
+            text      : Types *
+            interval  : string *
+            duration  : string *
+            completed : string *
             foreground: string option *
             background: string option
         | ProgressWidget of
-            tp: ProgressType *
-            value: int *
-            max: int *
-            width: Dimension *
-            height: Dimension *
-            show: string option
-        | EscapeWidget of sequence: Escape.EscapeSequence * multiplier: int
-        | CursorWidget of shape: Cursor.Shape * blink: string option * color: string option * visible: string option
+          tp    : ProgressType *
+          value : int *
+          max   : int *
+          width : Dimension *
+          height: Dimension *
+          show  : string option
+        | EscapeWidget of 
+            sequence: Escape.EscapeSequence * multiplier: int
+        | CursorWidget of 
+            shape   : Cursor.Shape * blink              : string option * color: string option * visible: string option
         | FrameWidget of
-            tp: Frames.FrameWorks *
-            color: string option *
-            width: Dimension *
-            heigth: Dimension *
+            tp      : Frames.FrameWorks *
+            color   : string option *
+            width   : Dimension *
+            heigth  : Dimension *
             overflow: OverflowValues *
-            align: Align option *
-            padding: int *
-            int *
+            align   : Align option *
+            padding : int * int *
             children: Widget list
 
     ///
@@ -990,10 +991,13 @@ module Tree =
                 let winTitle = tryGetAttr "window-title" attrs |> Option.defaultValue "PTML"
                 let tabTitle = tryGetAttr "icon-name" attrs |> Option.defaultValue "ptmlexec"
 
+                let fore = tryGetAttr "foreground" attrs
+                let back = tryGetAttr "background" attrs
+
                 let childrenWidgets = children |> List.collect buildWidget
 
                 [
-                    TerminalWidget(width, height, xAlign, yAlign, winTitle, tabTitle, childrenWidgets)
+                    TerminalWidget(width, height, fore, back, xAlign, yAlign, winTitle, tabTitle, childrenWidgets)
                 ]
             | "spinner" ->
                 let spinnerType =
