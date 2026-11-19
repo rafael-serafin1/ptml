@@ -330,6 +330,26 @@ Comece apenas com:
 
 ---
 
+# Documentação em site
+
+Uma versão navegável da documentação está disponível em `docs-site/`. Para executá-la localmente:
+
+```sh
+cd docs-site
+npm install
+npm run dev
+```
+
+Para gerar os arquivos estáticos:
+
+```sh
+npm run build
+```
+
+O site organiza a documentação em páginas com URLs próprias e cobre os elementos cujo comportamento está confirmado no parser e no renderizador.
+
+---
+
 # Filosofia
 
 PTML não tenta substituir linguagens de programação.

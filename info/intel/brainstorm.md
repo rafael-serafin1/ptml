@@ -893,7 +893,7 @@ end
 ## Elemento `<block>`
 
 `<block></block>`
-Define um bloco nomeado através de um atributo obrigatório chamado `title`. A diferença chave entre `<box>` e `<block>` é que o conteúdo de `<block>` é tratado como dele, assim poderá no futuro colocar várias seções de botões rádio que não vão conflitarem entre si.
+Define um componente semântico nomeado através de um atributo obrigatório chamado `title`. A diferença chave entre `<box>` e `<block>` é que o conteúdo de `<block>` é tratado como dele, assim poderá no futuro colocar várias seções de botões rádio que não vão conflitarem entre si.
 
 Exemplo:
 - Input
@@ -1139,6 +1139,41 @@ Exemplo .3:
 │ Pao de Batata  │ Pao, Batata.   │
 └────────────────┴────────────────┘
 ```
+
+Exemplo .4 (Ocorre atualmente):
+- Input
+```ptml
+<block title="Cardapio">
+    <column>
+        <row>
+            <cell>
+                <text>Tilapia Cozida</text>
+            </cell>
+            <cell>
+                <text>Pao de Batata</text>
+            </cell>
+        </row>
+    </column>
+    <column>
+        <row>
+            <cell>
+                <text>Tilapia, Ervas.</text>
+            </cell>
+        </row>
+    </column>
+</block>
+```
+
+- Output
+```cmd
+┌ Cardapio ──────┬────────────────┐
+│ Tilapia Cozida │ Tilapia, Ervas.│
+├────────────────┼────────────────┤         
+│ Pao de Batata  │                │
+└────────────────┴────────────────┘
+``` 
+
+> Como observado, uma quantidade declarada de células com contagem ímpar, gera uma célula fantasma sem nada para segurar o espaço que uma célula declarada seguraria.
 
 > OBS: Como toda célula, a divisão é feita de forma proporcional, ou seja, nunca se divide por números ímpares.
 
