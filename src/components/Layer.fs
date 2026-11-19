@@ -135,11 +135,11 @@ module Depth =
             let filteredGrids = processedGrids
             (Some (PositionedGridWidget(border, borderColor, metrics, filteredGrids)), List.collect id nestedLayers)
 
-        | PositionedTerminalWidget(width, height, alignX, alignY, metrics, children) ->
+        | PositionedTerminalWidget(width, height, foreground, background, alignX, alignY, windowT, tabT, metrics, children) ->
             let childResults = children |> List.map (extractWidget (offsetX + metrics.x) (offsetY + metrics.y))
             let filteredChildren = childResults |> List.choose fst
             let nestedLayers = childResults |> List.collect snd
-            (Some (PositionedTerminalWidget(width, height, alignX, alignY, metrics, filteredChildren)), nestedLayers)
+            (Some (PositionedTerminalWidget(width, height, foreground, background, alignX, alignY, windowT, tabT, metrics, filteredChildren)), nestedLayers)
 
         | PositionedSpinnerWidget(tp, interval, duration, completed, foreground, background, metrics) ->
             (Some (PositionedSpinnerWidget(tp, interval, duration, completed, foreground, background, metrics)), [])
@@ -148,6 +148,8 @@ module Depth =
             (Some (PositionedTextWidget(text, foreground, background, font, url, metrics)), [])
         | PositionedFragWidget(text, foreground, background, font, url, metrics) ->
             (Some (PositionedFragWidget(text, foreground, background, font, url, metrics)), [])
+        | PositionedCharWidget(codename, metrics) ->
+            (Some (PositionedCharWidget(codename, metrics)), [])
         | PositionedHrWidget(ori, width, height, metrics) -> 
             (Some (PositionedHrWidget(ori, width, height, metrics)), [])
         | PositionedProgressWidget(tp, value, maxi, w, h, str, metrics) ->

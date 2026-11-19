@@ -1,4 +1,3 @@
-
 namespace PTML
 open PTML.Buffer
 

@@ -6,10 +6,24 @@ open PTML.Spinner
 open PTML.Drawers
 open PTML.Overflow
 open PTML.OverflowFunctions
+open PTML.Char
+open PTML.OSC
+open PTML.Utils
+open PTML.FontCode
 
 module Render =
     let rec private renderWidget offsetX offsetY widget =
         match widget with
+        | PositionedCharWidget(codename, metrics) ->
+            let baseX = offsetX + metrics.x
+            let baseY = offsetY + metrics.y
+            
+            let finalString = 
+                codename
+                |> matchCodename
+                |> string
+
+            [ DrawChar(finalString, baseX, baseY, None, None, None, None) ]
         | PositionedCursorWidget(sh, blk, clr, v, metrics) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
@@ -156,9 +170,21 @@ module Render =
 
             separatorOps @ childOps
 
-        | PositionedTerminalWidget(_, _, alignX, alignY, metrics, children) ->
+        | PositionedTerminalWidget(_, _, foreground, background, _, _, windowT, tabT, metrics, children) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
+
+            changeWindowTitle windowT
+            changeIconName    tabT
+
+            match foreground with
+            | Some f -> terminalColorChange (matchColorAlias f) Foreground
+            | None -> ()
+
+            match background with
+            | Some b -> terminalColorChange (matchColorAlias b) Background
+            | None -> ()
+
             children |> List.collect (renderWidget baseX baseY)
 
         | PositionedFrameWidget(fw, fc, w, h, overflow, align, paddingV, paddingH, metrics, children) ->

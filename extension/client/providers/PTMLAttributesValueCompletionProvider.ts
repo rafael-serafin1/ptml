@@ -37,6 +37,19 @@ export const colors = [
     "lightblue"
 ];
 
+export const basicColors = [
+    "white",
+    "black",
+    "teal",
+    "pink",
+    "purple",
+    "green",
+    "red",
+    "yellow",
+    "blue",
+    "orange"
+]
+
 export const fonts = [
     "none",
     "bold",
@@ -173,6 +186,30 @@ export const ofstyles = [
     "upper-alphabet"
 ]
 
+export const charcodiname = [
+    "copyright",
+    "rights-reserved",
+    "trade-mark",
+    "service-mark",
+    "phonogram",
+    "celsius",
+    "fahrenheit",
+    "number",
+    "section",
+    "nul",
+    "esc",
+    "del",
+    "infinite",
+    "integral",
+    "empty"
+]
+
+export const contentHandlers = [
+    "clipboard",
+    "primary",
+    "secondary"
+]
+
 export class PTMLAttributeValueCompletionProvider
     implements vscode.CompletionItemProvider {
 
@@ -204,6 +241,7 @@ export class PTMLAttributeValueCompletionProvider
         index: nums && NaNValuesInNumericAttrs,
         id: [],
         snippet: [],
+        content: contentHandlers,
         extends: [],
 
         type: spinners,
@@ -231,6 +269,10 @@ export class PTMLAttributeValueCompletionProvider
         ofstyle: ofstyles,
         before: [],
         after: [],
+
+        codename: charcodiname,
+        "icon-name": [],
+        "window-title": [],
     };
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {

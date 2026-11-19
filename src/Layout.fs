@@ -5,6 +5,7 @@ open System
 open PTML.Spinner
 open PTML.Escape
 open PTML.Overflow
+open PTML.Char
 
 module Layout = 
     type Metrics = {
@@ -15,6 +16,7 @@ module Layout =
     }
 
     type PositionedWidget =
+        | PositionedCharWidget of codename: CharCodename * metrics: Metrics
         | PositionedCursorWidget of shape: Cursor.Shape * blink: string option * color: string option * visible: string option * metrics: Metrics
         | PositionedHrWidget of ori:Orientation * width: Dimension * height: Dimension * metrics: Metrics
         | PositionedSpinnerWidget of text:Types * interval:string * duration:string * completed:string * foreground:string option * background:string option * metrics:Metrics
@@ -27,7 +29,7 @@ module Layout =
         | PositionedBoxWidget of width:Dimension * height:Dimension * overflow:OverflowValues * border:Border * borderColor:string option * align:Align option * padding:int * int * metrics:Metrics * children:PositionedWidget list
         | PositionedBlockWidget of width:Dimension * height:Dimension * overflow:OverflowValues * border:Border * borderColor:string option * name:string option * align:Align option * padding:int * int * metrics:Metrics * children:PositionedWidget list
         | PositionedGridWidget of border:Border * borderColor:string option * metrics: Metrics * children: GridLayout list
-        | PositionedTerminalWidget of width:Dimension * height:Dimension * xAlign:Align option * yAlign:Align option * metrics:Metrics * children:PositionedWidget list
+        | PositionedTerminalWidget of width:Dimension * height:Dimension * foreground: string option * background: string option * xAlign:Align option * yAlign:Align option * windowT: string * tabT: string * metrics:Metrics * children:PositionedWidget list
         | PositionedProgressWidget of tp: Progress.ProgressType * value: int * max: int * width: Dimension * height: Dimension * show: string option * metrics: Metrics
         | PositionedEscapeWidget of escseq: string *sequence: EscapeSequence * multiplier: int * metrics: Metrics
         | PositionedFrameWidget of frame: Frames.FrameWorks * fc: string option * width:Dimension * height:Dimension * overflow:OverflowValues * align: Align option * padding: int * int * metrics:Metrics * children:PositionedWidget list
@@ -61,7 +63,7 @@ module Layout =
             | DepthWidget(_, _, _, _, children)
             | BoxWidget(_, _, _, _, _, _, _, _, children)
             | BlockWidget(_, _, _, _, _, _, _, _, _, children)
-            | TerminalWidget(_, _, _, _, children) -> containsCell children
+            | TerminalWidget(_, _, _, _, _, _, _, _, children) -> containsCell children
             | _ -> false)
 
     let private charWidth = 1
@@ -93,6 +95,8 @@ module Layout =
     let rec private shiftWidget dx dy widget =
         let shiftMetrics metrics = { metrics with x = metrics.x + dx; y = metrics.y + dy }
         match widget with
+            | PositionedCharWidget(codename, metrics) ->
+                PositionedCharWidget(codename, shiftMetrics metrics)
             | PositionedCursorWidget(sh, blk, clr, v, m) ->
                 PositionedCursorWidget(sh, blk, clr, v, shiftMetrics m) 
             | PositionedHrWidget(ori, width, height, metrics) ->
@@ -126,8 +130,8 @@ module Layout =
                 PositionedBoxWidget(width, height, overflow, border, borderColor, align, paddingV, paddingH, shiftMetrics metrics, children)
             | PositionedBlockWidget(width, height, overflow, border, borderColor, name, align, paddingV, paddingH, metrics, children) ->
                 PositionedBlockWidget(width, height, overflow, border, borderColor, name, align, paddingV, paddingH, shiftMetrics metrics, children)
-            | PositionedTerminalWidget(width, height, xAlign, yAlign, metrics, children) ->
-                PositionedTerminalWidget(width, height, xAlign, yAlign, shiftMetrics metrics, children)
+            | PositionedTerminalWidget(width, height, foreground, background, xAlign, yAlign, win, tab, metrics, children) ->
+                PositionedTerminalWidget(width, height, foreground, background, xAlign, yAlign, win, tab, shiftMetrics metrics, children)
             | PositionedProgressWidget(tp, v, m, w, h, str, metrics) ->
                 PositionedProgressWidget(tp, v, m, w, h, str, shiftMetrics metrics)
             | PositionedEscapeWidget(esc, seq, multi, metrics) ->
@@ -162,7 +166,7 @@ module Layout =
         | DepthWidget(_, _, _, _, children)
         | BoxWidget(_, _, _, _, _, _, _, _, children)
         | BlockWidget(_, _, _, _, _, _, _, _, _, children)
-        | TerminalWidget(_, _, _, _, children) ->
+        | TerminalWidget(_, _, _, _, _, _, _, _, children) ->
             children |> List.collect collectCellRows
         | _ -> []
 
@@ -182,6 +186,7 @@ module Layout =
 
     let private metricsOf widget =
         match widget with
+        | PositionedCharWidget(_, m)
         | PositionedCursorWidget(_, _, _, _, m)
         | PositionedHrWidget(_, _, _, m)
         | PositionedSpinnerWidget(_,_,_,_,_,_,m)
@@ -193,7 +198,7 @@ module Layout =
         | PositionedGridWidget(_, _, m, _)
         | PositionedBoxWidget(_, _, _, _, _, _, _, _, m, _)
         | PositionedBlockWidget(_, _, _, _, _, _, _, _, _, m, _)
-        | PositionedTerminalWidget(_, _, _, _, m, _)
+        | PositionedTerminalWidget(_, _, _, _, _, _, _, _, m, _)
         | PositionedProgressWidget(_, _, _, _, _, _, m)
         | PositionedEscapeWidget(_, _, _, m)
         | PositionedDepthWidget(_, _, _, _, m, _)
@@ -464,7 +469,7 @@ module Layout =
                             let xOffset = paddingH + alignOffset availableWidth childTotalWidth align
                             shiftWidget xOffset paddingV child)
                     PositionedBlockWidget(width, height, overflow, border, borderColor, name, align, paddingV, paddingH, { x = 0; y = 0; w = resolvedContentWidth + paddingH * 2; h = resolvedContentHeight + paddingV * 2 }, positionedChildren)
-        | TerminalWidget(width, height, alignX, alignY, children) -> 
+        | TerminalWidget(width, height, foreground, background, alignX, alignY, windowT, tabT, children) -> 
             let cmd = getLayoutViewport()
 
             let positionedChildren = children |> List.map (fun child -> layoutWidget child (Some cmd.SafeWidth) (Some cmd.SafeHeight))
@@ -483,7 +488,7 @@ module Layout =
                     let yOffset = alignOffset resolvedHeight childTotalHeight alignY
                     shiftWidget xOffset yOffset child)
 
-            PositionedTerminalWidget(width, height, alignX, alignY, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren) 
+            PositionedTerminalWidget(width, height, foreground, background, alignX, alignY, windowT, tabT, { x = 0; y = 0; w = resolvedWidth; h = resolvedHeight }, positionedChildren) 
 
         | FrameWidget(tp, fc,  width, height, overflow, align, paddingV: int, paddingH: int, children) ->
             let measuredChildren = children |> List.map (fun child -> layoutWidget child None None)
@@ -508,6 +513,11 @@ module Layout =
                     let xOffset = paddingH + alignOffset availableWidth childTotalWidth align
                     shiftWidget xOffset paddingV child)
             PositionedFrameWidget(tp, fc, width, height, overflow, align, paddingV, paddingH, { x = 0; y = 0; w = resolvedContentWidth + paddingH * 2; h = resolvedContentHeight + paddingV * 2 }, positionedChildren)
+
+        | CharWidget(codename) ->
+            let w = charWidth
+            let h = lineHeight
+            PositionedCharWidget(codename, { x = 0; y = 0; w = w; h = h })
 
         // failsafe for unimplemented widget types
         | _ -> failwith $"Layout for widget type '{widget.GetType().Name}' is not implemented."

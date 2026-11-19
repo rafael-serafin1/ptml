@@ -2,7 +2,7 @@ namespace PTML
 
 module Global =
     let validTags = 
-        Set.ofList ["frag"; "text"; "row"; "column"; "layer"; "box"; "block"; "terminal"; "cell"; "snippet"; "spinner"; "hr"; "progress"; "escape"; "frame"; "cursor"; "tree"; "list"; "code"]
+        Set.ofList ["frag"; "text"; "row"; "column"; "layer"; "box"; "block"; "terminal"; "cell"; "snippet"; "spinner"; "hr"; "progress"; "escape"; "frame"; "cursor"; "tree"; "list"; "code"; "char"]
     let colorValues = 
         Set.ofList ["none"; "black"; "red"; "green"; "gold"; "blue"; "purple"; "cyan"; "fire"; "limegreen"; "yellow"; "lightblue"; "lilac"; "crystal"; "gray"; "lightgray"; "white"]
     let fontValues = Set.ofList ["none"; "bold"; "dim"; "italic"; "underline"; "slow-blink"; "rapid-blink"; "reverse"; "conceal"; "strike-through"; "double-underline"; "overline"]
@@ -80,6 +80,10 @@ module Global =
         "terminal", Map.ofList [
             "x-align", alignValues
             "y-align", alignValues
+            "window-title", Set.empty
+            "icon-name", Set.empty
+            "foreground", Set.empty
+            "background", Set.empty
         ]
         "cell", Map.ofList [];      // no attrs for now
         "spinner", Map.ofList [
@@ -122,6 +126,29 @@ module Global =
             "src", Set.empty
             "execute-method", Set.ofList ["async"; "defer"]
         ]
+        "char", Map.ofList ["codename", PTML.Char.validCodenames]
     ]
     
-    let globalAttributes = Set.ofList ["id"; "snippet"]
+    let globalAttributes = Set.ofList ["id"; "snippet"; "content"]
+
+    type ContentAttrValue =
+    | Clipboard
+    | Primary
+    | Secondary
+
+    let matchContentAttrValue(key: string): ContentAttrValue = 
+        match key.ToLower() with
+        | "clipboard" -> Clipboard
+        | "primary"   -> Primary
+        | "secondary" -> Secondary
+        | _           -> failwith $"Unknown type of value for 'content' attr: {key}"
+
+    let tryMatchContentAttrValue(key: string option): ContentAttrValue option = 
+        match key with
+        | None             -> None
+        | Some (s: string) ->
+            match s.ToLower() with
+            | "clipboard" -> Some Clipboard
+            | "primary"   -> Some Primary
+            | "secondary" -> Some Secondary
+            | _           -> None

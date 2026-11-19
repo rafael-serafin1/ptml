@@ -6,21 +6,14 @@ open System.Threading
 open PTML.Spinner
 open PTML.State
 open PTML.FontCode
+open PTML.OSC
 
 module Output =
     let private escape = "\x1b"
     let private resetCode = sprintf "%s[0m" escape
-    let private bell = "\x07"
-
+    
     let private cursorTo x y =
         sprintf "%s[%d;%dH" escape (y + 1) (x + 1)
-
-    // OSC 8 ; ; URL BEL -> abre um hyperlink; o mesmo OSC com URL vazia fecha
-    let private urlCode = function
-        | Some (url: string) -> Some(sprintf "%s]8;;%s%s" escape url bell)
-        | None -> None
-
-    let private urlCloseCode = sprintf "%s]8;;%s" escape bell
  
     // escreve o char da célula, envolvendo-o em OSC 8 (hyperlink) quando cell.url = Some url
     let private appendCellChar (sb: StringBuilder) (cell: Cell) =
@@ -31,11 +24,6 @@ module Output =
             sb.Append(urlCloseCode) |> ignore
         | None ->
             sb.Append(cell.char) |> ignore
-
-    // OSC 12 ;color BEL -> define a cor do cursor de texto
-    let private cursorColorCode (color: string option) =
-        color
-        |> Option.map (fun hex -> sprintf "%s]12;%s%s" escape hex bell)
 
     // Junta tudo que o <cursor> estiliza numa única sequência a ser escrita
     let private ansiCursorStyle (cursor: Cursor) =

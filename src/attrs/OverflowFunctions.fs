@@ -103,7 +103,7 @@ module OverflowFunctions =
         | PositionedRowWidget(_, _, _, _, _, _, children)
         | PositionedColumnWidget(_, _, _, _, _, _, children)
         | PositionedCellWidget(_, children)
-        | PositionedTerminalWidget(_, _, _, _, _, children) ->
+        | PositionedTerminalWidget(_, _, _, _, _, _, _, _, _, children) ->
             children |> List.exists containsFramedChild
         | _ -> false
 
