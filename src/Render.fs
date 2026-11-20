@@ -7,12 +7,15 @@ open PTML.Drawers
 open PTML.Overflow
 open PTML.OverflowFunctions
 open PTML.Char
-open PTML.OSC
 open PTML.Utils
 open PTML.FontCode
+open PTML.Terminal
+open PTML.Snippet
+open PTML.Content
+open PTML.Global
 
 module Render =
-    let rec private renderWidget offsetX offsetY widget =
+    let rec private renderWidget applyTerminalEffects offsetX offsetY widget =
         match widget with
         | PositionedCharWidget(codename, metrics) ->
             let baseX = offsetX + metrics.x
@@ -63,12 +66,12 @@ module Render =
         | PositionedColumnWidget(_, overflow, _, _, _, metrics, children) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
-            children |> List.collect (renderWidget baseX baseY) |> applyContainerOverflow overflow Auto Auto { metrics with x = baseX; y = baseY } children
+            children |> List.collect (renderWidget applyTerminalEffects baseX baseY) |> applyContainerOverflow overflow Auto Auto { metrics with x = baseX; y = baseY } children
 
         | PositionedCellWidget(metrics, children) ->
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
-            children |> List.collect (renderWidget baseX baseY)
+            children |> List.collect (renderWidget applyTerminalEffects baseX baseY)
 
         | PositionedBoxWidget(width, height, overflow, border, borderColor, _, _, _, metrics, children) ->
             let baseX = offsetX + metrics.x
@@ -79,7 +82,7 @@ module Render =
             let childBaseX = if border <> NoBorder then baseX + 1 else baseX
             let childBaseY = if border <> NoBorder then baseY + 1 else baseY
 
-            let childOps = children |> List.collect (renderWidget childBaseX childBaseY) |> applyContainerOverflow overflow width height { metrics with x = childBaseX; y = childBaseY } children
+            let childOps = children |> List.collect (renderWidget applyTerminalEffects childBaseX childBaseY) |> applyContainerOverflow overflow width height { metrics with x = childBaseX; y = childBaseY } children
             borderOps @ childOps
 
         | PositionedBlockWidget(width, height, overflow, border, borderColor, name, align, _, _, metrics, children) ->
@@ -88,7 +91,7 @@ module Render =
             let borderOps = drawBorderWithTitle baseX baseY metrics.w metrics.h border borderColor name
             let childBaseX = if border <> NoBorder then baseX + 1 else baseX
             let childBaseY = if border <> NoBorder then baseY + 1 else baseY
-            let childOps = children |> List.collect (renderWidget childBaseX childBaseY) |> applyContainerOverflow overflow width height { metrics with x = childBaseX; y = childBaseY } children
+            let childOps = children |> List.collect (renderWidget applyTerminalEffects childBaseX childBaseY) |> applyContainerOverflow overflow width height { metrics with x = childBaseX; y = childBaseY } children
             borderOps @ childOps
 
         | PositionedGridWidget(border, borderColor, metrics, children: List<GridLayout>) ->
@@ -166,7 +169,7 @@ module Render =
                 children
                 |> List.collect (fun grid ->
                     grid.cells
-                    |> List.collect (fun cell -> renderWidget (baseX + cell.metrics.x) (baseY + cell.metrics.y) cell.widget))
+                    |> List.collect (fun cell -> renderWidget applyTerminalEffects (baseX + cell.metrics.x) (baseY + cell.metrics.y) cell.widget))
 
             separatorOps @ childOps
 
@@ -174,18 +177,19 @@ module Render =
             let baseX = offsetX + metrics.x
             let baseY = offsetY + metrics.y
 
-            changeWindowTitle windowT
-            changeIconName    tabT
+            if applyTerminalEffects then
+                windowTitle windowT
+                iconName tabT
 
-            match foreground with
-            | Some f -> terminalColorChange (matchColorAlias f) Foreground
-            | None -> ()
+                match foreground with
+                | Some f -> foregroundColor (matchColorAlias f)
+                | None -> ()
 
-            match background with
-            | Some b -> terminalColorChange (matchColorAlias b) Background
-            | None -> ()
+                match background with
+                | Some b -> backgroundColor (matchColorAlias b)
+                | None -> ()
 
-            children |> List.collect (renderWidget baseX baseY)
+            children |> List.collect (renderWidget applyTerminalEffects baseX baseY)
 
         | PositionedFrameWidget(fw, fc, w, h, overflow, align, paddingV, paddingH, metrics, children) ->
             let baseX = offsetX + metrics.x
@@ -196,11 +200,14 @@ module Render =
             let childBaseX = baseX + 1
             let childBaseY = baseY + 1
             
-            let childOps = children |> List.collect (renderWidget childBaseX childBaseY) |> applyContainerOverflow overflow w h { metrics with x = childBaseX; y = childBaseY } children
+            let childOps = children |> List.collect (renderWidget applyTerminalEffects childBaseX childBaseY) |> applyContainerOverflow overflow w h { metrics with x = childBaseX; y = childBaseY } children
             borderOps @ childOps
 
         | PositionedDepthWidget(_, _, _, _, _, _) ->    
             []
 
     let renderTree(widgets: PositionedWidget list): RenderOperation list =
-        widgets |> List.collect (renderWidget 0 0)
+        widgets |> List.collect (renderWidget true 0 0)
+
+    let renderTreeForContent(widgets: PositionedWidget list): RenderOperation list =
+        widgets |> List.collect (renderWidget false 0 0)

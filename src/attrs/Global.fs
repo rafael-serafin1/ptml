@@ -1,6 +1,7 @@
 namespace PTML
 
 module Global =
+//#region POSSIBLE_VALUES
     let validTags = 
         Set.ofList ["frag"; "text"; "row"; "column"; "layer"; "box"; "block"; "terminal"; "cell"; "snippet"; "spinner"; "hr"; "progress"; "escape"; "frame"; "cursor"; "tree"; "list"; "code"; "char"]
     let colorValues = 
@@ -14,7 +15,9 @@ module Global =
     let progresstype = Set.ofList ["blocks"; "square"; "dots"; "tiny-square"; "rhombus"]
     let boolean = Set.ofList ["true"; "false"]
     let frameworks = Set.ofList ["bold"; "pixels"; "cubic"; "point"; "border"; "picture"; "photograph"; "pythagoras"; "arrow"; "ascii"]
+//#endregion
 
+//#region VALIDATION_MAP
     let validAttributes = Map.ofList [
         "hr", Map.ofList [
             "orientation", orientation
@@ -128,7 +131,65 @@ module Global =
         ]
         "char", Map.ofList ["codename", PTML.Char.validCodenames]
     ]
-    
+//#endregion
+
+//#region TYPES
+    type Dimension =
+        | Auto
+        | Percent of int
+        | Fixed of int
+
+    type CellOrientation =
+        | Horizontal
+        | Vertical
+
+    type Align =
+        | Start
+        | Center
+        | End
+
+    type Border =
+        | Single
+        | Double
+        | Classic
+        | Bold
+        | Strange
+        | Rounded
+        | Ascii
+        | Borderless
+        | NoBorder
+
+    type Colors =
+        | None = 0
+        | Black = 30
+        | Red = 31
+        | Green = 32
+        | Gold = 33
+        | Blue = 34
+        | Purple = 35
+        | Cyan = 36
+        | White = 37
+
+    type Fonts =
+        | None = 0
+        | Bold = 1
+        | Dim = 2
+        | Italic = 3
+        | UnderLine = 4
+        | SlowBlink = 5
+        | RapidBlink = 6
+        | Marked = 7
+        | Conceal = 8
+        | StrikeThrough = 9
+        | Overline = 10
+        | DoubleUnderLine = 11
+
+    type Orientation =
+        | Vertical
+        | Horizontal
+//#endregion
+
+//#region GLOBAL_ATTRS
     let globalAttributes = Set.ofList ["id"; "snippet"; "content"]
 
     type ContentAttrValue =
@@ -136,12 +197,25 @@ module Global =
     | Primary
     | Secondary
 
-    let matchContentAttrValue(key: string): ContentAttrValue = 
-        match key.ToLower() with
-        | "clipboard" -> Clipboard
-        | "primary"   -> Primary
-        | "secondary" -> Secondary
-        | _           -> failwith $"Unknown type of value for 'content' attr: {key}"
+    type GlobalAttributes = {
+        Id: string option
+        Snippet: string option
+        Content: ContentAttrValue option
+    }
+
+    type SnippetDefinition = {
+        Id              : string
+        Extends         : string option
+        GlobalAttributes: GlobalAttributes
+        Attributes      : list<string * string>
+    }
+
+    type SnippetRegistry   = Map<string, SnippetDefinition>
+    type ValidationWarning = { Message: string }
+    type ValidationError   = { Message: string }
+
+    let emptyGlobalAttributes(): GlobalAttributes  = 
+        { Id = None; Snippet = None; Content = None }
 
     let tryMatchContentAttrValue(key: string option): ContentAttrValue option = 
         match key with
@@ -152,3 +226,21 @@ module Global =
             | "primary"   -> Some Primary
             | "secondary" -> Some Secondary
             | _           -> None
+
+    ///<summary>Divide os atributos registrados de uma tag em atributos locais e globais</summary>
+    ///<return>Uma lista contento uma estrutura de atributos considerados globais e atributos locais (atributos da própria tag)</return>
+    let splitGlobalAttrs attrs =
+        let id = 
+            attrs |> List.tryFind (fun (name, _) -> name = "id") |> Option.map snd
+
+        let snippet =
+            attrs |> List.tryFind (fun (name, _) -> name = "snippet") |> Option.map snd
+
+        let content = 
+            attrs |> List.tryFind (fun (name, _) -> name = "content") |> Option.map snd
+
+        let filtered =
+            attrs |> List.filter (fun (name, _) -> name <> "id" && name <> "snippet" && name <> "content")
+
+        ({ Id = id; Snippet = snippet; Content = tryMatchContentAttrValue(content) }, filtered)
+//#endregion

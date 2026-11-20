@@ -4,6 +4,7 @@ open PTML.Drawers
 open PTML.Layout
 open PTML.Tree
 open PTML.Overflow
+open PTML.Global
 
 module OverflowFunctions = 
     let textCells operations =

@@ -81,6 +81,7 @@ module Watch =
                 let layout = layoutTree semantic
                 let filteredLayout, depthLayers = Depth.extractDepthLayers layout
                 let renderOps = renderTree filteredLayout
+                ContentExecution.execute ast
                 let terminal = getOutputViewport()
                 let baseBuffer =
                     processRenderTree renderOps terminal.SafeWidth terminal.SafeHeight

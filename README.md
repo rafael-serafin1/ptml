@@ -321,12 +321,32 @@ Comece apenas com:
 
 # Estado Atual
 ```
-✅ Funcionando: Spinners, Barra de Progresso, Frames                                                                        |
-⚠️ Funcionando de forma errada: Depth Layer                                                                                 |
+✅ Funcionando: Frames, DirTrees, Listas, Macro de Caracteres Especiais                                                     |
+⚠️ Funcionando de forma errada: ...                                                                                         |
 ⛔ Não funcionando: ...                                                                                                     |
-🚧 Em construção: ...                                                                                                       |
-📜 Planejados: Listas, Inputs avançados, Graphs, Trees, Output binding e Execução integrada de código                       |
+🚧 Em construção: HyperTextos                                                                                               |
+📜 Planejados: Notificações, Inputs avançados, Graphs, Output binding e Execução integrada de código                        |
 ```
+
+---
+
+# Documentação em site
+
+Uma versão navegável da documentação está disponível em `docs-site/`. Para executá-la localmente:
+
+```sh
+cd docs-site
+npm install
+npm run dev
+```
+
+Para gerar os arquivos estáticos:
+
+```sh
+npm run build
+```
+
+O site organiza a documentação em páginas com URLs próprias e cobre os elementos cujo comportamento está confirmado no parser e no renderizador.
 
 ---
 

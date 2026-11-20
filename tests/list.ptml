@@ -1,6 +1,6 @@
 <?ptml encoding="UTF-8" terminal-resize="static"?>
 <column gap="1">
-    <list ofstyle="enum" before="Step " after=" ">
+    <list ofstyle="enum" before="Step " after=" " content="clipboard">
         <column>
             <text>Create a PTML file.</text>
             <text>Run the PTML file.</text>
@@ -27,8 +27,7 @@
         </column>
     </list>
 
-    <code src="hello.lua" execute-method="async">
-        print("hello World!")
-        let health = 5
-    </code>
+    <list ofstyle="enum" after=" ">
+        <text>Olá</text>
+    </list>
 </column>

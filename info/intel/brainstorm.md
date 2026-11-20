@@ -35,6 +35,7 @@ Sendo assim, atualmente os concretos são:
 <progress>
 <frame>
 <tree>
+<char>
 ---> Em desenvolvimento
 <hyper>
 <input>
@@ -75,6 +76,24 @@ Atributo que aplica um identificador único ao elemento.
 *LEIA `<snippet>` PARA MELHOR CONTEXTO* 
 Atributo que todos os elementos possuem e que faz a adição dos atributos resumidos no elemento `<snippet>`.
 > OBS.1: Se o `<snippet>` tiver atributos que o elemento não possui, exemplo `padding` para `<text>`, a execução não será interrompida, mas um aviso será gerado no terminal para deixar claro que aquele atributo não existe para tal elemento.
+
+***content***:
+Atributo que faz referência ao conteúdo do elemento. Valores possíveis:
+O conteúdo copiado corresponde à saída visual do elemento renderizado isoladamente, incluindo bordas, separadores e espaços de layout.
+```
+clipboard       =>      Copia o texto para a área de transferência Crtl-C Crtl-V
+primary         =>      Copia o conteúdo selecionado e envia para a área de transferência primária
+secondary       =>      Copia o conteúdo selecionado e envia para a área de transferência secundária
+```
+1. Exemplo :
+  + Input
+  ```ptml
+    <text content="clipboard">Olá mundo!</text>
+  ```
+  + Output
+  ```cmd
+    Olá mundo!          (Olá mundo foi copiado para a área de transferência, sem impedir que ele também fosse mostrado na tela)
+  ```
 
 --- 
 ## Atributos Compartilhados
@@ -211,15 +230,6 @@ Seu uso é simples:
 ```
 Github  
 ```
-
-***content***:
-Atributo que faz referência ao conteúdo do elemento. Compartilhado para todos os elementos. Valores possíveis:
-```
-clipboard       =>      Copia o texto para a área de transferência Crtl-C Crtl-V
-primary         =>      Copia o conteúdo selecionado e envia para a área de transferência primária
-secondary       =>      Copia o conteúdo selecionado e envia para a área de transferência secundária
-```
-
 
 ---
 ### Elemento `<text>`
@@ -612,231 +622,96 @@ Exemplo:
 ```
 
 ---
-## Elemento `<layer>`
+## Proposta de redesign: elemento `<layer>`
 
-`<layer></layer>`
-Faz juz a profundidade. Seus filhos são distribuídos por índice da 3º dimensão espacial.
+> **Status: proposta conceitual, ainda não implementada nem validada.** A projeção da profundidade no espaço 2D do terminal permanece pendente; portanto, esta seção descreve o modelo desejado, não uma garantia do comportamento atual.
 
-Exemplo .1:
-- Input
+`<row>`, `<column>` e `<layer>` organizam os eixos X, Y e Z, respectivamente. `<layer>` orquestra uma matriz de colunas: cada `<column>` ocupa uma coordenada de profundidade, enquanto mantém seu fluxo vertical normal. O resultado deve ser estático e reproduzível para a mesma árvore e o mesmo tamanho de terminal.
+
+### Sintaxe proposta
+
+O `<layer>` agrupa colunas, como `<row>` e `<column>` agrupam seus próprios filhos. O `index` identifica a profundidade de cada coluna, em vez de identificar o próprio `<layer>`.
+
 ```ptml
-<layer index="0">
-    <box>
-        <text>Hello World!</text>
-    </box>
-</layer>
-<layer index="-1">
-    <box>
-        <text>GoodBye World!</text>
-    </box>
-</layer>
-<layer index="-2">
-    <box>
-        <text>Hello Again!</text>
-    </box>
+<layer gap="1" z-align="center">
+    <column index="-1">
+        <text>Fundo</text>
+        <text>Detalhe distante</text>
+    </column>
+    <column index="0">
+        <text>Plano de referência</text>
+    </column>
+    <column index="1">
+        <text>Frente</text>
+    </column>
 </layer>
 ```
 
-- Output
-```cmd
-┌────────────┐
-│┌───────────┴┐
-└┤┌───────────┴┐
- └┤Hello World!│
-  └────────────┘
-```
+### Saídas esquemáticas
 
-### **Disclaimer** --> o conteúdo dos índices -1 e -2 não foram perdido, apenas sobrescrito, ainda é possível acessar eles.
-### **OBS** N1--> Em caso de o usuário utilizar outros valores para representar a superfície (0), um aviso aparecerá no terminal, mas isso não impedirá a execução do código.
+Os exemplos abaixo usam apenas para ilustração a hipótese de que cada passo em `index` desloca uma célula para baixo e para a direita. Eles mostram posições relativas, sem definir o enquadramento final no terminal.
 
-Exemplo .(1.5):
-- Input
 ```ptml
-<layer index="0">
-    <box>
-        <text>Hello World!</text>
-    </box>
-    <box>
-        <text>GoodBye World!</text>
-    </box>
-</layer>
-```
-
-- Output
-```cmd
-Erro: não pode haver dois filhos com índice de mesmo valor!
-```
-
-Exemplo .2:
-- Input
-```ptml
-<layer index="0">
-    <column>
-        <row>
-            <box border="single">
-                <text foreground="gold">Hello World!</text>
-            </box>
-            <box border="single">
-                <text>GoodBye World!</text>
-            </box>
-        </row>
-        <row>
-            <box border="single">
-                <text foreground="gold">Hello World!</text>
-            </box>
-            <box border="single">
-                <text>GoodBye World!</text>
-            </box>
-        </row>
+<layer gap="1">
+    <column index="-1">
+        <text>A</text>
     </column>
-</layer>
-<layer index="-1">
-    <column>
-        <row>
-            <box border="single">
-                <text foreground="gold">Hello World!</text>
-            </box>
-            <box border="single">
-                <text>GoodBye World!</text>
-            </box>
-        </row>
-        <row>
-            <box border="single">
-                <text foreground="gold">Hello World!</text>
-            </box>
-            <box border="single">
-                <text>GoodBye World!</text>
-            </box>
-        </row>
+    <column index="0">
+        <text>B</text>
+    </column>
+    <column index="1">
+        <text>C</text>
     </column>
 </layer>
 ```
 
-- Output
-```cmd
-┌────────────┐  ┌──────────────┐
-│┌───────────┴┐ │┌─────────────┴┐
-└┤Hello World!│ └┤GoodBye World!│
- └────────────┘  └──────────────┘
-┌────────────┐  ┌──────────────┐ 
-│┌───────────┴┐ │┌─────────────┴┐
-└┤Hello World!│ └┤GoodBye World!│
- └────────────┘  └──────────────┘
+Saída ilustrativa:
+
+```text
+A
+ B
+  C
 ```
 
-### **Atributos**:
+Este segundo exemplo ilustra a prioridade quando duas colunas projetam conteúdo sobre a mesma célula: `X`, no índice maior, substitui o `B` nessa posição.
 
-***index*** (obrigatório):
-Define o índice de profundidade do elemento-filho.
-
-Exemplo:
-- Input
-```ptml
-<layer index="0">
-    <column>
-        <box>
-            <text>Hello World!</text>
-        </box>
-    </column>
-</layer>
-<layer index="-1">
-    <column>
-        <box>
-            <text>GoodBye World!</text>
-        </box>
-    </column>
-</layer>
-```
-
-- Output
-```cmd
-┌───────────┐
-│┌──────────┴─┐
-└┤Hello World!│
- └────────────┘
-```
-
-***z-align***:
-Atributo que alinha um conteúdo dimensionalmente pela profundidade disponível do container pai. Valores possíveis:
-```
-start       (valor default)
-center 
-end         (valor default APENAS para o cenário descrito na observação N2)
-```
-
-Exemplo
-- Input
-```ptml
-<layer index="0" z-align="center">
-    <column>
-        <text>Hello World!</text>
-    </column>
-</layer>
-<layer index="-1" z-align="center">
-    <column>
-        <text>Bye World!</text>
-    </column>
-</layer>
-```
-
-- Output
-```cmd
-  ┌──────────┐
- ┌┴──────────┴┐
- │Hello World!│
- └────────────┘
-```
-
-
-***gap***:
-Define o espaçamento entre um filho e outro no layout. O valor deve ser numérico e inteiro.
-
-Exemplo:
-- Input
-```ptml
-<layer index="0" gap="1">
-    <column>
-        <text>Hello World!</text>
-    </column>
-</layer>
-<layer index="-1" gap="1">
-    <column>
-        <text>Bye World!</text>
-    </column>
-</layer>
-```
-
-- Output
-```cmd
-┌────────────┐  
-│Bye World!  │        
-└┬───────────┴┐ 
- │Hello World!│ 
- └────────────┘ 
-```
-
-### **OBS** N2 --> Caso o elemento `<layer>` tenha gap igual ou maior que 1 ***E*** o conteúdo do elemento `<column>`, de índice menor que a da superfície, for maior que o conteúdo do elemento da superfície, um aviso deve ser gerado no terminal e a coluna deve ser exibida da seguinte forma:
-
-- Input 
 ```ptml
 <layer gap="1">
     <column index="0">
-        <text>Hello World!</text>
+        <text>AAA</text>
+        <text>BBB</text>
     </column>
-    <column index="-1">
-        <text>GoodBye World!</text>
+    <column index="1">
+        <text>X</text>
     </column>
 </layer>
 ```
 
-- Output
-```cmd
- ┌──────────────┐  
- │GoodBye World!│        
-┌┴───────────┬──┘
-│Hello World!│ 
-└────────────┘ 
+Saída ilustrativa:
+
+```text
+AAA
+BXB
 ```
+
+### Modelo de composição
+
+- `index` é um inteiro que representa a posição da coluna no eixo Z. `0` é o plano de referência; índices negativos ficam atrás dele e positivos, à frente.
+- Cada coluna direta deve ter um índice único. Índices repetidos tornam a composição ambígua e devem resultar em erro explícito.
+- Quando células projetadas ocuparem a mesma posição do terminal, a coluna com o maior `index` prevalece. Assim, a prioridade é determinada pela profundidade, não pela ordem dos elementos no documento.
+- O conteúdo interno de cada `<column>` segue as regras verticais desse elemento; `<layer>` não reordena os filhos da coluna.
+- `gap` é um inteiro não negativo que controla o espaçamento entre posições consecutivas de profundidade. A unidade visual desse espaçamento depende da projeção ainda pendente.
+- `z-align` propõe alinhar a composição projetada no espaço disponível, usando `start`, `center` ou `end`, em paralelo a `align` de `<row>` e `y-align` de `<column>`. O eixo e a área exata de alinhamento precisam ser definidos junto com a projeção.
+
+### Projeção e previsibilidade
+
+Como o terminal é bidimensional, o eixo Z precisa ser projetado em X e Y. Os exemplos acima usam a hipótese de deslocar diagonalmente cada passo de profundidade, com `gap` como deslocamento. A direção, a origem, o tratamento de índices negativos, o enquadramento e o clipping ainda não estão especificados; essas saídas não devem ser tratadas como regra final nem como comportamento implementado.
+
+Depois que a projeção for definida, ela deverá produzir o mesmo posicionamento e a mesma regra de sobreposição para a mesma árvore e viewport. Animação, atualização temporal ou dependência da ordem de renderização não fazem parte deste modelo.
+
+### Diferença para a implementação atual
+
+O código atual exige `index` em cada `<layer>` e extrai camadas para composição sobre o buffer do terminal. Ele não implementa o modelo proposto de `<layer>` contendo `<column index="…">` nem a projeção tridimensional descrita aqui. A sintaxe acima é uma proposta para discussão, não um exemplo funcional da versão atual.
 
 ---
 ## Elemento `<box>`
@@ -893,7 +768,7 @@ end
 ## Elemento `<block>`
 
 `<block></block>`
-Define um bloco nomeado através de um atributo obrigatório chamado `title`. A diferença chave entre `<box>` e `<block>` é que o conteúdo de `<block>` é tratado como dele, assim poderá no futuro colocar várias seções de botões rádio que não vão conflitarem entre si.
+Define um componente semântico nomeado através de um atributo obrigatório chamado `title`. A diferença chave entre `<box>` e `<block>` é que o conteúdo de `<block>` é tratado como dele, assim poderá no futuro colocar várias seções de botões rádio que não vão conflitarem entre si.
 
 Exemplo:
 - Input
@@ -1139,6 +1014,41 @@ Exemplo .3:
 │ Pao de Batata  │ Pao, Batata.   │
 └────────────────┴────────────────┘
 ```
+
+Exemplo .4 (Ocorre atualmente):
+- Input
+```ptml
+<block title="Cardapio">
+    <column>
+        <row>
+            <cell>
+                <text>Tilapia Cozida</text>
+            </cell>
+            <cell>
+                <text>Pao de Batata</text>
+            </cell>
+        </row>
+    </column>
+    <column>
+        <row>
+            <cell>
+                <text>Tilapia, Ervas.</text>
+            </cell>
+        </row>
+    </column>
+</block>
+```
+
+- Output
+```cmd
+┌ Cardapio ──────┬────────────────┐
+│ Tilapia Cozida │ Tilapia, Ervas.│
+├────────────────┼────────────────┤         
+│ Pao de Batata  │                │
+└────────────────┴────────────────┘
+``` 
+
+> Como observado, uma quantidade declarada de células com contagem ímpar, gera uma célula fantasma sem nada para segurar o espaço que uma célula declarada seguraria.
 
 > OBS: Como toda célula, a divisão é feita de forma proporcional, ou seja, nunca se divide por números ímpares.
 
@@ -1628,7 +1538,7 @@ relationship            (e1 --<...>-- e2)
 ***relation***:
 Descreve a relação entre as duas entidades.
 
----
+--- 
 ## Elemento `<tree>`
 
 `<tree />`  

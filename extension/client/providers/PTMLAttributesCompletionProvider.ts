@@ -324,8 +324,9 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         {
             name: "multiplier"
         },
-        globalAttributes,
-        globalAttributes2
+        globalAttributes,   
+        globalAttributes2,
+        globalAttributes3
     ],
     frame: [
         {
@@ -354,8 +355,9 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
             name: "padding",
             values: NaNValuesInNumericAttrs
         },
-        globalAttributes,
-        globalAttributes2
+        globalAttributes,   
+        globalAttributes2,
+        globalAttributes3
     ],
     cursor: [
         {
@@ -373,7 +375,10 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         {
             name: "color",
             values: cursorColor
-        }
+        },
+        globalAttributes,   
+        globalAttributes2,
+        globalAttributes3
     ],
     tree: [
         {
@@ -381,7 +386,10 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         },
         {
             name: "root-limit",
-        }
+        },
+        globalAttributes,   
+        globalAttributes2,
+        globalAttributes3
     ],
     list: [
         {
@@ -393,13 +401,19 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
         },
         {
             name: "after"
-        }
+        },
+        globalAttributes,   
+        globalAttributes2,
+        globalAttributes3
     ],
     char: [
         {
             name: "codename",
             values: charcodiname
-        }
+        },
+        globalAttributes,   
+        globalAttributes2,
+        globalAttributes3
     ]
 };
 

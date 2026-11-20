@@ -21,6 +21,7 @@ extras/
 testing/
 .vscode/
 .vs/
+dist/
 */.vs
 
 .fake

@@ -6,6 +6,7 @@ open PTML.Spinner
 open PTML.Escape
 open PTML.Overflow
 open PTML.Char
+open PTML.Global
 
 module Layout = 
     type Metrics = {
@@ -237,6 +238,23 @@ module Layout =
             m.h + 2
         | PositionedDepthWidget(_, _, _, _, m, _) -> m.h
         | _ -> metrics.h
+
+    let renderedSize widgets =
+        let width =
+            widgets
+            |> List.map (fun widget ->
+                let metrics = metricsOf widget
+                metrics.x + totalWidth widget)
+            |> List.fold max 0
+
+        let height =
+            widgets
+            |> List.map (fun widget ->
+                let metrics = metricsOf widget
+                metrics.y + totalHeight widget)
+            |> List.fold max 0
+
+        max 1 width, max 1 height
 
     (*ESCAPE ELEMENT MESS*)
     let flowAdvance (widget: PositionedWidget) =

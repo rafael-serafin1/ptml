@@ -4,11 +4,16 @@ open System.Text
 open PTML.Global
 open PTML.Utils
 
+// NÃO USE ESSE MÓDULO DIRETAMENTE NOS ARQUIVOS PRINCIPAIS
+// sempre use indiretamente através de componentes
+// Output.fs é uma exceção que não deve ser tratada, deixe o arquivo implementar esse modulo diretamente
 module OSC =
-    let ESC_escape = "\x1b"
-    let OSC_escape = "\x07"
+    let private ESC = "\x1b"
+    let private BEL = "\x07"
+    let private ST = "\x1b\\"
+
     let getOSC_entry (num: int) =
-        $"{ESC_escape}]{num};"
+        $"{ESC}]{num};"
 
     let private buildString(str1: string) (str2: string) (compl: string): string  =
         let joined = str1 + compl + str2
@@ -17,10 +22,10 @@ module OSC =
 //#region TERMINAL TITLES
 
     let changeWindowTitle (newTitle: string) = 
-        Console.Write (buildString (getOSC_entry 2) OSC_escape newTitle)
+        Console.Write (buildString (getOSC_entry 2) BEL newTitle)
 
     let changeIconName (newTitle: string) =
-        Console.Write (buildString (getOSC_entry 1) OSC_escape newTitle)
+        Console.Write (buildString (getOSC_entry 1) BEL newTitle)
 
 //#endregion
 
@@ -30,18 +35,18 @@ module OSC =
     // OSC 12 ;color BEL -> define a cor do cursor de texto
     let cursorColorCode (color: string option) =
         color
-        |> Option.map (fun hex -> sprintf "%s]12;%s%s" ESC_escape hex OSC_escape)
+        |> Option.map (fun hex -> sprintf "%s]12;%s%s" ESC hex BEL)
 
 //#endregion
 
 
 //#region URL
     
-    let urlCloseCode = sprintf "%s]8;;%s" ESC_escape OSC_escape
+    let urlCloseCode = sprintf "%s]8;;%s" ESC BEL
 
     // OSC 8 ; ; URL BEL -> abre um hyperlink; o mesmo OSC com URL vazia fecha
     let urlCode = function
-        | Some (url: string) -> Some(sprintf "%s]8;;%s%s" ESC_escape url OSC_escape)
+        | Some (url: string) -> Some(sprintf "%s]8;;%s%s" ESC url BEL)
         | None -> None
 
 //#endregion
@@ -51,7 +56,7 @@ module OSC =
 // é necessário implementar a execução dessa função no programa principal
 
     let private buildOSC52(str1: string)(char: char) = 
-        sprintf "%s]%d;%c;%s%s" OSC_escape 52 char str1 ESC_escape
+        sprintf "%s]%d;%c;%s%s" ESC 52 char str1 ST
 
     let private toBase64 (text: string) =
         Convert.ToBase64String(Encoding.UTF8.GetBytes text)
@@ -85,10 +90,10 @@ module OSC =
 //#region TERMINAL FORE/BACKGROUND
 
     let private terminalForeground (color: string) = 
-        $"{ESC_escape}]10;{color}{OSC_escape}"
+        $"{ESC}]10;{color}{BEL}"
 
     let private terminalBackground (color: string)  = 
-        $"{ESC_escape}]11;{color}{OSC_escape}"
+        $"{ESC}]11;{color}{BEL}"
 
     let terminalColorChange(color: string)(ground: Grounds) = 
         let curPos = Console.GetCursorPosition()
