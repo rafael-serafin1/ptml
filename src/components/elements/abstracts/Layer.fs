@@ -6,6 +6,7 @@ open PTML.Render
 open PTML.Buffer
 open PTML.Token
 open PTML.Messager
+open PTML.Global
 
 module Depth =
     type DepthLayer = {
@@ -41,8 +42,8 @@ module Depth =
         | Some End -> max 0 (containerSize - childSize)
         | None -> 0
 
-    let private renderLayerBuffer width height children =
-        let renderOps = children |> Render.renderTree
+    let private renderLayerBuffer renderTree width height children =
+        let renderOps = children |> renderTree
         Buffer.processRenderTree renderOps width height
 
     let private validateUniqueIndices (layers: DepthLayer list) =
@@ -60,17 +61,17 @@ module Depth =
         if not (List.isEmpty layers) && not (List.exists (fun layer -> layer.Index = 0) layers) then
             PTMLMessage("Aviso: a superfície principal não está usando index = 0.", MessageStatus.Warning)
 
-    let rec private extractWidget offsetX offsetY widget =
+    let rec private extractWidget renderTree offsetX offsetY widget =
         match widget with
         | PositionedCursorWidget(s, b, c, v, m) ->
             (Some (PositionedCursorWidget(s, b, c, v, m)), [])
         | PositionedDepthWidget(index, overflow, zAlign, gap, metrics, children) ->
             let absoluteX = offsetX + metrics.x
             let absoluteY = offsetY + metrics.y
-            let childResults = children |> List.map (extractWidget absoluteX absoluteY)
+            let childResults = children |> List.map (extractWidget renderTree absoluteX absoluteY)
             let filteredChildren = childResults |> List.choose fst
             let nestedLayers = childResults |> List.collect snd
-            let layerBuffer = renderLayerBuffer metrics.w metrics.h filteredChildren
+            let layerBuffer = renderLayerBuffer renderTree metrics.w metrics.h filteredChildren
             let layer = {
                 Index = index
                 ZAlign = zAlign
@@ -84,31 +85,31 @@ module Depth =
             (None, layer :: nestedLayers)
 
         | PositionedRowWidget(width, overflow, border, gap, align, metrics, children) ->
-            let childResults = children |> List.map (extractWidget (offsetX + metrics.x) (offsetY + metrics.y))
+            let childResults = children |> List.map (extractWidget renderTree (offsetX + metrics.x) (offsetY + metrics.y))
             let filteredChildren = childResults |> List.choose fst
             let nestedLayers = childResults |> List.collect snd
             (Some (PositionedRowWidget(width, overflow, border, gap, align, metrics, filteredChildren)), nestedLayers)
 
         | PositionedColumnWidget(width, overflow, border, gap, yAlign, metrics, children) ->
-            let childResults = children |> List.map (extractWidget (offsetX + metrics.x) (offsetY + metrics.y))
+            let childResults = children |> List.map (extractWidget renderTree (offsetX + metrics.x) (offsetY + metrics.y))
             let filteredChildren = childResults |> List.choose fst
             let nestedLayers = childResults |> List.collect snd
             (Some (PositionedColumnWidget(width, overflow, border, gap, yAlign, metrics, filteredChildren)), nestedLayers)
 
         | PositionedCellWidget(metrics, children) ->
-            let childResults = children |> List.map (extractWidget (offsetX + metrics.x) (offsetY + metrics.y))
+            let childResults = children |> List.map (extractWidget renderTree (offsetX + metrics.x) (offsetY + metrics.y))
             let filteredChildren = childResults |> List.choose fst
             let nestedLayers = childResults |> List.collect snd
             (Some (PositionedCellWidget(metrics, filteredChildren)), nestedLayers)
 
         | PositionedBoxWidget(width, height, overflow, border, borderColor, align, paddingV, paddingH, metrics, children) ->
-            let childResults = children |> List.map (extractWidget (offsetX + metrics.x) (offsetY + metrics.y))
+            let childResults = children |> List.map (extractWidget renderTree (offsetX + metrics.x) (offsetY + metrics.y))
             let filteredChildren = childResults |> List.choose fst
             let nestedLayers = childResults |> List.collect snd
             (Some (PositionedBoxWidget(width, height, overflow, border, borderColor, align, paddingV, paddingH, metrics, filteredChildren)), nestedLayers)
 
         | PositionedBlockWidget(width, height, overflow, border, borderColor, name, align, paddingV, paddingH, metrics, children) ->
-            let childResults = children |> List.map (extractWidget (offsetX + metrics.x) (offsetY + metrics.y))
+            let childResults = children |> List.map (extractWidget renderTree (offsetX + metrics.x) (offsetY + metrics.y))
             let filteredChildren = childResults |> List.choose fst
             let nestedLayers = childResults |> List.collect snd
             (Some (PositionedBlockWidget(width, height, overflow, border, borderColor, name, align, paddingV, paddingH, metrics, filteredChildren)), nestedLayers)
@@ -122,7 +123,7 @@ module Depth =
                         |> List.map (fun cell ->
                             let widgetOffsetX = offsetX + metrics.x + cell.metrics.x
                             let widgetOffsetY = offsetY + metrics.y + cell.metrics.y
-                            let childResult = extractWidget widgetOffsetX widgetOffsetY cell.widget
+                            let childResult = extractWidget renderTree widgetOffsetX widgetOffsetY cell.widget
                             let cellWidget =
                                 match fst childResult with
                                 | Some widget -> Some { cell with widget = widget }
@@ -136,7 +137,7 @@ module Depth =
             (Some (PositionedGridWidget(border, borderColor, metrics, filteredGrids)), List.collect id nestedLayers)
 
         | PositionedTerminalWidget(width, height, foreground, background, alignX, alignY, windowT, tabT, metrics, children) ->
-            let childResults = children |> List.map (extractWidget (offsetX + metrics.x) (offsetY + metrics.y))
+            let childResults = children |> List.map (extractWidget renderTree (offsetX + metrics.x) (offsetY + metrics.y))
             let filteredChildren = childResults |> List.choose fst
             let nestedLayers = childResults |> List.collect snd
             (Some (PositionedTerminalWidget(width, height, foreground, background, alignX, alignY, windowT, tabT, metrics, filteredChildren)), nestedLayers)
@@ -157,19 +158,28 @@ module Depth =
         | PositionedEscapeWidget(str, seq, multi, metrics) ->
             (Some (PositionedEscapeWidget(str, seq, multi, metrics)), [])
         | PositionedFrameWidget(fw, fc, w, h, overflow, align, pv, ph, metrics, children) ->
-            let childResults = children |> List.map (extractWidget (offsetX + metrics.x) (offsetY + metrics.y))
+            let childResults = children |> List.map (extractWidget renderTree (offsetX + metrics.x) (offsetY + metrics.y))
             let filteredChildren = childResults |> List.choose fst
             let nestedLayers = childResults |> List.collect snd
             (Some (PositionedFrameWidget(fw, fc, w, h, overflow, align, pv, ph, metrics, filteredChildren)), nestedLayers)
         
 
-    let extractDepthLayers widgets =
-        let results = widgets |> List.map (extractWidget 0 0)
+    let private extractDepthLayersWith renderTree validateLayers widgets =
+        let results = widgets |> List.map (extractWidget renderTree 0 0)
         let filteredWidgets = results |> List.choose fst
         let layers = results |> List.collect snd
-        validateUniqueIndices layers
-        warnMissingSurface layers
+
+        if validateLayers then
+            validateUniqueIndices layers
+            warnMissingSurface layers
+
         (filteredWidgets, layers)
+
+    let extractDepthLayers widgets =
+        extractDepthLayersWith Render.renderTree true widgets
+
+    let extractDepthLayersForContent widgets =
+        extractDepthLayersWith Render.renderTreeForContent false widgets
 
     let composeDepthLayers (baseBuffer: Cell[,]) (layers: DepthLayer list) =
         let sortedLayers = layers |> List.sortBy (fun layer -> layer.Index)

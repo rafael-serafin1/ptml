@@ -321,11 +321,11 @@ Comece apenas com:
 
 # Estado Atual
 ```
-✅ Funcionando: Spinners, Barra de Progresso, Frames                                                                        |
-⚠️ Funcionando de forma errada: Depth Layer                                                                                 |
+✅ Funcionando: Frames, DirTrees, Listas, Macro de Caracteres Especiais                                                     |
+⚠️ Funcionando de forma errada: ...                                                                                         |
 ⛔ Não funcionando: ...                                                                                                     |
-🚧 Em construção: ...                                                                                                       |
-📜 Planejados: Listas, Inputs avançados, Graphs, Trees, Output binding e Execução integrada de código                       |
+🚧 Em construção: HyperTextos                                                                                               |
+📜 Planejados: Notificações, Inputs avançados, Graphs, Output binding e Execução integrada de código                        |
 ```
 
 ---

@@ -2,6 +2,7 @@ namespace PTML
 open PTML.Tree
 open PTML.Layout
 open PTML.Spinner
+open PTML.Global
 
 module Drawers = 
     type RenderOperation =
