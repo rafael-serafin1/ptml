@@ -1,4 +1,4 @@
-<?ptml encoding="UTF-8" terminal-resize="static"?>
+<?ptml encoding="UTF-8" terminal-resize="static" console-instance="clear"?>
 <terminal x-align="start">
     <row gap="1">
         <column>
@@ -8,6 +8,6 @@
             </row>
         </column>
         <cursor shape="underline" color="#837878" /> 
-        <text>Hello World!</text>
+        <text>Hello World! <char codename="del"/></text>
     </row>
 </terminal>

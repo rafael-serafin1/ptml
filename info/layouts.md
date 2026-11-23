@@ -127,7 +127,7 @@ OSC (Operating System Commands)
 
 Troque Nº por qualquer um destes:
 
-### OSC TERMINAL
+# OSC TERMINAL
 0   =>  parametro esperado: texto   =   Altera o título da janela, quanto o nome do ícone/aba
 1   =>  p' esperado: texto  =   Altera apenas o nome do ícone/aba do terminal
 2   =>  p' esperado: texto  =   Altera apenas o título da janela do terminal
@@ -204,3 +204,42 @@ CSI (Control Sequence Introducer)   =>      ESC[ o famoso \x1b[
 OSC (Operating System Command)
 DCS (Device Control String)
 PM (Privacy Message)
+
+
+# CSI TERMINAL
+
+## LIMPEZA DE BUFFER
+
+### LIMPAR TELA
+
+`\x1b[2J`   -> Limpa tela
+`\x1b[1J`   -> Limpa do começo até o cursor
+`\x1b[0J`   -> Limpa do cursor até o fim
+
+`\x1b[2K`   -> Limpa uma linha inteira
+
+## TERMINAL MANIP..
+
+Prefixo: `\x1b[?`
+
+### CURSOR
+
+`25l`       -> Oculta o cursor
+`25h`       -> Exibe o cursor
+
+### EVENTOS
+
+Sufixos:
+`h` -> habilitar
+`l` -> desabilitar
+
+`1000`     -> Ativa eventos de clique
+`1002`     -> Ativa eventos de movimento com clique pressionado
+`1003`     -> Ativa todos os eventos de movimento
+`1006`     -> Ativa codificação SGR para mouse
+
+CSI < button ; x ; y M              ==      formato de evento do mouse usando SGR
+CSI < button ; x ; y m              ==      para liberação do botão
+
+`1004`     -> Log de foco em aplicação
+

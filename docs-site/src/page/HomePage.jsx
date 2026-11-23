@@ -24,8 +24,23 @@ export function HomePage({ tags }) {
             <span>primeiro-exemplo.ptml</span>
             <span className="terminal-lang">PTML</span>
           </div>
-          <pre><code><span className="code-muted">&lt;</span><span className="code-tag">column</span> <span className="code-attr">gap</span>=<span className="code-string">"1"</span><span className="code-muted">&gt;</span>{"\n"}  <span className="code-muted">&lt;</span><span className="code-tag">block</span> <span className="code-attr">title</span>=<span className="code-string">"Status"</span><span className="code-muted">&gt;</span>{"\n"}    <span className="code-muted">&lt;</span><span className="code-tag">text</span> <span className="code-attr">foreground</span>=<span className="code-string">"limegreen"</span><span className="code-muted">&gt;</span>{"\n"}      Servidor online{"\n"}    <span className="code-muted">&lt;/</span><span className="code-tag">text</span><span className="code-muted">&gt;</span>{"\n"}  <span className="code-muted">&lt;/</span><span className="code-tag">block</span><span className="code-muted">&gt;</span>{"\n"}<span className="code-muted">&lt;/</span><span className="code-tag">column</span><span className="code-muted">&gt;</span></code></pre>
-          <div className="terminal-status"><span /> marcação declarativa para o seu terminal</div>
+            <pre>
+              <code>
+                <span className = "code-muted">&lt;</span>
+                <span className = "code-tag">column</span>
+                <span className = "code-attr"> gap</span>=<span className="code-string">"1"</span><span className = "code-muted">&gt;</span>
+                {"\n"}  
+                  <span className = "code-muted">&lt;</span><span className="code-tag">block</span> <span className = "code-attr"> title</span>=<span className="code-string">"Status"</span><span className = "code-muted">&gt;</span>
+                  {"\n"}    
+                  <span className = "code-muted">&lt;</span><span className="code-tag">text</span> <span className = "code-attr">foreground</span> = <span className = "code-string">"limegreen"</span><span className="code-muted">&gt;</span>
+                  {"\n"}      Servidor online{"\n"}    
+                  <span className = "code-muted">&lt;/</span><span className = "code-tag">text</span><span className = "code-muted">&gt;</span>
+                  {"\n"}  <span className = "code-muted">&lt;/</span>
+                  <span className = "code-tag">block</span><span className = "code-muted">&gt;</span>
+                {"\n"}<span className = "code-muted">&lt;/</span><span className = "code-tag">column</span><span className = "code-muted">&gt;</span>
+              </code>
+            </pre>
+            <div  className = "terminal-status"><span /> marcação declarativa para o seu terminal</div>
         </div>
       </div>
 

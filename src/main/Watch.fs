@@ -79,12 +79,16 @@ module Watch =
                 let ast: AstNode list = buildAst(tokens)
                 let semantic: Widget list = buildSemanticTree(ast)
                 let layout = layoutTree semantic
+                
                 let filteredLayout, depthLayers = Depth.extractDepthLayers layout
                 let renderOps = renderTree filteredLayout
-                ContentExecution.execute ast
+
+                ContentExecution.tryExecute ast
+
                 let terminal = getOutputViewport()
                 let baseBuffer =
                     processRenderTree renderOps terminal.SafeWidth terminal.SafeHeight
+
                 let buffer = Depth.composeDepthLayers baseBuffer depthLayers
                 let size = (Array2D.length2 buffer, Array2D.length1 buffer)
 

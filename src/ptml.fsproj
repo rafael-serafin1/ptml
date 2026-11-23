@@ -25,14 +25,15 @@
     <Compile Include="components/elements/concretes/Hyper.fs"           />
     <Compile Include="components/elements/concretes/Char.fs"            />
     <Compile Include="attrs/FontCode.fs"                                />
+    <Compile Include="attrs/Global.fs"                                  />
+    <Compile Include="cmd/CSI.fs"                                       />
+    <Compile Include="cmd/OSC.fs"                                       />
     <Compile Include="attrs/PiAttrs.fs"                                 />
     <Compile Include="attrs/Overflow.fs"                                />
-    <Compile Include="attrs/Global.fs"                                  />
-    <Compile Include="cmd/OSC.fs"                                       />
     <Compile Include="components/elements/abstracts/Terminal.fs"        />
     <Compile Include="Token.fs"                                         />
     <Compile Include="Lexer.fs"                                         />
-    <Compile Include="Parser.fs"                                        />
+    <Compile Include="Parser.fs"                                        /> 
     <Compile Include="components/psi/Snippet.fs"                        />
     <Compile Include="components/psi/Content.fs"                        />
     <Compile Include="components/psi/Id.fs"                             />
@@ -54,7 +55,7 @@
     <Compile Include="main/Debug.fs"                                    />
     <Compile Include="Program.fs"                                       />
   </ItemGroup>
-
+  
   <ItemGroup />
 
   <ItemGroup>

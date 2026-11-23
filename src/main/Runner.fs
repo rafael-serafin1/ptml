@@ -29,7 +29,8 @@ module Runner =
         let layout = layoutTree semantic
         let filteredLayout, depthLayers = Depth.extractDepthLayers layout
         let renderOps = renderTree filteredLayout
-        ContentExecution.execute ast
+
+        ContentExecution.tryExecute ast
 
         let T = getViewport()
         if Utils.shouldWindow then

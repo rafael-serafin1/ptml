@@ -7,6 +7,13 @@ module Utils =
     | Background
 
     let mutable shouldWindow: bool = false
+//#region CONTENT_GLOBAL_ATTR
+    let mutable SEC = false
+
+    let shouldExecuteContent(should: bool) =
+        SEC <- true
+//#endregion
+
     
     type Classify = 
     | even = 0
