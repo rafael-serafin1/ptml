@@ -184,8 +184,10 @@ module Snippet =
                 | Some snippetId ->
                     let resolvedSnippetAttrs = resolveSnippetAttributes snippetId Set.empty
                     let mergedAttrs, warnings = mergeSnippetAttributes tag resolvedSnippetAttrs attrs
+
                     emitWarnings warnings
                     let mergedGlobals = { Id = globalAttrs.Id; Snippet = None; Content = globalAttrs.Content }
+                    
                     Some(Element(tag, mergedGlobals, mergedAttrs, resolvedChildren))
                 | None -> Some(Element(tag, globalAttrs, attrs, resolvedChildren))
 

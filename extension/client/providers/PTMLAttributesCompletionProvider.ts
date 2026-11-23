@@ -45,6 +45,10 @@ const widgetAttributes: Record<string, AttributeDefinition[]> = {
             name: "encoding",
             values: encoding
         },
+        {
+            name: "console-instance",
+            values: consoleInstance
+        }
     ],
 
     terminal: [

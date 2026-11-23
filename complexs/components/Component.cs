@@ -14,4 +14,9 @@ public abstract class Component
         _height = height;
         _placeholder = placeholder ?? throw new ArgumentNullException(nameof(placeholder));
     }
+
+    public virtual void Draw(int L = 0, int T = 0, string placeholder = "~~ph~~")
+    {
+        throw new NotImplementedException("Faça 'override' desse método.");
+    }
 }

@@ -11,3 +11,4 @@
 11. [X] Implementar atributo *window-title* e *icon-name* para <terminal>
 12. [X] Adicionar atributos de cor foreground/background para <terminal> 
 13. [ ] Terminar a tag <notification>
+14. [ ] Resolver o bug do Console.OutputEncoding não receber como parâmetro o encoding UTF-32

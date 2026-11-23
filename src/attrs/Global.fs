@@ -1,4 +1,5 @@
 namespace PTML
+open PTML.Utils
 
 module Global =
 //#region POSSIBLE_VALUES
@@ -238,6 +239,9 @@ module Global =
 
         let content = 
             attrs |> List.tryFind (fun (name, _) -> name = "content") |> Option.map snd
+
+        if content <> None then
+            Utils.shouldExecuteContent true
 
         let filtered =
             attrs |> List.filter (fun (name, _) -> name <> "id" && name <> "snippet" && name <> "content")

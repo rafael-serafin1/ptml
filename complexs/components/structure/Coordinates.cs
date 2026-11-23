@@ -3,6 +3,17 @@ public struct Coordinates
     private int left;
     private int top;
 
+    public Coordinates(int left, int top)
+    {
+        if (left < 0)
+            throw new ArgumentOutOfRangeException(nameof(left), "Left coordinate must be non-negative.");
+        if (top < 0)
+            throw new ArgumentOutOfRangeException(nameof(top), "Top coordinate must be non-negative.");
+
+        this.left = left;
+        this.top = top;
+    }
+
     public int Left { 
         get => left; 
         set

@@ -22,8 +22,10 @@ endif
 os:
 	echo $(OS)
 
-all: 
+b:
 	dotnet build
+
+all: b
 	dotnet publish -c $(PUBLISH_CONFIG) $(RELEASE_TARGET) $(PUBLISH_FLAGS) $(BUILD_PATH)
 
 build_ptml:

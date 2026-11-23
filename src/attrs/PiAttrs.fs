@@ -1,7 +1,7 @@
 namespace PTML
-
 open System
 open System.Text
+open PTML.CSI
 
 module PiAttrs =
     type EncodingMode =
@@ -43,39 +43,41 @@ module PiAttrs =
     let private parseInstance(value: string): Instance =
         match normalizeAttrValue(value).ToLowerInvariant() with
         | "default" -> Default
-        | "clear" -> Clear
+        | "clear"   -> Clear
         | invalid -> failwith $"Invalid instance: {invalid}. Supported values are default, clear."
 
     let private parseEncodingMode (value: string) =
         match normalizeAttrValue(value).ToUpperInvariant() with
-        | "UTF-8" | "UTF8" -> UTF8
-        | "UTF-16" | "UTF16" -> UTF16
-        | "UTF-32" -> UTF32
-        | "ASCII" -> ASCII
+        | "UTF-8" | "UTF8"      -> UTF8
+        | "UTF-16" | "UTF16"    -> UTF16
+        | "UTF-32"              -> UTF32
+        | "ASCII"               -> ASCII
         | invalid -> failwith $"Invalid encoding: {invalid}. Supported values are UTF-8, UTF-16, ASCII."
 
     let private parseTerminalResizeMode (value: string) =
         match normalizeAttrValue(value).ToLowerInvariant() with
-        | "reflow" -> Reflow
-        | "clip" -> Clip
-        | "static" -> Static
+        | "reflow"  -> Reflow
+        | "clip"    -> Clip
+        | "static"  -> Static
         | invalid -> failwith $"Invalid terminal-resize: {invalid}. Supported values are reflow, clip, static."
 
     let private applyEncodingMode = function
-        | UTF8 -> Encoding.UTF8
+        | UTF8  -> Encoding.UTF8
         | UTF16 -> Encoding.Unicode
         | UTF32 -> Encoding.UTF32
         | ASCII -> Encoding.ASCII
 
     let private updateConsoleEncoding mode =
         let enc: Encoding = applyEncodingMode mode
-        Console.OutputEncoding <- enc
-        Console.InputEncoding <- enc
+        Console.OutputEncoding  <- enc
+        Console.InputEncoding   <- enc
 
     let private handleInstance(instance: Instance) = 
         match instance with
         | Instance.Clear ->
-            Console.Clear()
+            ResetCursorPos()
+            let settings = [ClearSettings.FromCursor; ClearSettings.ToCursor]
+            ClearAll settings
         | _ -> ()
 
     let private ensureSavedViewport width height =
@@ -91,9 +93,9 @@ module PiAttrs =
         |> List.fold (fun settings (name, value) ->
             match name with
             | "console-instance" -> { settings with instance = parseInstance value }
-            | "encoding" -> { settings with encoding = parseEncodingMode value }
-            | "terminal-resize" -> { settings with terminalResize = parseTerminalResizeMode value }
-            | (invalid: string) -> failwith $"Invalid pi attribute for procedural instruction: {invalid}"
+            | "encoding"         -> { settings with encoding = parseEncodingMode value }
+            | "terminal-resize"  -> { settings with terminalResize = parseTerminalResizeMode value }
+            | (invalid: string)  -> failwith $"Invalid pi attribute for procedural instruction: {invalid}"
         ) currentSettings
 
     let applySettings settings =

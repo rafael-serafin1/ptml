@@ -38,7 +38,8 @@ module Debug =
         printfn "Depth Layers: %A" depthLayers
 
         let renderOps = renderTree filteredLayout
-        ContentExecution.execute ast
+        
+        ContentExecution.tryExecute ast
         printfn "Render Tree: %A" renderOps
 
         let baseBuffer = processRenderTree renderOps (terminal.ViewWidth) (terminal.ViewHeight)

@@ -1,17 +1,13 @@
 namespace PTML
-
 open PTML.Token
 
 module ContentExecution =
+
     let private bufferToText (buffer: Buffer.Cell[,]) =
         [|
             for y in 0 .. Array2D.length1 buffer - 1 do
-                yield
-                    System.String(
-                        Array.init (Array2D.length2 buffer) (fun x -> buffer[y, x].char)
-                    )
-        |]
-        |> String.concat "\n"
+                yield System.String(Array.init (Array2D.length2 buffer) (fun x -> buffer[y, x].char))
+        |] |> String.concat "\n"
 
     let private renderElement node =
         let widgets = Tree.buildWidget node
@@ -37,3 +33,7 @@ module ContentExecution =
                 children |> List.iter executeNode
 
         ast |> List.iter executeNode
+
+    let tryExecute ast =
+        if Utils.SEC then execute ast
+        else ()

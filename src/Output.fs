@@ -296,7 +296,6 @@ module Output =
     let getState () = terminalState
     let invalidateState () = terminalState <- None
     let private fullRedraw (buffer: Cell[,]) =
-        Console.Clear()
         writeAnsiBuffer buffer
 
     // Trava de segurança: se o usuário estiver arrastando a borda da janela
