@@ -58,10 +58,10 @@ Agora, os abstratos são:
 <list>
 ---> Em desenvolvimento
 <notification>
+<code>
 <toast>
 <carousel>  
 <slide>
-<code>
 <function>
 ```
 
@@ -1408,7 +1408,7 @@ custom
 ## Elemento `<code>`
 
 `<code></code>`
-Elemento usado para inferir ou referenciar scripts executáveis na linguagem Lua, via interpretador MoonSharp.
+Elemento usado para inferir ou referenciar scripts executáveis.
 
 Exemplo:
 - Input

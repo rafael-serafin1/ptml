@@ -4,9 +4,6 @@ open System.Text
 open PTML.Global
 open PTML.Utils
 
-// NÃO USE ESSE MÓDULO DIRETAMENTE NOS ARQUIVOS PRINCIPAIS
-// sempre use indiretamente através de componentes
-// Output.fs é uma exceção que não deve ser tratada, deixe o arquivo implementar esse modulo diretamente
 module OSC =
     let private ESC = "\x1b"
     let private BEL = "\x07"
