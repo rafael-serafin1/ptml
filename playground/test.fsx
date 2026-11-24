@@ -29,10 +29,10 @@ type NotificationUrgency =
 | High = 2
 
 type NotificationPayload =
-    | Title of string
-    | Body of string
+    | Title   of string
+    | Body    of string
     | Close
-    | Icon of byte[]
+    | Icon    of byte[]
     | QMark
     | Alive
     | Buttons of string list
@@ -214,7 +214,7 @@ let NOTIF: BUILD_NOTIFICATION = {
     id = "1"
     parent = "PTML Execution Process"
 
-    urgency = NotificationUrgency.Medium
+    urgency = NotificationUrgency.High
 
     payload = [
         Title "PTML"

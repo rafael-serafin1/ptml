@@ -180,9 +180,7 @@ module Output =
                                 sb.Append(cursorTo x y) |> ignore
                                 appendCellChar sb cell
 
-                        lock Console.Out (fun () ->
-                            Console.Out.Write(sb.ToString())
-                        )
+                        lock Console.Out ( fun () -> Console.Out.Write(sb.ToString()) )
                     ))
             |]
 
@@ -193,10 +191,13 @@ module Output =
         let width = Array2D.length2 buffer
         let height = Array2D.length1 buffer
         let lineWidth = max 1 lineWidth
+
         let mutable currentStyle = ""
         let mutable column = 0
+
         let lastVisibleColumns = Array.zeroCreate height
         let rowOffsets = Array.zeroCreate height
+        
         let spinnerPositions = ResizeArray<int * int * Spinner>()
         let mutable outputLineCount = 0
 

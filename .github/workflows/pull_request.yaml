@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: Build
-        run: dotnet build
+        run: dotnet build --project ptml
       
       - name: Test
-        run: dotnet test
+        run: dotnet test --project ptml
