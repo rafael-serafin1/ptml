@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            src/
+            PTML/
             ptml_app.slnx
           sparse-checkout-cone-mode: false
 
@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: Build
-        run: dotnet build --project ptml
+        run: dotnet build
       
       - name: Test
-        run: dotnet test --project ptml
+        run: dotnet test

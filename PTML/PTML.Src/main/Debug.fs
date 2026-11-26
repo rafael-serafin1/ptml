@@ -27,7 +27,10 @@ module Debug =
         let ast: AstNode list = buildAst(tokens)
         printfn "AST: %A" ast
 
-        let semantic: Widget list = buildSemanticTree(ast)
+        let dom = buildDom ast
+        printfn "DOM: %A" dom
+
+        let semantic: Widget list = buildSemanticTreeFromDom dom
         printfn "Semantic Tree: %A" semantic
 
         let layout = layoutTree semantic

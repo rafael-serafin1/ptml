@@ -1107,7 +1107,9 @@ Exemplo 2:
 ## Elemento `<spinner>`
 
 `<spinner></spinner>` ou `<spinner />`
-Elemento que cria um spinner no terminal.
+Elemento que cria um spinner no terminal. 
+
+> Esse componente não funciona com o comando `run`, use o comando `watch`.
 
 Exemplo:
 - Usage
@@ -1124,7 +1126,7 @@ Define o tipo de `<spinner>` a ser usado. Seu valor padrão é `braille`. Valore
 ```
 braille         (⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
 dots            (⣾ ⣽ ⣻ ⢿ ⡿ ⣟ ⣯ ⣷)
-waiting         (. .. ... ....)                                     ! AGORA FUNCIONA
+waiting         (. .. ... ....)
 burger          (- = ≡)
 beam            (= == ===) -- ([=  ] [== ] [===] [ ==] [  =])       ! NÃO FUNCIONA PORQUE O PRIMEIRO FRAME POSSUI 5 CARACTERES
 ascii           (| / - \)

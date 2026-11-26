@@ -1,5 +1,7 @@
 namespace PTML
 open System
+open System.Threading
+
 open PTML.Token
 open PTML.Parser
 open PTML.Spinner
@@ -9,10 +11,10 @@ open PTML.Overflow
 open PTML.Code
 open PTML.Hyper
 open PTML.Char
-open System.Threading
 open PTML.Global
 open PTML.Snippet
 open PTML.Id
+open PTML.Parsers
 
 
 module Tree =
@@ -243,140 +245,167 @@ module Tree =
         | EndTag tag :: _ -> failwith $"Unexpected closing tag: {tag}"
         | _ -> failwith "Unable to parse tokens to AST"
 
+//#region DOM_BUILDING
+    let buildDom (ast: AstNode list) : PTML.DOM.Builder.PTMLDocument =
+        let inputAttributes attributes =
+            attributes
+            |> List.rev
+            |> List.map (fun (name, value) -> name, value)
+            |> Map.ofList
 
-    //
-    // SEMANTIC TREE BUILDING
-    //
-    let private tryGetAttr name attrs =
-        attrs |> List.tryFind (fun (k, _) -> k = name) |> Option.map snd
+        let fragmentAttributes (fragment: FragmentNode) =
+            [
+                fragment.Foreground |> Option.map (fun value -> "foreground", value)
+                fragment.Background |> Option.map (fun value -> "background", value)
+                fragment.Font |> Option.map (fun value -> "font", value)
+                fragment.Url |> Option.map (fun value -> "url", value)
+            ]
+            |> List.choose id
+            |> Map.ofList
 
-    let private parseIntAttr name defaultValue attrs =
-        match tryGetAttr name attrs with
-        | Some value ->
-            let strValue: string = value
-            let mutable i: int = 0
+        let globalAttributes (attributes: GlobalAttributes) =
+            [
+                attributes.Id |> Option.map (fun value -> "id", value)
+                attributes.Snippet |> Option.map (fun value -> "snippet", value)
+                attributes.Content
+                |> Option.map (function
+                    | Clipboard -> "content", "clipboard"
+                    | Primary -> "content", "primary"
+                    | Secondary -> "content", "secondary")
+            ]
+            |> List.choose id
 
-            if System.Int32.TryParse(strValue, &i) then
-                i
-            else
-                failwith $"Invalid integer value for {name}: {value}"
-        | None -> defaultValue
+        let rec toInputNodes (node: AstNode) : PTML.DOM.Builder.InputNode list =
+            match node with
+            | TextNode contents ->
+                contents
+                |> List.map (function
+                    | RawText text -> PTML.DOM.Builder.InputText text
+                    | Fragment fragment ->
+                        PTML.DOM.Builder.InputElement(
+                            "frag",
+                            fragmentAttributes fragment,
+                            [ PTML.DOM.Builder.InputText fragment.Content ]
+                        ))
+            | Element(tag, globals, attributes, children) ->
+                let attributes =
+                    Map.ofList (globalAttributes globals @ (inputAttributes attributes |> Map.toList))
 
-    let private parseDimension value =
-        if value = "auto" then
-            Auto
-        elif value.EndsWith("%") then
-            let numStr: string = value.[0 .. value.Length - 2]
-            let mutable i: int = 0
+                [
+                    PTML.DOM.Builder.InputElement(
+                        tag,
+                        attributes,
+                        children |> List.collect toInputNodes
+                    )
+                ]
 
-            if System.Int32.TryParse(numStr, &i) then
-                Percent i
-            else
-                failwith $"Invalid percentage: {value}"
-        else
-            let strValue: string = value
-            let mutable i: int = 0
+        ast
+        |> List.collect toInputNodes
+        |> PTML.DOM.Builder.construct
 
-            if System.Int32.TryParse(strValue, &i) then
-                Fixed i
-            else
-                failwith $"Invalid dimension: {value}"
+    let private astFromDom (document: PTML.DOM.Builder.PTMLDocument) =
+        let getNode (id: PTML.DOM.Builder.NodeId) : PTML.DOM.Builder.PTMLNode =
+            Map.tryFind id document.Nodes
+            |> Option.defaultWith (fun () -> failwith $"DOM node {id} does not exist.")
 
-    let private parseAlign =
-        function
-        | "start" -> Start
-        | "center" -> Center
-        | "end" -> End
-        | value -> failwith $"Invalid align value: {value}"
+        let childrenOf (node: PTML.DOM.Builder.PTMLNode) =
+            node.Children |> List.map getNode
 
-    let private parseOverflow = Overflow.parseOverflow
+        let attributesOfNode (attributes: Map<string, string>) : GlobalAttributes * list<string * string> =
+            let content =
+                match Map.tryFind "content" attributes with
+                | None -> None
+                | Some value ->
+                    Some(
+                        tryMatchContentAttrValue (Some value)
+                        |> Option.defaultWith (fun () -> failwith $"Invalid DOM content attribute: {value}")
+                    )
 
-    let private parsePadding (value: string) =
-        let parsePart (part: string) =
-            let mutable i: int = 0
+            let globals = {
+                Id = Map.tryFind "id" attributes
+                Snippet = Map.tryFind "snippet" attributes
+                Content = content
+            }
 
-            if System.Int32.TryParse(part, &i) && i >= 0 then
-                i
-            else
-                failwith $"Invalid padding value: {value}"
+            let localAttributes =
+                attributes
+                |> Map.remove "id"
+                |> Map.remove "snippet"
+                |> Map.remove "content"
+                |> Map.toList
 
-        let parts: string[] = value.Split([| 'x' |])
+            globals, localAttributes
 
-        match parts with
-        | [| part |] -> let p = parsePart part in (p, p)
-        | [| vertical; horizontal |] -> (parsePart vertical, parsePart horizontal)
-        | _ -> failwith $"Invalid padding format: {value}"
+        let fragmentOfNode (node: PTML.DOM.Builder.PTMLNode) : FragmentNode =
+            let allowedAttributes = set [ "foreground"; "background"; "font"; "url" ]
+            let unsupportedAttributes =
+                node.Attributes
+                |> Map.keys
+                |> Seq.filter (fun name -> not (Set.contains name allowedAttributes))
+                |> Seq.toList
 
-    let private parseHr =
-        function
-        | "vertical" -> Vertical
-        | "horizontal" -> Horizontal
-        | value -> failwith $"Invalid orientation value: {value}"
+            if not (List.isEmpty unsupportedAttributes) then
+                let names = String.concat ", " unsupportedAttributes
+                failwith $"Invalid attribute on DOM fragment: {names}"
 
-    let private parseBorder =
-        function
-        | "single" -> Single
-        | "double" -> Double
-        | "classic" -> Classic
-        | "bold" -> Bold
-        | "strange" -> Strange
-        | "rounded" -> Rounded
-        | "ascii" -> Border.Ascii
-        | "none" -> NoBorder
-        | "borderless" -> Borderless
-        | value -> failwith $"Invalid border value: {value}"
+            let content =
+                childrenOf node
+                |> List.map (fun child ->
+                    match child.Kind, child.Children with
+                    | PTML.DOM.Builder.NodeKind.TextNode text, [] -> text
+                    | _ -> failwith "DOM fragments can only contain text nodes.")
+                |> String.concat ""
 
-    let private parseSpinnerType =
-        function
-        | "braille" -> Braille
-        | "dots" -> Spinner.Dots
-        | "waiting" -> Waiting
-        | "burger" -> Burger
-        | "beam" -> Beam
-        | "ascii" -> Spinner.Ascii
-        | "circle" -> Circle
-        | "square" -> Spinner.Square
-        | "moon" -> Moon
-        | "arrow" -> Arrow
-        | "bounce" -> Bounce
-        | "fill" -> Fill
-        | value -> failwith $"Invalid spinner type: {value}"
+            {
+                Url = Map.tryFind "url" node.Attributes
+                Foreground = Map.tryFind "foreground" node.Attributes
+                Background = Map.tryFind "background" node.Attributes
+                Font = Map.tryFind "font" node.Attributes
+                Content = content
+            }
 
-    let private parseProgressType =
-        function
-        | "blocks" -> Blocks
-        | "dots" -> Dots
-        | "square" -> Square
-        | "tiny-square" -> TinySquare
-        | "rhombus" -> Rhombus
-        | value -> failwith $"Tipagem inexistente para <progress>: '{value}'"
+        let rec toAst (node: PTML.DOM.Builder.PTMLNode) : AstNode list =
+            match node.Kind with
+            | PTML.DOM.Builder.NodeKind.DocumentNode ->
+                if not (Map.isEmpty node.Attributes) then
+                    failwith "The DOM document node cannot have attributes."
 
-    let private normalizeSpinnerCompleted value =
-        if String.IsNullOrWhiteSpace(value) then
-            "✓"
-        else
-            match value with
-            | "check" -> "✓"
-            | "error" -> "✖"
-            | "star" -> "✱"
-            | "cog" -> "⚙"
-            | "bright" -> "✦"
-            | _ -> value
+                childrenOf node |> List.collect toAst
+            | PTML.DOM.Builder.NodeKind.TextNode text ->
+                if not (List.isEmpty node.Children) then
+                    failwith "DOM text nodes cannot have children."
 
-    let private parseEscapeSequence =
-        function
-        | "new-line"
-        | "break" -> EscapeSequence.Break
-        | "horizontal-tab" -> HorizontalTab
-        | "vertical-tab" -> VerticalTab
-        | "audible-bell" -> AudibleBell
-        | "backspace" -> BackSpace
-        | "form-feed" -> FormFeed
-        | "carriage-return" -> CarriageReturn
-        | value -> failwith $"Tipagem inexistente para <escape>: '{value}'"
+                [ PTML.Token.TextNode [ RawText text ] ]
+            | PTML.DOM.Builder.NodeKind.ElementNode tag ->
+                let childNodes = childrenOf node
 
-    let mutable previousTag: AstNode option = None
+                let astChildren =
+                    if tag = "text" then
+                        childNodes
+                        |> List.collect (fun child ->
+                            match child.Kind with
+                            | PTML.DOM.Builder.NodeKind.ElementNode "frag" ->
+                                [ PTML.Token.TextNode [ Fragment(fragmentOfNode child) ] ]
+                            | PTML.DOM.Builder.NodeKind.TextNode text ->
+                                if not (List.isEmpty child.Children) then
+                                    failwith "DOM text nodes cannot have children."
 
+                                [ PTML.Token.TextNode [ RawText text ] ]
+                            | _ -> toAst child)
+                    else
+                        childNodes |> List.collect toAst
+
+                let globals, attributes = attributesOfNode node.Attributes
+                [ Element(tag, globals, attributes, astChildren) ]
+
+        let root = getNode document.Root
+
+        match root.Kind with
+        | PTML.DOM.Builder.NodeKind.DocumentNode -> toAst root
+        | _ -> failwith "The DOM root must be a document node."
+//#endregion
+
+//#region SEMANTIC_TREE
     let private buildTextNodeWidgets contents =
         contents
         |> List.collect (function
@@ -803,4 +832,10 @@ module Tree =
                 [ CharWidget(translateCodename codename) ]
             | _ -> failwith $"Unsupported semantic tag: {tag}"
 
-    let semanticTreeOfTokens tokens = tokens |> buildAst |> buildSemanticTree
+    let buildSemanticTreeFromDom (document: PTML.DOM.Builder.PTMLDocument) =
+        document |> astFromDom |> buildSemanticTree
+
+    let semanticTreeOfTokens tokens =
+        let ast = buildAst tokens
+        ast |> buildDom |> buildSemanticTreeFromDom
+//#endregion

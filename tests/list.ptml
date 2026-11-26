@@ -1,4 +1,4 @@
-<?ptml encoding="UTF-8" terminal-resize="static"?>
+<?ptml encoding="UTF-32" terminal-resize="static"?>
 <column gap="1">
     <list ofstyle="enum" before="Step " after=" " content="clipboard">
         <column>

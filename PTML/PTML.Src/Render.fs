@@ -1,20 +1,13 @@
 namespace PTML
 open System
-
-open PTML.Tree
-open PTML.Layout
-open PTML.Spinner
-open PTML.Drawers
-open PTML.Overflow
-open PTML.OverflowFunctions
+     
 open PTML.Char
-open PTML.Utils
+open PTML.Global
+open PTML.Layout
+open PTML.Drawers
 open PTML.FontCode
 open PTML.Terminal
-open PTML.Snippet
-open PTML.Content
-open PTML.Global
-open PTML.CSI
+open PTML.OverflowFunctions
 
 module Render =
     let rec private renderWidget applyTerminalEffects offsetX offsetY widget =

@@ -24,6 +24,7 @@ module Spinner =
     let private lifecycleLock = obj()
     let private activeSpinners = ConcurrentDictionary<int, Thread * CancellationTokenSource>()
     let mutable private nextSpinnerId = 0
+    let private cursorPos = Console.GetCursorPosition()
 
     type Duration =
         {
