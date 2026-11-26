@@ -1,5 +1,7 @@
 // AQUI FICARÁ A CLASSE "MouseSignalEvent" QUE SERÁ RESPONSÁVEL POR REALIZAR A OBSERVAÇÃO DE SINAIS LANÇADOS PELO TERMINAL DE ORIGEM DO MOUSE, FAZER O PARSING DO EVENTO E CLASSIFICAR ENTRE LMB/MMB/RMB
 
+using complexs.components.structure;
+
 namespace complexs.components.events;
 
 public class MouseSignalEvent

@@ -1,9 +1,11 @@
+
 using complexs.components;
 using complexs.components.events;
+using complexs.components.structure;
 
 namespace complexs.components.domain;
 
-public class Button : Component
+public class Button : TerminalComponent
 {
     private const string Escape = "\x1b";
     private readonly string _label;
@@ -40,6 +42,7 @@ public class Button : Component
 
     public bool HandleMouseEvent(string sgrSequence)
     {
+        Thread? t = null;
         IsClicked = false;
 
         if (!MouseSignalEvent.TryParseSgr(sgrSequence, out var eventType, out var position))
@@ -58,14 +61,14 @@ public class Button : Component
             _pressed = false;
         }
 
-        Draw();
+        Draw(ref t);
         return IsClicked;
     }
 
-    public override void Draw(int L = 0, int T = 0, string placeholder = "~~ph~~")
+    public override void Draw(ref Thread thread, string placeholder = "~~ph~~")
     {
-        int left = L + _position.Left;
-        int top = T + _position.Top;
+        int left = _position.Left;
+        int top = _position.Top;
         string label = _label.Length > _width - 2
             ? _label[..(_width - 2)]
             : _label.PadLeft((_width - 2 + _label.Length) / 2).PadRight(_width - 2);

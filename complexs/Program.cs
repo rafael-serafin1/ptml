@@ -1,9 +1,37 @@
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 using System.Text;
 using complexs.components.domain;
+using complexs.components.structure;
 
-namespace complexs;
+internal static class Program
+{
+    public static void Main()
+    {
+        Console.Clear();
+        // Console.WriteLine("A jovem guarda não era um estilo musical!");
 
+        // Toast toast = new(new Coordinates{ Left = 0, Top = 0 }, 10, 1, 3000);
+        // toast.Display("Esse áudio contém mensagem, viu?", 1000);
+
+        Thread? t1 = null;
+        Thread? t2 = null;
+
+        Orchestrator orquestrador = Orchestrator.Compartilhado;
+        
+        Spinner spn1 = new(new Coordinates{Left = 1, Top = 1}, 1, 1, ["|", "/", "-", "\\"], 500, 5000, 'K', orquestrador);
+        Spinner spn2 = new(new Coordinates{Left = 1, Top = 2}, 1, 1, ["|", "/", "-", "\\"], 500, 5000, 'K', orquestrador);
+
+        t1 = new Thread(() => spn1.Draw(ref t1));
+        t2 = new Thread(() => spn2.Draw(ref t2));
+        t1.Start();
+        t2.Start();
+        t1.Join();
+        t2.Join();
+    }
+}
+
+/*
 internal static class Program
 {
     private const int StdInputHandle = -10;
@@ -94,3 +122,4 @@ internal static class Program
         }
     }
 }
+*/

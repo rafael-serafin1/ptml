@@ -1,0 +1,7 @@
+<?ptml encoding="UTF-8" terminal-resize="static"?>
+<terminal x-align="start">
+    <row gap="1">
+        <spinner type="ascii" interval="100ms" duration="5s" completed="K"/>
+        <spinner type="ascii" interval="100ms" duration="5s" completed="K"/>
+    </row>
+</terminal>

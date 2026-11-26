@@ -1,6 +1,10 @@
 using System.Globalization;
 using complexs.components;
-public class Input: Component
+using complexs.components.structure;
+
+namespace complexs.components.domain;
+
+public class Input: TerminalComponent
 {
     private readonly int _maxLength;
 
