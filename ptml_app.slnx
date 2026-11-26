@@ -1,3 +1,5 @@
 <Solution>
-  <Project Path="src/ptml.fsproj" Id="c60f2064-98d6-4b76-a863-22225eb6e244"  />
+  <Project Path="PTML/PTML.Complexs/PTML.Complexs.csproj" />
+  <Project Path="PTML/PTML.DOM/PTML.DOM.fsproj" />
+  <Project Path="PTML/PTML.Src/PTML.Src.fsproj" Id="c60f2064-98d6-4b76-a863-22225eb6e244"  />
 </Solution>

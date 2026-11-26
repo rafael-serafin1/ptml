@@ -11,18 +11,23 @@ ptml-language-*.vsix
 /logs
 /hazard
 /prompt
+/build/
 */out
 */node_modules
 */bin
 */obj
+*/dist
 */testing
 /extras
 extras/
 testing/
 .vscode/
 .vs/
-dist/
 */.vs
+
+# specifics
+bin/
+obj/
 
 .fake
 .markdown

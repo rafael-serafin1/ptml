@@ -1,6 +1,7 @@
 #!/bin/bash
 BUILD_PATH = ./build
-PUBLISH_FLAGS = --self-contained true -o
+
+PUBLISH_FLAGS = --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o
 PUBLISH_CONFIG = Release -r
 
 ifeq ($(OS), Windows_NT)
@@ -26,7 +27,8 @@ b:
 	dotnet build
 
 all: b
-	dotnet publish -c $(PUBLISH_CONFIG) $(RELEASE_TARGET) $(PUBLISH_FLAGS) $(BUILD_PATH)
+	dotnet publish PTML/PTML.Src/PTML.Src.fsproj -c $(PUBLISH_CONFIG) $(RELEASE_TARGET) $(PUBLISH_FLAGS) $(BUILD_PATH)
+	
 
 build_ptml:
 	python build.py

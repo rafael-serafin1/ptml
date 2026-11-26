@@ -1151,11 +1151,12 @@ laps             (voltas)
 ```
 Lap é calculado pela multiplicação da quantidade de frames pelo intervalo. Então se um tipo de spinner tem 4 frames a conta seria:
     qtd_frames * interval_int = total_duration
+    
     4 * 250ms = 1000ms
 ```
 
 ***completed***:
-Define o que deve fazer ao ser completado. Por padrão, é colocado o caractere `✓` (alias para `check`). Alias possíveis:
+Define o que deve fazer ao ser completado. Por padrão, é colocado o caractere `✓` (alias para `check`), mas é possível colocar qualquer caractere desejado. Alias possíveis:
 ```
 check                           (✓)
 error                           (✖)
