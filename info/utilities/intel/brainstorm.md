@@ -30,8 +30,8 @@ Sendo assim, atualmente os concretos são:
 <text>
 <box>
 <block>
-<spinner>
 <hr>
+<spinner>
 <progress>
 <frame>
 <tree>
@@ -1860,8 +1860,13 @@ Esse texto vai ficar aparecendo por apenas 3 segundos.
 
 ### **Atributos**:
 
+***delay***:
+Atribui um pequeno delay antes de mostrar a mensagem.
+
 ***duration***:
-Duração extendida do texto em tela, Valor padrão '500ms'.
+Duração extendida do texto em tela, Valor padrão '1000ms'.
+
+******
 
 ---
 ### IGNORE POR ENQUANTO!!

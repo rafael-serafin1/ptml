@@ -23,3 +23,5 @@ module Cursor =
         | "pink" -> "#f0f"
         | "green" -> "#0f0"
         | value -> value
+
+    

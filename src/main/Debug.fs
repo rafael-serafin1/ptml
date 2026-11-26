@@ -54,12 +54,5 @@ module Debug =
 
         Console.Write("\x1b[2J\x1b[H")
         Output.writeAnsiBuffer(buffer)
-        for y = 0 to buffer.GetLength(0) - 1 do
-            for x = 0 to buffer.GetLength(0) - 1 do
-                let cell = buffer[y, x]
-                match cell.spinner with
-                | Some c -> 
-                    Spinner.threadDraw(c.tp, x, y, c.interval, c.dur, c.complete)
-                | None -> ()
         printfn ""
         Status.Success

@@ -7,6 +7,7 @@ open PTML.Spinner
 open PTML.State
 open PTML.FontCode
 open PTML.OSC
+open PTML.CSI
 
 module Output =
     let private escape = "\x1b"
@@ -14,7 +15,35 @@ module Output =
     
     let private cursorTo x y =
         sprintf "%s[%d;%dH" escape (y + 1) (x + 1)
+
+//#region CURSOR_NONCOLOR_RELATED
+    let private cursorRelated (shape: Cursor.Shape)(visible: string option)(blink: string option)
+        : Cursor.Shape * bool * bool =
+        let vis = 
+            match visible with
+            | Some v -> 
+                match v with
+                | "true" -> true
+                | _      -> false    
+            | None -> true 
+
+        let blk = 
+            match blink with
+            | Some b ->
+                match b with
+                | "true" -> true
+                | _      -> false
+            | None -> false
+
+        Tuple.Create(shape, vis, blk)    
  
+    let private cursorInterpretNonColor (cursor_state: Cursor.Shape * bool * bool) =
+        match cursor_state with
+        | s, v, b ->
+            parseCursor (Tuple.Create(s, b))
+            showCursor v
+//#endregion
+    
     // escreve o char da célula, envolvendo-o em OSC 8 (hyperlink) quando cell.url = Some url
     let private appendCellChar (sb: StringBuilder) (cell: Cell) =
         match urlCode cell.url with
@@ -27,9 +56,10 @@ module Output =
 
     // Junta tudo que o <cursor> estiliza numa única sequência a ser escrita
     let private ansiCursorStyle (cursor: Cursor) =
-        [ cursorShapeCode cursor.sh cursor.blk
-          cursorColorCode cursor.clr
-          cursorVisibilityCode cursor.v ]
+        cursorRelated cursor.sh cursor.v cursor.blk
+        |> cursorInterpretNonColor
+
+        [ cursorColorCode cursor.clr ]
         |> List.choose id
         |> String.concat ""
 
@@ -51,12 +81,6 @@ module Output =
         || Option.isSome (fontCode cell.font)
         || Option.isSome (urlCode cell.url)
 
-    let private shouldRenderSpinner(cell: Cell) =
-        cell.char <> ' '
-        && Option.isSome (cell.spinner)
-        || Option.isSome (foregroundCode cell.foreground)
-        || Option.isSome (backgroundCode cell.background)
-        || Option.isSome (fontCode cell.font)
     let bufferToAnsi (buffer: Cell[,]) =
         let height = Array2D.length1 buffer
         let width = Array2D.length2 buffer
@@ -108,34 +132,7 @@ module Output =
                 for x in 0 .. width - 1 do
                     let cell = buffer.[y, x]
                     match cell.spinner with
-                    | Some c ->
-                        if shouldRenderSpinner cell then
-                            sb.Append(cursorTo x y) |> ignore
-                            let t =
-                                Thread(ThreadStart(fun () ->
-                                    Spinner.drawSpinner(
-                                        c.tp,
-                                        x,
-                                        y,
-                                        c.interval,
-                                        c.dur,
-                                        c.complete
-                                    )
-                                ))
-                            t.Start()
-                            match ansiStyle cell with
-                            | Some style when style <> currentStyle ->
-                                if currentStyle <> "" then
-                                    sb.Append(resetCode) |> ignore
-
-                                sb.Append(style) |> ignore
-                                currentStyle <- style
-
-                            | None when currentStyle <> "" ->
-                                sb.Append(resetCode) |> ignore
-                                currentStyle <- ""
-
-                            | _ -> ()
+                    | Some _ -> ()
                     | None ->
                         match cell.cursor with
                         | Some cursor ->
@@ -160,6 +157,29 @@ module Output =
                 sb.ToString()
             )
         Console.Out.Write(String.Concat(lines))
+
+        let spinnerPositions = ResizeArray<int * int * Spinner>()
+        for y in 0 .. Array2D.length1 buffer - 1 do
+            for x in 0 .. Array2D.length2 buffer - 1 do
+                match buffer.[y, x].spinner with
+                | Some spinner ->
+                    let frameWidth = max 1 (Spinner.firstFrame spinner.tp).Length
+                    let mutable runStart = x
+                    while runStart > 0 && buffer.[y, runStart - 1].spinner = Some spinner do
+                        runStart <- runStart - 1
+                    if (x - runStart) % frameWidth = 0 then
+                        spinnerPositions.Add((x, y, spinner))
+                | None -> ()
+
+        for x, y, spinner in spinnerPositions do
+            Spinner.threadDraw(
+                spinner.tp,
+                x,
+                y,
+                spinner.interval,
+                spinner.dur,
+                spinner.complete
+            )
 
     // usa threads para escrever cada linhas da matriz
     let writeAll(buffer: Cell[,]) = 
@@ -262,17 +282,14 @@ module Output =
             let screenX = x % lineWidth
             let screenY = finalCursorY - outputLineCount + rowOffsets.[y] + x / lineWidth
             if screenX < lineWidth && screenY >= 0 && screenY < windowHeight then
-                let thread =
-                    Thread(ThreadStart(fun () ->
-                        Spinner.drawSpinner(
-                            spinner.tp,
-                            screenX,
-                            screenY,
-                            spinner.interval,
-                            spinner.dur,
-                            spinner.complete
-                        )))
-                thread.Start()
+                Spinner.threadDraw(
+                    spinner.tp,
+                    screenX,
+                    screenY,
+                    spinner.interval,
+                    spinner.dur,
+                    spinner.complete
+                )
 
     // O que a Output acredita estar na tela agora (último frame desenhado).
     let mutable private terminalState: State.BufferState option = None

@@ -1,3 +1,5 @@
+namespace complexs.components.structure;
+
 public struct Coordinates
 {
     private int left;

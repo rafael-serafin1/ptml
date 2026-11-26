@@ -17,6 +17,11 @@ export const navigation = [
       { title: "<box>", path: "/docs/tags/box" },
       { title: "<block>", path: "/docs/tags/block" },
       { title: "<hr>", path: "/docs/tags/hr" },
+      { title: "<escape>", path: "/docs/tags/escape" },
+      { title: "<cursor>", path: "/docs/tags/cursor" },
+      { title: "<char>", path: "/docs/tags/char" },
+      { title: "<spinner>", path: "/docs/tags/spinner" },
+      { title: "<list>", path: "/docs/tags/list" },
       { title: "<terminal>", path: "/docs/tags/terminal" },
     ],
   },
@@ -541,6 +546,202 @@ export const pages = {
           {
             title: "Separador horizontal com largura",
             code: `<hr orientation="horizontal" width="32" />`,
+          },
+        ],
+      },
+    ],
+  },
+  "/docs/tags/escape": {
+    title: "<escape>",
+    eyebrow: "Elemento de texto",
+    description:
+      "Insere caracteres de controle, como quebras de linha e tabulações, no conteúdo.",
+    sections: [
+      {
+        title: "Sequências disponíveis",
+        text:
+          "O atributo `sequence` aceita `break` (padrão), `new-line`, `horizontal-tab`, `vertical-tab`, `audible-bell`, `backspace`, `form-feed` e `carriage-return`. `break` e `new-line` produzem uma quebra de linha.",
+        examples: [
+          {
+            title: "Quebra de linha",
+            code: `<text>Primeira linha<escape sequence="break" />Segunda linha</text>`,
+          },
+          {
+            title: "Tabulação",
+            code: `<text>Item:<escape sequence="horizontal-tab" />Terminal</text>`,
+          },
+        ],
+      },
+      {
+        title: "Repetir uma sequência",
+        text:
+          "`multiplier` define quantas vezes a sequência será inserida. O padrão é `1`; o parser exige um inteiro positivo.",
+        examples: [
+          {
+            title: "Duas quebras de linha",
+            code: `<text>Antes<escape sequence="break" multiplier="2" />Depois</text>`,
+          },
+        ],
+      },
+    ],
+  },
+  "/docs/tags/cursor": {
+    title: "<cursor>",
+    eyebrow: "Elemento de terminal",
+    description:
+      "Define formato, cor, visibilidade e comportamento de piscar do cursor do terminal.",
+    sections: [
+      {
+        title: "Formato e opções",
+        text:
+          "`shape` aceita `block`, `bar` ou `underline` (padrão). `blink` e `visible` aceitam `true` ou `false`; por padrão, o cursor não pisca e permanece visível.",
+        examples: [
+          {
+            title: "Cursor em bloco piscante",
+            code: `<cursor shape="block" blink="true" />`,
+          },
+          {
+            title: "Ocultar o cursor",
+            code: `<cursor visible="false" />`,
+          },
+        ],
+      },
+      {
+        title: "Cor",
+        text:
+          "`color` define a cor do cursor. Os aliases reconhecidos são `red`, `yellow`, `white`, `black`, `teal`, `blue`, `pink`, `green` e `purple`; o padrão é branco. Também é possível informar uma cor hexadecimal.",
+        examples: [
+          {
+            title: "Cor nomeada",
+            code: `<cursor color="green" />`,
+          },
+          {
+            title: "Cor hexadecimal",
+            code: `<cursor color="#837878" />`,
+          },
+        ],
+      },
+    ],
+  },
+  "/docs/tags/char": {
+    title: "<char>",
+    eyebrow: "Elemento concreto",
+    description:
+      "Insere um caractere especial usando um nome (`codename`) reconhecido pelo parser.",
+    sections: [
+      {
+        title: "Inserir um caractere",
+        text:
+          "`codename` é obrigatório. Os valores aceitos pelo parser são `copyright`, `rights-reserved`, `trade-mark`, `service-mark`, `phonogram`, `celsius`, `fahrenheit`, `number`, `section`, `nul`, `esc`, `del`, `infinite`, `integral` e `empty`.",
+        examples: [
+          {
+            title: "Símbolo de copyright em texto",
+            code: `<text>Copyright <char codename="copyright" /> — todos os direitos reservados.</text>`,
+          },
+          {
+            title: "Vários caracteres especiais",
+            code: `<row gap="1">
+  <char codename="section" />
+  <char codename="number" />
+  <char codename="infinite" />
+</row>`,
+          },
+        ],
+      },
+      {
+        title: "Observação sobre o codename object",
+        text:
+          "A conversão interna contém o caractere `object`, mas esse valor não consta na lista permitida pelo parser. Portanto, `codename=\"object\"` é rejeitado atualmente.",
+      },
+    ],
+  },
+  "/docs/tags/spinner": {
+    title: "<spinner>",
+    eyebrow: "Elemento concreto",
+    description:
+      "Exibe uma animação de carregamento e um marcador quando ela termina.",
+    sections: [
+      {
+        title: "Tipos de animação",
+        text:
+          "`type` escolhe a animação e, se omitido, usa `braille`. Os valores disponíveis são `braille`, `dots`, `waiting`, `burger`, `beam`, `ascii`, `circle`, `square`, `moon`, `arrow`, `bounce` e `fill`. O tipo `beam` tem uma falha de largura conhecida no primeiro quadro.",
+        examples: [
+          {
+            title: "Spinner ASCII",
+            code: `<spinner type="ascii" />`,
+          },
+          {
+            title: "Spinner com duração e marcador de conclusão",
+            code: `<spinner type="dots" interval="250ms" duration="3s" completed="check" />`,
+          },
+        ],
+      },
+      {
+        title: "Intervalo, duração e conclusão",
+        text:
+          "`interval` define o tempo entre quadros e aceita `ms` ou `s`; o padrão é `250ms`. `duration` aceita `ms`, `s` ou `laps` (voltas completas) e usa `3000ms` por padrão. Ao terminar, o padrão é mostrar `✓`. Os aliases de `completed` são `check` (`✓`), `error` (`✖`), `star` (`✱`), `cog` (`⚙`) e `bright` (`✦`).",
+        examples: [
+          {
+            title: "Duração por voltas",
+            code: `<spinner type="circle" interval="200ms" duration="2laps" completed="bright" />`,
+          },
+        ],
+      },
+      {
+        title: "Cores",
+        text:
+          "`foreground` e `background` definem as cores do spinner e usam os mesmos valores de cor documentados para `<text>`.",
+        examples: [
+          {
+            title: "Spinner colorido",
+            code: `<spinner type="dots" foreground="limegreen" background="black" />`,
+          },
+        ],
+      },
+    ],
+  },
+  "/docs/tags/list": {
+    title: "<list>",
+    eyebrow: "Elemento de layout",
+    description:
+      "Aplica marcadores aos itens e organiza-os no fluxo definido pelos elementos filhos.",
+    sections: [
+      {
+        title: "Estilos de marcador",
+        text:
+          "`ofstyle` escolhe o marcador: `bullet` (padrão, ○), `unorder` (-), `enum` (1., 2., 3.), `lower-alphabet` (a., b., c.) ou `upper-alphabet` (A., B., C.). Os estilos alfabéticos continuam com letras adicionais após Z.",
+        examples: [
+          {
+            title: "Lista numerada",
+            code: `<list ofstyle="enum" after=" ">
+  <column>
+    <text>Preparar o arquivo</text>
+    <text>Executar o programa</text>
+  </column>
+</list>`,
+          },
+        ],
+      },
+      {
+        title: "Itens e texto ao redor do marcador",
+        text:
+          "Cada filho direto da lista representa um item; um `<row>` ou `<column>` pode agrupar esses itens e manter sua disposição. Sem esse contêiner, os itens são dispostos horizontalmente. `before` e `after` inserem texto antes e depois do marcador.",
+        examples: [
+          {
+            title: "Prefixo e sufixo do marcador",
+            code: `<list ofstyle="enum" before="Etapa " after=" ">
+  <column>
+    <text>Criar o documento</text>
+    <text>Executar o documento</text>
+  </column>
+</list>`,
+          },
+          {
+            title: "Itens em linha",
+            code: `<list ofstyle="bullet" after=" ">
+  <text>CPU</text>
+  <text>Memória</text>
+</list>`,
           },
         ],
       },

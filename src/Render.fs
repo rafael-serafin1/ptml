@@ -1,5 +1,6 @@
 namespace PTML
 open System
+
 open PTML.Tree
 open PTML.Layout
 open PTML.Spinner
@@ -13,6 +14,7 @@ open PTML.Terminal
 open PTML.Snippet
 open PTML.Content
 open PTML.Global
+open PTML.CSI
 
 module Render =
     let rec private renderWidget applyTerminalEffects offsetX offsetY widget =

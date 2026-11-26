@@ -15,7 +15,7 @@ module Buffer =
         sh:     Cursor.Shape
         blk:    string option
         clr:    string option
-        v:  string option
+        v:      string option
     }
 
     type Cell = {
