@@ -6,17 +6,18 @@
     <OutPath>dist\build\</OutPath>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
+    <AssemblyName>ptml</AssemblyName>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup><Compile Include="utils/Utils.fs" />
     <None Include=".env.example" />
-    <Compile Include="utils/Utils.fs" />
     <Compile Include="utils/Messager.fs" />
-    <Compile Include="components/elements/abstracts/Notification.fs" /> 
-    <Compile Include="components/elements/abstracts/Collections.fs" />
+    <Compile Include="components/elements/abstracts/Notification.fs" />
+    <Compile Include="components/elements/abstracts/Collections.fs" /> 
     <Compile Include="components/elements/abstracts/List.fs" />
     <Compile Include="components/elements/abstracts/Code.fs" />
     <Compile Include="components/elements/abstracts/Cursor.fs" />
+    
     <Compile Include="components/elements/concretes/Spinner.fs" />
     <Compile Include="components/elements/concretes/Progress.fs" />
     <Compile Include="components/elements/concretes/Escape.fs" />
@@ -42,6 +43,7 @@
     <Compile Include="helper/Drawers.fs" />
     <Compile Include="attrs/OverflowFunctions.fs" />
     <Compile Include="Render.fs" />
+    
     <Compile Include="Buffer.fs" />
     <Compile Include="BufferState.fs" />
     <Compile Include="Diff.fs" />
@@ -55,13 +57,14 @@
     <Compile Include="main/Debug.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\complexs\complexs.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Include="application.json"></None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PTML.Complexs\PTML.Complexs.csproj" />
+    <ProjectReference Include="..\PTML.DOM\PTML.DOM.fsproj" />
   </ItemGroup>
 
 </Project>

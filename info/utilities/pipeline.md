@@ -12,6 +12,9 @@ Parser
 
 ↓
 
+DOM
+"gera modelo objeto a partir de documento PTML"
+
 AST
 “representação sintática”
 
