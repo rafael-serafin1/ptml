@@ -12,3 +12,4 @@
 12. [X] Adicionar atributos de cor foreground/background para <terminal> 
 13. [ ] Terminar a tag <notification>
 14. [ ] Resolver o bug do Console.OutputEncoding não receber como parâmetro o encoding UTF-32
+15. [ ] Migrar a implementação do componente Progress para o PTML.Complexs devido a integração com execuções de script e manipulação de DOM

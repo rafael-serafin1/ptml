@@ -77,7 +77,8 @@ module Watch =
                 parser(tokens, [])
 
                 let ast: AstNode list = buildAst(tokens)
-                let semantic: Widget list = buildSemanticTree(ast)
+                let dom = buildDom ast
+                let semantic: Widget list = buildSemanticTreeFromDom dom
                 let layout = layoutTree semantic
                 
                 let filteredLayout, depthLayers = Depth.extractDepthLayers layout
@@ -157,13 +158,17 @@ module Watch =
 
         watcher.Changed.Add(fun event ->
             if isTarget event.FullPath then scheduleRender())
+
         watcher.Created.Add(fun event ->
             if isTarget event.FullPath then scheduleRender())
+
         watcher.Deleted.Add(fun event ->
             if isTarget event.FullPath then scheduleRender())
+
         watcher.Renamed.Add(fun event ->
             if isTarget event.FullPath || isTarget event.OldFullPath then
                 scheduleRender())
+                
         watcher.Error.Add(fun event ->
             lock renderLock (fun () ->
                 if not shutdown.IsCancellationRequested then

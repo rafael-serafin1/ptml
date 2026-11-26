@@ -25,8 +25,12 @@ public class Spinner: TerminalComponent
         _frames    = frames;
         _interval  = interval;
         _duration  = duration;
-        _completed = complete ?? throw new ArgumentNullException(nameof(complete));
-        _orquestrador = orquestrador ?? Orchestrator.Compartilhado;
+        
+        _completed = complete 
+            ?? throw new ArgumentNullException(nameof(complete));
+
+        _orquestrador = orquestrador 
+            ?? Orchestrator.Compartilhado;
     }
 
     private void DrawFrame(int index)
@@ -47,11 +51,7 @@ public class Spinner: TerminalComponent
         });
     }
 
-    public void Draw(
-        CancellationToken cancellationToken,
-        int? laps = null,
-        bool runUntilCancelled = false,
-        bool clearAtCycle = false)
+    public void Draw(CancellationToken cancellationToken, int? laps = null, bool runUntilCancelled = false, bool clearAtCycle = false)
     {
         _orquestrador.IniciarDesenho();
         Stopwatch duration = Stopwatch.StartNew();
@@ -108,8 +108,7 @@ public class Spinner: TerminalComponent
 
     public override void Draw(ref Thread? thread, string placeholder = "~~ph~~")
     {
-        if (thread == null)
-            thread = new Thread(() => Draw(CancellationToken.None));
+        thread ??= new Thread(() => Draw(CancellationToken.None));
 
         Draw(CancellationToken.None);
     }

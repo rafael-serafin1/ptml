@@ -11,6 +11,8 @@ open PTML.Buffer
 open PTML.Render
 open PTML.Depth
 
+open PTML.DOM.Builder
+
 module Runner =
     let run(path: string): Status =
         let mutable terminal: Terminal option = None
@@ -24,8 +26,10 @@ module Runner =
         let tokens = lex input 0 []
         parser(tokens, [])
 
-        let ast: AstNode list = buildAst(tokens)
-        let semantic: Widget list = buildSemanticTree(ast)
+        let ast: AstNode list       = buildAst tokens
+        let dom: PTMLDocument       = buildDom ast
+        let semantic: Widget list   = buildSemanticTreeFromDom dom
+
         let layout = layoutTree semantic
         let filteredLayout, depthLayers = Depth.extractDepthLayers layout
         let renderOps = renderTree filteredLayout

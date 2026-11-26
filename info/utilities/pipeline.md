@@ -12,11 +12,18 @@ Parser
 
 ↓
 
-DOM
-"gera modelo objeto a partir de documento PTML"
-
 AST
 “representação sintática”
+
+↓
+
+DOM
+"Representação estrutural e manipulável do documento"
+
+↓
+
+Script Execution
+"Executa o script presente dentro do elemento `<code>`"
 
 ↓
 

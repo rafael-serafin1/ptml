@@ -9,16 +9,15 @@
     <AssemblyName>ptml</AssemblyName>
   </PropertyGroup>
 
-  <ItemGroup><Compile Include="utils/Utils.fs" />
+  <ItemGroup><Compile Include="utils/Utils.fs" /><Compile Include="utils/Messager.fs" />
     <None Include=".env.example" />
-    <Compile Include="utils/Messager.fs" />
     <Compile Include="components/elements/abstracts/Notification.fs" />
-    <Compile Include="components/elements/abstracts/Collections.fs" /> 
-    <Compile Include="components/elements/abstracts/List.fs" />
+    <Compile Include="components/elements/abstracts/Collections.fs" />
+    <Compile Include="components/elements/abstracts/List.fs" /> 
     <Compile Include="components/elements/abstracts/Code.fs" />
     <Compile Include="components/elements/abstracts/Cursor.fs" />
-    
     <Compile Include="components/elements/concretes/Spinner.fs" />
+    
     <Compile Include="components/elements/concretes/Progress.fs" />
     <Compile Include="components/elements/concretes/Escape.fs" />
     <Compile Include="components/elements/concretes/Frame.fs" />
@@ -34,7 +33,8 @@
     <Compile Include="components/elements/abstracts/Terminal.fs" />
     <Compile Include="Token.fs" />
     <Compile Include="Lexer.fs" />
-    <Compile Include="Parser.fs" /> 
+    <Compile Include="Parser.fs" />
+    <Compile Include="helper/Parsers.fs" /> 
     <Compile Include="components/psi/Snippet.fs" />
     <Compile Include="components/psi/Content.fs" />
     <Compile Include="components/psi/Id.fs" />

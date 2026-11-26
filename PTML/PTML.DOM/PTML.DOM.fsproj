@@ -6,8 +6,8 @@
     <AssemblyName>dom</AssemblyName>
   </PropertyGroup>
 
-  <ItemGroup><Compile Include="Builder.fs" />
-    <Compile Include="Library.fs" />
+  <ItemGroup>
+    <Compile Include="Builder.fs" />
   </ItemGroup>
 
 </Project>

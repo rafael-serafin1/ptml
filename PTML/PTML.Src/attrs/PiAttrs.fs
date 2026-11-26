@@ -64,7 +64,9 @@ module PiAttrs =
     let private applyEncodingMode = function
         | UTF8  -> Encoding.UTF8
         | UTF16 -> Encoding.Unicode
-        | UTF32 -> Encoding.UTF32
+        | UTF32 -> 
+            printf "Opção 'UTF-32' está desabilitada por enquanto, codificação convertida para 'UTF-16'."
+            Encoding.Unicode
         | ASCII -> Encoding.ASCII
 
     let private updateConsoleEncoding mode =
@@ -92,8 +94,8 @@ module PiAttrs =
         attrs
         |> List.fold (fun settings (name, value) ->
             match name with
-            | "console-instance" -> { settings with instance = parseInstance value }
-            | "encoding"         -> { settings with encoding = parseEncodingMode value }
+            | "console-instance" -> { settings with instance       = parseInstance value }
+            | "encoding"         -> { settings with encoding       = parseEncodingMode value }
             | "terminal-resize"  -> { settings with terminalResize = parseTerminalResizeMode value }
             | (invalid: string)  -> failwith $"Invalid pi attribute for procedural instruction: {invalid}"
         ) currentSettings
